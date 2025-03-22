@@ -1,0 +1,9 @@
+git stash
+git pull origin fix-access-issues
+git reset --hard 0bbdffa08b5c247469802fa5584337267a008640
+git checkout -b fix-issues-local
+git fetch origin
+git branch
+git checkout fix-access-issues
+git reset --hard origin/fix-access-issues
+git checkout -b fix-acces-issues-mobile
