@@ -62,6 +62,15 @@
     padding: 50px;
 
     min-height: fit-content;
+
   }
-  
+  .actionBox h1{
+    text-align: left;
+  }
+  .actionBox h2{
+    text-align: left;
+  }
+  .actionBox p{
+    text-align: left;
+  }
 }

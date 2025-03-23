@@ -7,7 +7,7 @@
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  max-height: 70vh; /* Limit height to make it scrollable */
+  /* max-height: 70vh; Limit height to make it scrollable */
   overflow-y: auto; 
   height: fit-content;/* Enable vertical scrolling */
 }
@@ -186,33 +186,8 @@
 }
 
 /* Add custom scrollbar styling */
-.privacyContent::-webkit-scrollbar {
-  width: 6px; /* Slightly thinner */
-}
 
-.privacyContent::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05); /* More subtle track */
-  border-radius: 8px;
-  margin: 4px; /* Add some space around the track */
-}
 
-.privacyContent::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    to bottom,
-    rgba(221, 12, 126, 0.8),
-    rgba(202, 21, 130, 0.8)
-  ); /* Match the brand gradient */
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
-}
-
-.privacyContent::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    to bottom,
-    rgba(221, 12, 126, 1),
-    rgba(202, 21, 130, 1)
-  ); /* Stronger gradient on hover */
-}
 
 
 .pricingContainer {
@@ -235,13 +210,15 @@
 @media screen and (max-width: 1024px) {
   .supportContent{
     align-items: center;
-    min-height: fit-content;
+    overflow-y: auto; 
+    height: fit-content;/* Enable vertical scrolling */
   }
 
 
   .pricingContainer {
     flex-direction: column;
     align-items: center;
+    min-height: fit-content;
   }
 
   .pricingContent {
@@ -293,9 +270,9 @@
     align-items: center;
   }
  
-  .description{
+  /* .description{
     text-align: center;
-  }
+  } */
   
   .supportContainer {
   
@@ -324,7 +301,7 @@
   }
  
   .description{
-    text-align: center;
+    text-align: left;
   }
   .pricingContent {
     align-items: center;
