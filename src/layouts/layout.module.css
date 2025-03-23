@@ -76,7 +76,7 @@
     align-items: start;
     margin-bottom: 20px;
   }
-  
+
   .navigationUser {
    /* border-left: solid 2px white; */
    margin-top: 0;
@@ -88,5 +88,11 @@
 @media screen and (max-width: 480px) {
   .mainLayout {
     padding: 10px;
+  }
+}
+
+@media screen and (max-height: 768px) {
+  .mainLayout {
+    padding: 50px 20px;
   }
 }
