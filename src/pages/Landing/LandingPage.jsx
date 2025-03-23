@@ -36,17 +36,16 @@ const LandingPage = () => {
         },
         body: JSON.stringify({ code: tokenResponse.code }),
       })
-        .then((response) => {
-          if (!response.ok) {
-            throw new Error("Network response was not ok");
-          }
-          console.log("Response:", response);
-          return response.json();
-        })
-        .then((data) => {
-          if (data.authenticated) {
-            // First store the token
-            localStorage.setItem("authToken", data.authToken);
+
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        console.log("Response:", response);
+        return response.json();
+      })
+      .then(data => {
+        if (data.authenticated) {
 
             // Call the auth context login
             if (data.user && data.user.name && data.user.email) {

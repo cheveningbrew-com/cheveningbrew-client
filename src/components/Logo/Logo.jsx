@@ -7,7 +7,7 @@ const Logo = () => {
   const [redirectTo, setRedirectTo] = useState("/");
 
   useEffect(() => {
-    const sessionToken = localStorage.getItem("authToken");
+    const sessionToken = sessionStorage.getItem("authToken");
     if (sessionToken) {
       setRedirectTo("/upload");
     }

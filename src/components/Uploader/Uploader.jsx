@@ -62,7 +62,7 @@ const Uploader = ({ onUploadSuccess }) => {
       // Call the callback with the file path if provided
       if (onUploadSuccess) {
         onUploadSuccess(result.interview_questions);
-        localStorage.setItem("interviewQuestions", JSON.stringify(result.interview_questions));
+        sessionStorage.setItem("interviewQuestions", JSON.stringify(result.interview_questions));
       }
     } catch (error) {
       console.error("Upload error:", error);

@@ -13,19 +13,19 @@ const Feedback = () => {
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        // First, check if feedback exists in localStorage
-        const cachedFeedback = localStorage.getItem("cachedFeedback");
+        // First, check if feedback exists in sessionStorage
+        const cachedFeedback = sessionStorage.getItem("cachedFeedback");
 
         if (cachedFeedback) {
           // Use the cached feedback if available
-          console.log("Using cached feedback from localStorage");
+          console.log("Using cached feedback from sessionStorage");
           setFeedback(cachedFeedback);
           setLoading(false);
           return;
         }
 
-        // Get the chat history path from localStorage
-        const chatHistoryPath = localStorage.getItem("chatHistoryPath");
+        // Get the chat history path from sessionStorage
+        const chatHistoryPath = sessionStorage.getItem("chatHistoryPath");
 
         if (!chatHistoryPath) {
           throw new Error("Chat history path not found");
@@ -45,8 +45,8 @@ const Feedback = () => {
 
         const newFeedback = response.data.feedback;
 
-        // Store the feedback in localStorage for future use
-        localStorage.setItem("cachedFeedback", newFeedback);
+        // Store the feedback in sessionStorage for future use
+        sessionStorage.setItem("cachedFeedback", newFeedback);
 
         setFeedback(newFeedback);
         setLoading(false);

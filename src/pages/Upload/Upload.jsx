@@ -14,8 +14,8 @@ const Upload = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Check if the user has already paid (from localStorage)
-    const hasUserPaid = localStorage.getItem("paymentCompleted") === "true";
+    // Check if the user has already paid (from sessionStorage)
+    const hasUserPaid = sessionStorage.getItem("paymentCompleted") === "true";
 
     if (!hasUserPaid) {
       // Show payment popup if user hasn't paid

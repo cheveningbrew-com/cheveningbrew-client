@@ -34,9 +34,9 @@ function Page() {
 
   // Check if interview has been completed already
   useEffect(() => {
-    const interviewDone = localStorage.getItem("interviewDone") === "true";
-    const paymentCompleted =
-      localStorage.getItem("paymentCompleted") === "true";
+
+    const interviewDone = sessionStorage.getItem("interviewDone") === "true";
+    const paymentCompleted = sessionStorage.getItem("paymentCompleted") === "true";
     if (interviewDone) {
       navigate("/feedback");
     } else if (!paymentCompleted) {
@@ -76,7 +76,7 @@ function Page() {
     }
 
     setIsDisconnecting(true);
-    localStorage.setItem("interviewDone", "true");
+    sessionStorage.setItem("interviewDone", "true");
     updateConnectionDetails(null);
 
     setTimeout(() => {
@@ -103,18 +103,18 @@ function Page() {
 
   const onConnectButtonClicked = useCallback(async () => {
     try {
-      const userName = localStorage.getItem("userName");
-      const userQuestions = localStorage.getItem("interviewQuestions");
+      const userName = sessionStorage.getItem("userName");
+      const userQuestions = sessionStorage.getItem("interviewQuestions");
       // using userName and time, generate a unique file path for saving chat history
       // no space allowed in file name. No special characters allowed in file name except underscore
       const sanitizedUserName = userName.replace(/[^a-zA-Z0-9]/g, "_");
       const chatHistoryPath = `${sanitizedUserName}_${Date.now()}.txt`;
 
       // store the chat history path in local storage
-      localStorage.setItem("chatHistoryPath", chatHistoryPath);
+      sessionStorage.setItem("chatHistoryPath", chatHistoryPath);
 
       // clear cachedFeedback from local storage if it exists
-      localStorage.removeItem("cachedFeedback");
+      sessionStorage.removeItem("cachedFeedback");
       console.log("User name:", userName);
       console.log("User questions:", userQuestions);
 

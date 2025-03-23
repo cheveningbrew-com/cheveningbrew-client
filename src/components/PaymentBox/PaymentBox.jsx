@@ -28,8 +28,8 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
   // Handle payment completion
   const handlePaymentComplete = (orderId) => {
     console.log("Payment completed. Order ID:", orderId);
-    // Store payment status in localStorage
-    localStorage.setItem("paymentCompleted", "true");
+    // Store payment status in sessionStorage
+    sessionStorage.setItem("paymentCompleted", "true");
     onPaymentComplete(orderId);
     setIsProcessing(false);
   };
@@ -58,10 +58,10 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
 
     setIsProcessing(true);
 
-    const userName = localStorage.getItem("userName");
+    const userName = sessionStorage.getItem("userName");
     const firstName = userName ? userName.split(" ")[0] : "";
     const lastName = userName ? userName.split(" ")[1] : "";
-    const userEmail = localStorage.getItem("userEmail");
+    const userEmail = sessionStorage.getItem("userEmail");
 
     try {
       // Prepare payment details
