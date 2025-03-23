@@ -1,8 +1,6 @@
 .actionBox {
   width: 100%;
-  max-width: 1000px;
-  height: 600px;
-  margin: var(--spacing-xl);
+  height: 100%;
   padding: var(--spacing-xl);
   border: 2px solid rgba(255, 255, 255, 0.2);
   border-radius: var(--radius-lg);
@@ -10,8 +8,6 @@
   backdrop-filter: blur(10px);
   display: flex;
   flex-direction: column;
-  align-items: center;
-  justify-content: flex-start;
   position: relative;
   overflow: hidden;
   font-family: var(--font-primary);
@@ -24,10 +20,9 @@
 .actionBox h3,
 .actionBox p,
 .actionBox button {
-  font-family: var(--font-primary); /* Explicitly set font for text elements */
+  font-family: var(--font-primary);
 }
 
-/* Add a subtle gradient overlay */
 .actionBox::before {
   content: "";
   position: absolute;
@@ -39,8 +34,20 @@
   pointer-events: none;
 }
 
-/* Ensure content stays above the gradient overlay */
 .actionBox > * {
   position: relative;
   z-index: 1;
 }
+
+@media screen and (max-width: 760px) {
+  .actionBox {
+    padding: var(--spacing-lg);
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .actionBox {
+    padding: var(--spacing-md);
+  }
+}
+

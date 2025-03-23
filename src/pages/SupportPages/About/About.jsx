@@ -7,7 +7,7 @@ const About = () => {
   return (
     <SupportPagesLayout>
       <ActionBox>
-        <div className={styles.supportContent}>
+        <div className={`${styles.supportContent} customScroll`}>
           <h1 className={styles.pageTitle}>About CheveningBrew</h1>
           <p className={styles.description}>
             Most Chevening scholars personally knew an alumnus who helped them

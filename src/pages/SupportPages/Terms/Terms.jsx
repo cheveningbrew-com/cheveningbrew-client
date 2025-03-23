@@ -9,7 +9,7 @@ const Terms = () => {
   return (
     <SupportPagesLayout>
       <ActionBox>
-        <div className={styles.privacyContent}>
+        <div className={`${styles.supportContent} customScroll`}>
           <h1 className={styles.pageTitle}>Terms and Conditions</h1>
           <div className={styles.description}>
             <ReactMarkdown>{termsPolicyText}</ReactMarkdown>

@@ -1,28 +1,28 @@
 .uploadContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  place-items: center;
+  padding: 10px 20px 10px 10px;
+  overflow-y: auto;
+  text-align: center;
   height: 100%;
-  gap: var(--spacing-2xl);
+  position: relative;
 }
 
 .title {
   font-size: var(--font-size-2xl);
   text-align: center;
-  max-width: 80%;
   line-height: 1.4;
 }
-
-/* Add these styles to your existing Upload.module.css */
 
 .paymentPopupOverlay {
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
+  bottom: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(229, 165, 228, 0.421);
+  background-color: rgba(255, 255, 255, 0.11);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -30,17 +30,16 @@
 }
 
 .paymentPopup {
-  background: linear-gradient(
-    to bottom,
-    #4b0082,
-    #800080
-  );
+  background: linear-gradient(to bottom right,
+      #4b0082,
+      #800080);
   border-radius: 8px;
-
-  max-height: auto;
+  height: 90%;
+  max-height: fit-content;
   width: 90%;
   max-width: 600px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.352);
+  border: solid 1px rgba(255, 255, 255, 0.5);
   overflow: hidden;
 }
 
@@ -50,7 +49,7 @@
   align-items: center;
   padding: 16px 20px;
   background-color: #4b0082;
-  border-bottom: 1px solid #4b0082;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
 }
 
 .paymentPopupHeader h2 {
@@ -59,16 +58,6 @@
   font-size: 20px;
   color: var(--accent);
 }
-
-/* .closeButton {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-  color: #666;
-  padding: 0;
-  line-height: 1;
-} */
 
 .paymentPopupBody {
   padding: 20px;
@@ -79,6 +68,13 @@
   margin-top: 10px;
   padding: 5px;
   text-align: center;
+}
+
+.pricingContent{
+  height: calc(100% - 100px);
+  padding: 20px;
+  max-height: 250px;
+  overflow-y: auto;
 }
 
 .pricingCard {
@@ -147,10 +143,10 @@
   background-color: #0052a3;
 }
 
-/* Add these to your existing CSS file */
 .rulesContent {
+  height: calc(100% - 100px);
   padding: 20px;
-  max-height: 300px;
+  max-height: 500px;
   overflow-y: auto;
 }
 
@@ -184,34 +180,4 @@
 
 .agreeButton:hover {
   background-color: #45a049;
-}
-
-
-/* Add custom scrollbar styling */
-.rulesContent::-webkit-scrollbar {
-  width: 6px; /* Slightly thinner */
-}
-
-.rulesContent::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05); /* More subtle track */
-  border-radius: 8px;
-  margin: 4px; /* Add some space around the track */
-}
-
-.rulesContent::-webkit-scrollbar-thumb {
-  background: linear-gradient(
-    to bottom,
-    rgba(221, 12, 126, 0.8),
-    rgba(202, 21, 130, 0.8)
-  ); /* Match the brand gradient */
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1); /* Subtle border */
-}
-
-.rulesContent::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(
-    to bottom,
-    rgba(221, 12, 126, 1),
-    rgba(202, 21, 130, 1)
-  ); /* Stronger gradient on hover */
 }

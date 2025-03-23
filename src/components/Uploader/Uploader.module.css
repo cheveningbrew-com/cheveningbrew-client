@@ -3,10 +3,10 @@
 }
 
 .browseButton {
-  background: linear-gradient(to right, #dd0c7e, #ca1582);
-  color: white;
+  background: #ffe585;
+  color: rgb(136, 26, 166);
   padding: var(--spacing-md) var(--spacing-2xl);
-  border-radius: var(--radius-full);
+  border-radius: var(--radius-md);
   font-size: var(--font-size-lg);
   font-weight: 500;
   transition: all var(--transition-normal);

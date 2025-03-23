@@ -10,7 +10,7 @@ const Privacy = () => {
   return (
     <SupportPagesLayout>
       <ActionBox>
-        <div className={styles.privacyContent}>
+        <div className={`${styles.supportContent} customScroll`}>
           <div>
             <h1 className={styles.pageTitle}>Privacy Policy</h1>
           </div>

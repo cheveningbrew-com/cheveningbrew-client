@@ -19,10 +19,13 @@ const SupportPagesLayout = ({ children }) => {
     <div className={styles.pageContainer}>
       <div className={styles.mainLayout}>
         <div className={styles.navigationContainer}>
-          {userName && <NameDisplay userName={userName} />}
-
-          <Logo />
-          <SignOUt />
+          <div className={styles.navigationHead}>
+            <Logo />
+            <div className={styles.navigationUser}>
+            {userName && <NameDisplay userName={userName} />}
+              <SignOUt />
+            </div>
+          </div>
         </div>
         <div className={styles.contentContainer}>{children}</div>
       </div>

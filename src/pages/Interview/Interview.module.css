@@ -1,155 +1,18 @@
 .interviewContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  height: 100%;
-  padding: var(--spacing-xl);
-  gap: var(--spacing-2xl);
-}
-
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 80%; /* Reduced from 100% to align with content */
-  margin-bottom: var(--spacing-xl);
-}
-
-.progressDots {
-  display: flex;
-  gap: var(--spacing-sm);
-}
-
-.dot {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.dot.active {
-  background: white;
-}
-
-.mainContent {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  flex: 1;
-  gap: var(--spacing-2xl);
-}
-
-.timerSection {
+  display: grid;
+  place-items: center;
+  padding: 10px 20px 10px 10px;
+  overflow-y: auto;
+  overflow-x: hidden;
   text-align: center;
+  height: 100%;
+  position: relative;
 }
 
-.timerDisplay {
-  color: white;
-}
-
-.time {
-  font-size: var(--font-size-3xl);
-  font-weight: bold;
-}
-
-.timeLabel {
-  font-size: var(--font-size-md);
-  opacity: 0.8;
-}
-.controlsContainer {
-  display: flex;
-  gap: var(--spacing-xl);
-  justify-content: center;
-  align-items: center;
-  margin-top: var(--spacing-xl);
-}
-
-.controlButton {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  font-size: 24px;
-}
-
-.controlButton:hover {
-  background: rgba(255, 255, 255, 0.2);
-  transform: scale(1.05);
-}
-
-.playPauseButton {
-  background: linear-gradient(to right, #dd0c7e, #ca1582);
-}
-
-.stopButton {
-  background: rgba(255, 255, 255, 0.1);
-}
-.tipsButton {
-  display: flex;
-  align-items: center;
-  gap: var(--spacing-sm);
-  padding: var(--spacing-xs) var(--spacing-sm); /* Reduced padding */
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-full);
-  cursor: pointer;
-  transition: all var(--transition-normal);
-  font-size: var(--font-size-sm); /* Smaller font size */
-}
-
-.tipsIcon {
-  font-size: var(--font-size-lg); /* Reduced from xl to lg */
-}
-
-.tipsText {
-  color: white;
-  font-size: var(--font-size-xs); /* Reduced from sm to xs */
-}
 
 @media screen and (max-width: 768px) {
-  .interviewContent {
-    padding: var(--spacing-lg);
-  }
-  .header {
-    width: 100%;
-  }
-
-  .time {
-    font-size: var(--font-size-2xl);
-  }
-
-  .recordButton {
-    width: 60px;
-    height: 60px;
-  }
+/*  */
 }
-.logoContainer {
-  position: absolute;
-  top: 60px;
-  left: 145px;
-  z-index: 100;
-}
-
-@media screen and (max-width: 768px) {
-  .logoContainer {
-    position: absolute;
-    top: 40px;
-    left: 48%;
-    transform: translateX(-50%);
-    width: max-content;
-    z-index: 100;
-    margin-bottom: 30px;
-  }
-}
-/* ...existing code... */
 
 .confirmDialogOverlay {
   position: fixed;
@@ -157,7 +20,9 @@
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 100%;
+  height: 100%;
+  background-color: rgba(255, 255, 255, 0.11);
   display: flex;
   justify-content: center;
   align-items: center;
@@ -165,29 +30,44 @@
 }
 
 .confirmDialog {
-  background-color: white;
-  border-radius: 4px;
-  padding: 20px;
+  background: linear-gradient(to bottom right,
+      #4b0082,
+      #800080);
+  border-radius: 8px;
+  height: 90%;
+  max-height: fit-content;
   width: 90%;
-  max-width: 450px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  max-width: 600px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.352);
+  border: solid 1px rgba(255, 255, 255, 0.5);
+  overflow: hidden;
 }
 
 .confirmDialogTitle {
-  font-size: 18px;
-  font-weight: 600;
-  margin-bottom: 16px;
-  color: #333;
+  text-align: left;
+  padding: 16px 20px;
+  background-color: #4b0082;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  margin-bottom: 0;
+}
+
+.confirmDialogContent {
+  height: calc(100% - 100px);
+  padding: 20px;
+  max-height: fit-content;
+  overflow-y: auto;
 }
 
 .confirmDialogMessage {
-  margin-bottom: 20px;
-  line-height: 1.5;
-  color: #555;
-  font-size: 14px;
+  color: var(--neutral-100);
+  margin-top: 10px;
+  padding: 5px;
+  text-align: center;
 }
 
 .confirmDialogButtons {
+  padding: 20px;
+  flex-wrap: wrap;
   display: flex;
   justify-content: flex-end;
   gap: 12px;
