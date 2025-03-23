@@ -67,7 +67,7 @@ const Feedback = () => {
     return (
       <MainLayout>
         <ActionBox>
-          <div className={styles.loadingContainer}>
+          <div className={`${styles.feedbackContent} customScroll`}>
             <div className={styles.spinner}></div>
             <p>Generating your feedback...</p>
           </div>
@@ -80,7 +80,7 @@ const Feedback = () => {
     return (
       <MainLayout>
         <ActionBox>
-          <div className={styles.errorContainer}>
+          <div className={`${styles.feedbackContent} customScroll`}>
             <h2>Oops! Something went wrong</h2>
             <p>{error}</p>
           </div>
@@ -92,7 +92,7 @@ const Feedback = () => {
   return (
     <MainLayout>
       <ActionBox>
-        <div className={styles.feedbackContent}>
+        <div className={`${styles.feedbackContent} customScroll`}>
           <div className={styles.title}>Interview Performance Feedback</div>
           {feedback ? (
             <div className={styles.markdownContent}>

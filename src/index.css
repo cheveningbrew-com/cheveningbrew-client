@@ -6,7 +6,7 @@
   /* Modern color palette */
   --primary: #2c3e50;
   --secondary: #3498db;
-  --accent: #f39c12;
+  --accent: #ffe585;
   --success: #2ecc71;
   --danger: #e74c3c;
   --light: #ecf0f1;
@@ -84,7 +84,8 @@
 }
 
 .agent-visualizer > .lk-audio-bar {
-  width: 72px;
+  max-width: calc(100% / 6) !important;
+  width: 48px !important;
 }
 
 .lk-audio-bar-visualizer{
@@ -310,12 +311,6 @@ textarea:focus {
   font-weight: 900;
 }
 
-.glass {
-  background: var(--gradient-overlay);
-  backdrop-filter: blur(10px);
-  border: 1px solid var(--neutral-500);
-}
-
 .container {
   max-width: 1200px;
   margin: 0 auto;
@@ -328,3 +323,43 @@ textarea:focus {
 
 }
 
+
+/* Add custom scrollbar styling */
+.customScroll::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.customScroll::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.127);
+  border-radius: 8px;
+  margin: 4px;
+}
+
+.customScroll::-webkit-scrollbar-thumb {
+  background: #ffe585ce;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.customScroll::-webkit-scrollbar-thumb:hover {
+  background: #ffe585;
+}
+
+.startButton {
+  background: #ffe585;
+  color: rgb(136, 26, 166);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-lg) !important;
+  font-weight: 500 !important;
+  transition: all var(--transition-normal);
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-primary) !important;
+}
+
+.startButton:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}

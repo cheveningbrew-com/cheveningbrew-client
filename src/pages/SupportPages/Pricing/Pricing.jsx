@@ -7,7 +7,7 @@ const Pricing = () => {
   return (
     <SupportPagesLayout>
       <ActionBox>
-        <div className={styles.supportContent}>
+        <div className={`${styles.supportContent} customScroll`}>
           <h1 className={styles.pageTitle}>Pricing</h1>
           <p className={styles.description}>
             Explore our pricing plans to find the perfect fit for your needs.

@@ -11,7 +11,7 @@ const MainLayout = ({ children }) => {
 
   useEffect(() => {
     // Get username from localStorage when component mounts
-    const storedName = localStorage.getItem('userName');
+    const storedName = localStorage.getItem("userName");
     if (storedName) {
       setUserName(storedName);
     }
@@ -20,9 +20,14 @@ const MainLayout = ({ children }) => {
     <div className={styles.pageContainer}>
       <div className={styles.mainLayout}>
         <div className={styles.navigationContainer}>
-          <NameDisplay userName={userName} />
-          <Logo />
-          <SignOUt />
+          <div className={styles.navigationHead}>
+            <Logo />
+            <div className={styles.navigationUser}>
+              <NameDisplay userName={userName} />
+              <SignOUt />
+            </div>
+          </div>
+
           <Tabs />
         </div>
         <div className={styles.contentContainer}>{children}</div>

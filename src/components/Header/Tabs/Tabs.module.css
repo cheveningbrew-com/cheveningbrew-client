@@ -2,65 +2,53 @@
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: 24px;
+  justify-content: center;
+  height: 100%;
   font-size: 24px;
   color: white;
-}
-
-.firstTab {
-  margin-top: 100px; /* Reduced from 300px */
+  overflow-y: auto;
 }
 
 .tabLink {
   padding: 12px 0;
-  width: 180px; /* Fixed width for consistent hover effect */
+  width: 180px;
   text-decoration: none;
   color: white;
   font-weight: normal;
   border-radius: 4px;
   transition: all 0.3s;
-  text-align: right; /* Center text for consistent look */
-  margin-left: auto;
-  position: relative; /* Added for hover effect */
-  /* Push tabs to the right */
+  text-align: right;
+  position: relative;
+  cursor: pointer;
 }
 
 .active {
-  color: #dd0c7e;
+  color: #ffe585;
   font-weight: bold;
 }
 
 .tabLink:hover {
   background: rgba(255, 255, 255, 0.1);
-  padding-right: 32px; /* Increased padding on hover */
+  padding-right: 32px;
 }
 
-/* Media query for mobile devices */
 @media screen and (max-width: 768px) {
   .tabsContainer {
     flex-direction: row;
     justify-content: center;
     width: 100%;
-    gap: 16px;
     font-size: 18px;
-    margin-top: 60px; /* Increased top margin to move tabs down */
-  }
-
-  .firstTab {
-    margin-top: 10px; /* Remove margin on mobile since tabs are horizontal */
   }
 
   .tabLink {
     padding: var(--spacing-sm) var(--spacing-lg);
     text-align: center;
+    width: fit-content;
   }
 }
 
-/* Additional media query for very small screens */
 @media screen and (max-width: 480px) {
   .tabsContainer {
-    gap: 8px;
     font-size: 16px;
-    margin-top: 50px; /* Add top margin to move tabs down further */
   }
 }
