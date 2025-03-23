@@ -3,6 +3,8 @@
   background-size: cover;
   background-position: right;
   background-repeat: no-repeat;
+  height: 100vh; /* Force container to viewport height */
+  overflow-y: auto; /* Enable vertical scrolling */
 }
 
 .pageWrapper {

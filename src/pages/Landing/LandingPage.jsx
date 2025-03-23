@@ -98,7 +98,8 @@ const LandingPage = () => {
 
   return (
     <>
-      <div className={styles.container}>
+    <div className={`${styles.container} customScroll`}>
+
         <div className={styles.pageWrapper}>
           <div className={styles.content}>
             <Logo />
@@ -109,7 +110,6 @@ const LandingPage = () => {
               </b>
               Built for Chevening aspirants . . . by Chevening alumni.
             </div>
-
             {/* Timeline Section */}
             <div className={styles["timeline-container"]}>
               <div className={styles.timeline}>
@@ -145,6 +145,7 @@ const LandingPage = () => {
           <Footer className={styles.landingPageFooter} />
         </div>
       </div>
+
     </>
   );
 };
