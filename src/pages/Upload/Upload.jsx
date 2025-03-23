@@ -7,7 +7,7 @@ import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
 
 const Upload = () => {
-  const [filePath, setFilePath] = useState(null);
+  const [_, setFilePath] = useState(null);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
   const [paymentCompleted, setPaymentCompleted] = useState(false);
   const [showRulesPopup, setShowRulesPopup] = useState(false);

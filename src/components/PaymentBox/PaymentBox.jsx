@@ -26,27 +26,27 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
   }, []);
 
   // Handle payment completion
-  const handlePaymentComplete = (orderId) => {
+  const handlePaymentComplete = useCallback((orderId) => {
     console.log("Payment completed. Order ID:", orderId);
     // Store payment status in sessionStorage
     sessionStorage.setItem("paymentCompleted", "true");
     onPaymentComplete(orderId);
     setIsProcessing(false);
-  };
+  }, [onPaymentComplete]);
 
   // Handle payment errors
-  const handlePaymentError = (error) => {
+  const handlePaymentError = useCallback((error) => {
     console.error("Payment error:", error);
     onPaymentError(error);
     setIsProcessing(false);
-  };
+  }, [onPaymentError]);
 
   // Handle payment dismissal
-  const handlePaymentDismissed = () => {
+  const handlePaymentDismissed = useCallback(() => {
     console.log("Payment dismissed.");
     onPaymentDismissed();
     setIsProcessing(false);
-  };
+  }, [onPaymentDismissed]);
 
   // Initiate payment
   const initiatePayment = useCallback(async () => {
@@ -128,10 +128,9 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
       alert("There was an error initializing the payment. Please try again.");
       setIsProcessing(false);
     }
-  }, [isProcessing, onPaymentComplete, onPaymentDismissed, onPaymentError]);
+  }, [isProcessing, handlePaymentComplete, handlePaymentDismissed, handlePaymentError]);
 
-  // ...existing code...
-  return (
+   return (
     <div className={styles.paymentBox}>
       <button
         className={styles.paymentButton}

@@ -5,13 +5,14 @@ import Logo from "../../components/Logo/Logo";
 import Footer from "../../components/Footer/Footer";
 import g from "../../assets/images/G.webp";
 import { useGoogleLogin } from "@react-oauth/google";
-import { validateToken, clearAuthData } from "../../utils/auth";
-import { useAuth } from "../../context/AuthContext";
+import {useAuth} from '../../context/AuthContext';
+
+
 
 const LandingPage = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState(null);
+  const [_, setError] = useState(null);
   const [authSuccess, setAuthSuccess] = useState(false);
   const { login: authLogin } = useAuth(); // Renamed to authLogin
   console.log(
