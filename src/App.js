@@ -1,7 +1,9 @@
 import React from "react";
+import { HelmetProvider } from "react-helmet-async";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from './context/AuthContext';
+import MetaTags from "./components/MetaTags/MetaTags";
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LandingPage from "./pages/Landing/LandingPage";
 import Upload from "./pages/Upload/Upload";
@@ -15,6 +17,8 @@ import Terms from "./pages/SupportPages/Terms/Terms";
 
 const App = () => {
   return (
+    <HelmetProvider>
+      <MetaTags />
     <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}>
       <BrowserRouter>
         <AuthProvider>
@@ -37,6 +41,7 @@ const App = () => {
         </AuthProvider>
       </BrowserRouter>
     </GoogleOAuthProvider>
+    </HelmetProvider>
   );
 };
 
