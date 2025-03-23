@@ -58,15 +58,20 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
 
     setIsProcessing(true);
 
+    const userName = localStorage.getItem("userName");
+    const firstName = userName ? userName.split(" ")[0] : "";
+    const lastName = userName ? userName.split(" ")[1] : "";
+    const userEmail = localStorage.getItem("userEmail");
+
     try {
       // Prepare payment details
       const paymentDetails = {
         order_id: `ORDER-${Date.now()}`,
         amount: "5.00",
         currency: "USD",
-        first_name: "",
-        last_name: "",
-        email: "",
+        first_name: firstName,
+        last_name: lastName,
+        email: userEmail,
         phone: "",
         address: "",
         city: "",
