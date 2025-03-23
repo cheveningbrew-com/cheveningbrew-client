@@ -36,8 +36,7 @@
     #800080
   );
   border-radius: 8px;
-
-  max-height: auto;
+min-height: auto;
   width: 90%;
   max-width: 600px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.352);
@@ -147,3 +146,15 @@
   background-color: #0052a3;
 }
 
+@media screen and (max-width: 768px) {
+  .paymentPopup {
+    max-height: auto;
+  }
+  
+}
+@media screen and (max-width: 480px) {
+  .paymentPopup {
+    max-height: auto;
+  }
+  
+}

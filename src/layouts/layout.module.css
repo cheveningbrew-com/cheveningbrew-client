@@ -2,7 +2,7 @@
   height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  overflow: auto;
 }
 
 .mainLayout {
@@ -74,7 +74,7 @@
   .contentContainer {
     width: 100%;
     padding: 0;
-    max-height: none; /* Remove height constraint */
+    min-height: fit-content;
     overflow-y: visible; /* Let content flow normally */
   }
 

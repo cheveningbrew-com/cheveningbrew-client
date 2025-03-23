@@ -8,7 +8,8 @@
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
   max-height: 70vh; /* Limit height to make it scrollable */
-  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-y: auto; 
+  height: fit-content;/* Enable vertical scrolling */
 }
 
 /* Class for other support pages that shouldn't scroll */
@@ -17,6 +18,7 @@
   flex-direction: column;
   width: 100%;
   padding: 2rem;
+  height: 100%;
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
@@ -212,26 +214,91 @@
   ); /* Stronger gradient on hover */
 }
 
+
 .pricingContainer {
   display: flex;
-  justify-content: space-between;
-  gap: 20px;
+  justify-content: space-evenly;
   width: 100%;
+  gap: 2rem;
 }
 
 .pricingContent {
   display: flex;
   flex-direction: column;
   width: 100%;
-  flex: 1;
   padding: 2rem;
   border-radius: 8px;
   box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 /* Responsive styles */
-@media screen and (max-width: 768px) {
+@media screen and (max-width: 1024px) {
+  .supportContent{
+    align-items: center;
+    min-height: fit-content;
+  }
+
+
+  .pricingContainer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .pricingContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
   .supportContainer {
+    padding: 1.5rem;
+  }
+
+  .pageTitle {
+    font-size: 1.8rem;
+  }
+
+  .markdownContent h1 {
+    font-size: 1.7rem;
+  }
+
+  .markdownContent h2 {
+    font-size: 1.4rem;
+  }
+}
+@media screen and (max-width: 768px) {
+  .pricingContainer {
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
+    gap: 2rem;
+  }
+
+  .pricingContent {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+   
+    width: 100%;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  .supportContent{
+    align-items: center;
+  }
+ 
+  .description{
+    text-align: center;
+  }
+  
+  .supportContainer {
+  
     padding: 1.5rem;
   }
 
@@ -251,6 +318,17 @@
 @media screen and (max-width: 480px) {
   .supportContainer {
     padding: 1rem;
+  }
+  .supportContent{
+    align-items: center;
+  }
+ 
+  .description{
+    text-align: center;
+  }
+  .pricingContent {
+    align-items: center;
+    justify-content: space-evenly;
   }
 
   .pageTitle {
