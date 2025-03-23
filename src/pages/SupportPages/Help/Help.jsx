@@ -8,9 +8,24 @@ const Help = () => {
     <SupportPagesLayout>
       <ActionBox>
         <div className={styles.supportContent}>
-          <h1 className={styles.pageTitle}>Help</h1>
+          <h1 className={styles.pageTitle}>FAQs and further help</h1>
           <p className={styles.description}>
-            If you need help, please contact us at{" "}
+            <br />
+            <br />
+            <strong> Q: I have done the interview once and I want to do it again. How can I do that? </strong>
+            <br />
+            A: Simply, sign out and sign in again to retake the interview.
+            <br />
+            <br />
+            <strong>Q: I have done my interview and I am unsatisfied. How do I get a refund?</strong>
+            <br />
+            A: Please email as at help@cheveningbrew.com with the topic "REFUND REQUEST" and we will get back to you.
+            <br />
+            <br />
+          </p>
+
+          <p className={styles.description}>
+            If you need any other assistance, please contact us at{" "}
             <a href="mailto:">
               <strong>
                 <u>
