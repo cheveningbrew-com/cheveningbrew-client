@@ -1,9 +1,9 @@
 /**
- * Validates the JWT token stored in localStorage
+ * Validates the JWT token stored in sessionStorage
  * @returns {boolean} True if token is valid and not expired
  */
 export const validateToken = () => {
-    const token = localStorage.getItem("authToken");
+    const token = sessionStorage.getItem('authToken');
     if (!token) return false;
 
     try {
@@ -27,10 +27,9 @@ export const validateToken = () => {
     }
   };
 
-  /**
-   * Clears all authentication data from localStorage
-   */
+  /* Clears all authentication data from sessionStorage*/
   export const clearAuthData = () => {
-    localStorage.removeItem("authToken");
-    localStorage.removeItem("userName");
-  };
+  sessionStorage.removeItem('authToken');
+  sessionStorage.removeItem('userName');
+  sessionStorage.removeItem('userEmail');
+};

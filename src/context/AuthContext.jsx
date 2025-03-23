@@ -12,10 +12,6 @@ export const AuthProvider = ({ children }) => {
   // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus();
-
-    // Also set up a listener for localStorage changes
-    window.addEventListener('storage', checkAuthStatus);
-    return () => window.removeEventListener('storage', checkAuthStatus);
   }, []);
 
   const checkAuthStatus = () => {
@@ -23,13 +19,13 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
 
     // Log token for debugging
-    const token = localStorage.getItem('authToken');
+    const token = sessionStorage.getItem('authToken');
     console.log("Token exists:", !!token);
 
     if (validateToken()) {
       console.log("Token is valid, setting authenticated");
       setIsAuthenticated(true);
-      setUserName(localStorage.getItem('userName'));
+      setUserName(sessionStorage.getItem('userName'));
     } else {
       console.log("Token is invalid or missing");
       clearAuthData();
@@ -41,17 +37,14 @@ export const AuthProvider = ({ children }) => {
   };
 
   const login = (token, name, email) => {
-    localStorage.setItem('authToken', token);
-    localStorage.setItem('userName', name || '');
-    localStorage.setItem('userEmail', email || '');
+    sessionStorage.setItem('authToken', token);
+    sessionStorage.setItem('userName', name || '');
+    sessionStorage.setItem('userEmail', email || '');
     checkAuthStatus();
   };
 
   const logout = () => {
-    // Clear auth data with the utility function
-    clearAuthData();
-
-    // Clear all application-specific localStorage items
+    // Clear all application-specific sessionStorage items
     const itemsToClear = [
       'ally-supports-cache',
       'chatHistoryPath',
@@ -65,12 +58,13 @@ export const AuthProvider = ({ children }) => {
       'cachedFeedback'
     ];
 
-    itemsToClear.forEach(item => localStorage.removeItem(item));
+    itemsToClear.forEach(item => sessionStorage.removeItem(item));
 
     // Reset authentication state
     setIsAuthenticated(false);
     setUserName(null);
   };
+
 
   return (
     <AuthContext.Provider

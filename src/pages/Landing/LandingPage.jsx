@@ -45,8 +45,6 @@ const LandingPage = () => {
       })
       .then(data => {
         if (data.authenticated) {
-          // First store the token
-          localStorage.setItem('authToken', data.authToken);
 
           // Call the auth context login
           if (data.user && data.user.name && data.user.email) {

@@ -10,8 +10,8 @@ const MainLayout = ({ children }) => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-    // Get username from localStorage when component mounts
-    const storedName = localStorage.getItem('userName');
+    // Get username from sessionStorage when component mounts
+    const storedName = sessionStorage.getItem('userName');
     if (storedName) {
       setUserName(storedName);
     }
