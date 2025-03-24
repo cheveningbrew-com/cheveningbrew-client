@@ -53,7 +53,9 @@
     padding: var(--spacing-md);
     min-height: fit-content;
   }
-  
+  .actionBox h1{
+    text-align: left;
+  }
 }
 
 @media screen and (max-width: 480px) {

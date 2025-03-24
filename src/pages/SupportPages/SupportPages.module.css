@@ -200,6 +200,7 @@
 .pricingContent {
   display: flex;
   flex-direction: column;
+  text-align: center;
   width: 100%;
   padding: 2rem;
   border-radius: 8px;
@@ -238,6 +239,7 @@
 
   .pageTitle {
     font-size: 1.8rem;
+    text-align: left;
   }
 
   .markdownContent h1 {
@@ -260,7 +262,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-   
+   text-align: center;
     width: 100%;
     padding: 2rem;
     border-radius: 8px;
@@ -269,10 +271,6 @@
   .supportContent{
     align-items: center;
   }
- 
-  /* .description{
-    text-align: center;
-  } */
   
   .supportContainer {
   
