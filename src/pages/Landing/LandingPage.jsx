@@ -6,6 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import g from "../../assets/images/G.webp";
 import { useGoogleLogin } from "@react-oauth/google";
 import {useAuth} from '../../context/AuthContext';
+import {updateUserField} from '../../services/api';
 
 
 
@@ -54,6 +55,30 @@ const LandingPage = () => {
             } else {
               authLogin(data.authToken);
             }
+
+            // let's send a POST request to REACT_APP_DB_SERVER_URL=http://localhost:2005
+            // with data as the body
+            fetch(`${process.env.REACT_APP_DB_SERVER_URL}/create_user`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${data.authToken}`,
+              },
+              body: JSON.stringify(data.user),
+            })
+              .then((response) => {
+                if (!response.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                console.log("Response:", response);
+                return response.json();
+              })
+              .then((data) => {
+                console.log("User data saved:", data);
+              })
+              .catch((error) => {
+                console.error("User data save error:", error);
+              });
 
             console.log("Authentication successful");
             setIsLoading(false);

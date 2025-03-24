@@ -1,4 +1,5 @@
-const API_BASE_URL = 'https://www.cheveningbrew.com/'; // Update this with your FastAPI server URL
+const API_BASE_URL = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || 'https://www.cheveningbrew.com/'; // Update this with your FastAPI server URL
+const REACT_APP_DB_SERVER_URL = process.env.REACT_APP_DB_SERVER_URL || 'https://www.cheveningbrew.com/'; // Update this with your Express server URL
 
 export const uploadEssay = async (file) => {
     const formData = new FormData();
@@ -32,5 +33,23 @@ export const sendAudioChunk = async (audioBlob, sessionId) => {
         method: 'POST',
         body: formData,
     });
+    return response.json();
+};
+
+export const updateUserField = async (field, value) => {
+    const userEmail = sessionStorage.getItem("userEmail");
+
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/update_user_field`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: userEmail,
+            field: field,
+            value: String(typeof value === 'object' ? JSON.stringify(value) : value)
+        }),
+    });
+
     return response.json();
 };

@@ -17,6 +17,8 @@ import "@livekit/components-styles";
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { updateUserField} from "../../services/api";
+
 // Main Page component
 function Page() {
   const [connectionDetails, updateConnectionDetails] = useState(null);
@@ -36,6 +38,10 @@ function Page() {
     }
 
     sessionStorage.setItem("interviewDone", "true");
+
+    // Update database with interview data
+    updateUserField("interview_done", "true");
+
     updateConnectionDetails(null);
 
     setTimeout(() => {

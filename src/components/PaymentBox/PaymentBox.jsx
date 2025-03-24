@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
+import {updateUserField} from '../../services/api';
 import styles from './PaymentBox.module.css';
 
 const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
@@ -26,10 +27,14 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
   }, []);
 
   // Handle payment completion
-  const handlePaymentComplete = useCallback((orderId) => {
+  const handlePaymentComplete = useCallback(async (orderId) => {
     console.log("Payment completed. Order ID:", orderId);
     // Store payment status in sessionStorage
     sessionStorage.setItem("paymentCompleted", "true");
+
+    // Update payment status in database
+    updateUserField("payment_completed", true);
+
     onPaymentComplete(orderId);
     setIsProcessing(false);
   }, [onPaymentComplete]);
