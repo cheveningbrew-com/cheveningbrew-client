@@ -66,13 +66,7 @@
     min-height: fit-content;
 
   }
-  .actionBox h1{
-    text-align: left;
-  }
-  .actionBox h2{
-    text-align: left;
-  }
-  .actionBox p{
+  .actionBox h1,h2,p{
     text-align: left;
   }
 }
