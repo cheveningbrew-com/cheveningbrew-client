@@ -57,3 +57,45 @@ export const updateUserField = async (field, value) => {
 
     return response.json();
 };
+
+export const readUserField = async (field) => {
+    const userEmail = sessionStorage.getItem("userEmail");
+
+    if (!userEmail) {
+        throw new Error("User email not found in session storage");
+    }
+
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/read_user_field`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: userEmail,
+            field: field,
+        }),
+    });
+
+    return response.json();
+};
+
+
+export const clearUser = async () => {
+    const userEmail = sessionStorage.getItem("userEmail");
+
+    if (!userEmail) {
+        throw new Error("User email not found in session storage");
+    }
+
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/remove_user`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            email: userEmail,
+        }),
+    });
+
+    return response.json();
+}

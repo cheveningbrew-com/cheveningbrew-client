@@ -6,8 +6,6 @@ import Footer from "../../components/Footer/Footer";
 import g from "../../assets/images/G.webp";
 import { useGoogleLogin } from "@react-oauth/google";
 import {useAuth} from '../../context/AuthContext';
-import {updateUserField} from '../../services/api';
-
 
 
 const LandingPage = () => {

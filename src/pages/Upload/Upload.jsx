@@ -5,6 +5,7 @@ import Uploader from "../../components/Uploader/Uploader";
 import PaymentBox from "../../components/PaymentBox/PaymentBox";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
+import { readUserField } from "../../services/api";
 
 const Upload = () => {
   const [_, setFilePath] = useState(null);
@@ -15,7 +16,8 @@ const Upload = () => {
 
   useEffect(() => {
     // Check if the user has already paid (from sessionStorage)
-    const hasUserPaid = sessionStorage.getItem("paymentCompleted") === "true";
+    // const hasUserPaid = sessionStorage.getItem("paymentCompleted") === "true";
+    const hasUserPaid = readUserField("payment_completed") === "true";
 
     if (!hasUserPaid) {
       // Show payment popup if user hasn't paid

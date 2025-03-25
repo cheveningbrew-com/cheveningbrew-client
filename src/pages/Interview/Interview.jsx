@@ -18,7 +18,7 @@ import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
-import { updateUserField } from "../../services/api";
+import { updateUserField, readUserField } from "../../services/api";
 // Main Page component
 function Page() {
   const [connectionDetails, updateConnectionDetails] = useState(null);
@@ -32,14 +32,28 @@ function Page() {
 
   // Check if interview has been completed already
   useEffect(() => {
+    // const interviewDone = sessionStorage.getItem("interviewDone") === "true";
+    // const paymentCompleted = sessionStorage.getItem("paymentCompleted") === "true";
 
-    const interviewDone = sessionStorage.getItem("interviewDone") === "true";
-    const paymentCompleted = sessionStorage.getItem("paymentCompleted") === "true";
-    if (interviewDone) {
-      navigate("/feedback");
-    } else if (!paymentCompleted) {
-      navigate("/upload");
-    }
+    const checkInterviewStatus = async () => {
+      try {
+        const interviewDone = await readUserField("interview_done");
+        const paymentCompleted = await readUserField("payment_completed");
+
+        console.log("Interview done from DB:", interviewDone);
+        console.log("Payment completed DB:", paymentCompleted);
+
+        if (interviewDone === true) {
+          navigate("/feedback");
+        } else if (paymentCompleted !== true) {
+          navigate("/upload");
+        }
+      } catch (error) {
+        console.error("Error checking interview status:", error);
+      }
+    };
+
+    checkInterviewStatus();
   }, [navigate]);
 
   // Timer countdown effect
