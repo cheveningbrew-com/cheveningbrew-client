@@ -6,16 +6,20 @@ import { NoAgentNotification } from "../../components/NoAgentNotification";
 import { CloseIcon } from "../../components/CloseIcon";
 import styles from "./Interview.module.css";
 import {
+  AgentState,
   BarVisualizer,
   DisconnectButton,
   LiveKitRoom,
   RoomAudioRenderer,
   VoiceAssistantControlBar,
   useVoiceAssistant,
+  useParticipant,
+  useRoom,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
+import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
 // Main Page component
 function Page() {
@@ -24,25 +28,9 @@ function Page() {
   const [timeRemaining, setTimeRemaining] = useState(20 * 60); // 15 minutes in seconds
   const [timerActive, setTimerActive] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isDisconnecting, setIsDisconnecting] = useState(false);
 
   const navigate = useNavigate();
-
-
-  const handleInterviewEnd = useCallback((forceEnd = false) => {
-    // If timer hasn't expired and not forcing end, show confirmation
-    if (timeRemaining > 0 && !forceEnd && timerActive) {
-      setShowConfirmDialog(true);
-      return;
-    }
-
-    sessionStorage.setItem("interviewDone", "true");
-    updateConnectionDetails(null);
-
-    setTimeout(() => {
-      navigate("/feedback");
-    }, 1000);
-  }, [timeRemaining, timerActive, navigate]); // Include dependencies here
-
 
   // Check if interview has been completed already
   useEffect(() => {
@@ -69,13 +57,31 @@ function Page() {
     }
 
     return () => clearInterval(interval);
-  }, [timerActive, timeRemaining, handleInterviewEnd]);
+  }, [timerActive, timeRemaining]);
 
   // Format time as MM:SS
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return `${mins.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  };
+
+  const handleInterviewEnd = (forceEnd = false) => {
+    // If timer hasn't expired and not forcing end, show confirmation
+    if (timeRemaining > 0 && !forceEnd && timerActive) {
+      setShowConfirmDialog(true);
+      return;
+    }
+
+    setIsDisconnecting(true);
+    sessionStorage.setItem("interviewDone", "true");
+    updateConnectionDetails(null);
+
+    setTimeout(() => {
+      navigate("/feedback");
+    }, 1000);
   };
 
   const handleRoomDisconnect = () => {
@@ -234,7 +240,7 @@ function ControlBar(props) {
 
   useEffect(() => {
     krisp.setNoiseFilterEnabled(true);
-  }, [krisp]);
+  }, []);
 
   // Custom disconnect handler to trigger parent component's disconnect logic
   const handleDisconnect = () => {
