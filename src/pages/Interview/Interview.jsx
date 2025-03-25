@@ -17,7 +17,8 @@ import "@livekit/components-styles";
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { updateUserField} from "../../services/api";
+import { updateUserField } from "../../services/api";
+
 
 // Main Page component
 function Page() {
@@ -26,7 +27,9 @@ function Page() {
   const [timeRemaining, setTimeRemaining] = useState(20 * 60); // 15 minutes in seconds
   const [timerActive, setTimerActive] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
-
+  const handleAgentStateChange = useCallback((newState) => {
+    setAgentState(newState);
+  }, []);
   const navigate = useNavigate();
 
 
@@ -37,17 +40,22 @@ function Page() {
       return;
     }
 
-    sessionStorage.setItem("interviewDone", "true");
+    // Stop the timer first
+    setTimerActive(false);
 
-    // Update database with interview data
-    updateUserField("interview_done", "true");
-
+    // Reset connection details before navigating
     updateConnectionDetails(null);
 
+    // Set interview done status
+    sessionStorage.setItem("interviewDone", "true");
+
+    updateUserField("interview_completed", true);
+
+    // Add a small delay to allow LiveKitRoom to cleanup
     setTimeout(() => {
       navigate("/feedback");
-    }, 1000);
-  }, [timeRemaining, timerActive, navigate]); // Include dependencies here
+    }, 1500); // Increased delay to ensure cleanup completes
+  }, [timeRemaining, timerActive, navigate]);// Include dependencies here
 
 
   // Check if interview has been completed already
@@ -188,17 +196,19 @@ function Page() {
             data-lk-theme="default"
             className="h-fit grid content-center w-full"
           >
-            <LiveKitRoom
+              <LiveKitRoom
               token={connectionDetails?.participantToken}
               serverUrl={connectionDetails?.serverUrl}
-              connect={connectionDetails !== undefined}
+              connect={connectionDetails !== null} // Changed from !== undefined
               audio={true}
               video={false}
               onMediaDeviceFailure={onDeviceFailure}
               onDisconnected={handleRoomDisconnect}
+              // Add these new props
+              shouldConnect={connectionDetails !== null}
               className="grid grid-rows-[2fr_1fr] items-center"
-            >
-              <SimpleVoiceAssistant onStateChange={setAgentState} />
+              >
+              <SimpleVoiceAssistant onStateChange={handleAgentStateChange} />
               <ControlBar
                 onConnectButtonClicked={onConnectButtonClicked}
                 agentState={agentState}
@@ -214,12 +224,16 @@ function Page() {
   );
 }
 
+
 // SimpleVoiceAssistant component
-function SimpleVoiceAssistant(props) {
+function SimpleVoiceAssistant({ onStateChange }) {
   const { state, audioTrack } = useVoiceAssistant();
+
   useEffect(() => {
-    props.onStateChange(state);
-  }, [props, state]);
+    if (state) {
+      onStateChange(state);
+    }
+  }, [state, onStateChange]); // Add proper dependencies
 
   return (
     <div className="h-[200px] w-fit max-w-[50vw] mx-auto">
@@ -233,6 +247,7 @@ function SimpleVoiceAssistant(props) {
     </div>
   );
 }
+
 
 // ControlBar component
 function ControlBar(props) {

@@ -39,6 +39,10 @@ export const sendAudioChunk = async (audioBlob, sessionId) => {
 export const updateUserField = async (field, value) => {
     const userEmail = sessionStorage.getItem("userEmail");
 
+    if (!userEmail) {
+        throw new Error("User email not found in session storage");
+    }
+
     const response = await fetch(`${REACT_APP_DB_SERVER_URL}/update_user_field`, {
         method: 'POST',
         headers: {
@@ -47,7 +51,7 @@ export const updateUserField = async (field, value) => {
         body: JSON.stringify({
             email: userEmail,
             field: field,
-            value: String(typeof value === 'object' ? JSON.stringify(value) : value)
+            value: typeof value === 'object' ? JSON.stringify(value) : String(value)
         }),
     });
 
