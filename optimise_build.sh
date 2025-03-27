@@ -27,7 +27,7 @@ free -h
 
 # Run the build process
 echo "Starting build process..."
-npm run build
+PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true npm run build
 
 # Copy the build files to the server
 echo "Copying build files to server..."
