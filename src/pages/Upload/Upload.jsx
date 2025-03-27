@@ -17,15 +17,25 @@ const Upload = () => {
   useEffect(() => {
     // Check if the user has already paid (from sessionStorage)
     // const hasUserPaid = sessionStorage.getItem("paymentCompleted") === "true";
-    const hasUserPaid = readUserField("payment_completed") === "true";
+    const checkPaymentStatus = async () => {
+      try {
+        const paymentStatus = await readUserField("payment_completed");
+        const hasUserPaid = paymentStatus === "true";
 
-    if (!hasUserPaid) {
-      // Show payment popup if user hasn't paid
-      setShowPaymentPopup(true);
-    } else {
-      // User has already paid
-      setPaymentCompleted(true);
-    }
+        if (!hasUserPaid) {
+          // Show payment popup if user hasn't paid
+          setShowPaymentPopup(true);
+        } else {
+          // User has already paid
+          setPaymentCompleted(true);
+        }
+      } catch (error) {
+        console.error("Error checking payment status:", error);
+        setShowPaymentPopup(true); // Default to showing payment popup on error
+      }
+    };
+
+    checkPaymentStatus();
   }, []);
 
   const handleUploadSuccess = (path) => {

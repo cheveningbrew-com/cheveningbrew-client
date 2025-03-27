@@ -33,7 +33,7 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
     sessionStorage.setItem("paymentCompleted", "true");
 
     // Update payment status in database
-    updateUserField("payment_completed", true);
+    // updateUserField("payment_completed", true);
 
     onPaymentComplete(orderId);
     setIsProcessing(false);
