@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
+import {updateUserField} from '../../services/api';
 
 const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -29,8 +30,10 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
   const handlePaymentComplete = useCallback((orderId) => {
     console.log("Payment completed. Order ID:", orderId);
     // Store payment status in sessionStorage
-    sessionStorage.setItem("paymentCompleted", "true");
+    // sessionStorage.setItem("paymentCompleted", "true");
+    updateUserField("payment_completed", true);
     onPaymentComplete(orderId);
+    
     setIsProcessing(false);
   }, [onPaymentComplete]);
 
@@ -58,6 +61,8 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
 
     setIsProcessing(true);
 
+    
+    
     const userName = sessionStorage.getItem("userName");
     const firstName = userName ? userName.split(" ")[0] : "";
     const lastName = userName ? userName.split(" ")[1] : "";

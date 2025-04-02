@@ -3,6 +3,7 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import axios from "axios";
+import { updateUserField } from "../../services/api";
 import ReactMarkdown from "react-markdown";
 
 const Feedback = () => {
@@ -47,6 +48,7 @@ const Feedback = () => {
 
         // Store the feedback in sessionStorage for future use
         sessionStorage.setItem("cachedFeedback", newFeedback);
+        updateUserField("cached_feedback", newFeedback);
 
         setFeedback(newFeedback);
         setLoading(false);

@@ -4,12 +4,15 @@ import { googleLogout } from '@react-oauth/google';
 import { useAuth } from '../../context/AuthContext';
 import styles from './SignOut.module.css';
 import { clearAuthData } from '../../utils/auth';
+import {SignOut_clearUser} from '../../services/api';
 
 const SignOut = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
 
   const handleSignOut = () => {
+
+    SignOut_clearUser("email")
     // Sign out from Google
     googleLogout();
 
@@ -22,6 +25,7 @@ const SignOut = () => {
     // Redirect to landing page
     navigate('/');
   };
+
 
   return (
     <div

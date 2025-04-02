@@ -2,15 +2,23 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./Logo.module.css"; // Import as a module
 import logo from "../../assets/images/logo.png"
+import { readUserField } from "../../services/api";
 
 const Logo = () => {
   const [redirectTo, setRedirectTo] = useState("/");
 
   useEffect(() => {
-    const sessionToken = sessionStorage.getItem("authToken");
-    if (sessionToken) {
-      setRedirectTo("/upload");
-    }
+    const fetchSessionToken = async () => {
+      const userEmail = sessionStorage.getItem("userEmail");
+
+      const sessionToken = await readUserField(userEmail, "auth_token");
+
+      if (sessionToken) {
+        setRedirectTo("/upload");
+      }
+    };
+
+    fetchSessionToken();
   }, []);
 
   return (
