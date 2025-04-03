@@ -5,18 +5,25 @@ import Logo from "../components/Logo/Logo";
 import NameDisplay from "../components/NameDisplay/NameDisplay";
 import SignOUt from "../components/SignOut/SignOut";
 import styles from "./layout.module.css";
+import {getUserEmail,readUserField} from "../services/api"
 
 const MainLayout = ({ children }) => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
-
-    // Get username from sessionStorage when component mounts
-    const storedName = sessionStorage.getItem('userName');
-    if (storedName) {
-      setUserName(storedName);
-    }
+    const fetchUserName = async () => {
+      const userEmail = getUserEmail();
+      if (userEmail) {
+        const storedName = await readUserField(userEmail, "name");
+        if (storedName) {
+          setUserName(storedName);
+        }
+      }
+    };
+  
+    fetchUserName();
   }, []);
+  
   return (
     <div className={styles.pageContainer}>
       <div className={styles.mainLayout}>

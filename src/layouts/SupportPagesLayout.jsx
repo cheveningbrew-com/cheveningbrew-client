@@ -4,14 +4,14 @@ import Logo from "../components/Logo/Logo";
 import NameDisplay from "../components/NameDisplay/NameDisplay";
 import SignOUt from "../components/SignOut/SignOut";
 import styles from "./layout.module.css";
-import { readUserField } from "../services/api";
+import { readUserField,getUserEmail } from "../services/api";
 
 const SupportPagesLayout = ({ children }) => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const fetchUserName = async () => {
-      const userEmail = sessionStorage.getItem("userEmail");
+      const userEmail = getUserEmail()
       if (userEmail) {
         const storedName = await readUserField(userEmail, 'userName');
         if (storedName) {

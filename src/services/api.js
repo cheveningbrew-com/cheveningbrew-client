@@ -42,6 +42,8 @@ export const readUserField = async (email, field) => {
     }
 };
 
+export const getUserEmail = () => sessionStorage.getItem("userEmail");
+
 
 
 export const startInterview = async () => {
@@ -69,7 +71,7 @@ export const sendAudioChunk = async (audioBlob, sessionId) => {
 };
 
 export const updateUserField = async (field, value) => {
-    const userEmail = sessionStorage.getItem("userEmail");
+    const userEmail = getUserEmail();
 
     if (!userEmail) {
         throw new Error("User email not found in session storage");
@@ -95,9 +97,8 @@ export const updateUserField = async (field, value) => {
 };
 
 
-
 export const clearUser = async () => {
-    const userEmail = sessionStorage.getItem("userEmail");
+    const userEmail = getUserEmail();
 
     if (!userEmail) {
         throw new Error("User email not found in session storage");
@@ -119,7 +120,7 @@ export const clearUser = async () => {
 
 export const SignOut_clearUser = async () => {
     try {
-        const userEmail = sessionStorage.getItem("userEmail");
+        const userEmail = getUserEmail();
 
         if (!userEmail) {
             throw new Error("User email not found in session storage");
@@ -143,3 +144,6 @@ export const SignOut_clearUser = async () => {
         return { error: error.message };
     }
 };
+
+
+

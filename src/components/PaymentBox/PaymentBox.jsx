@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
-import {updateUserField} from '../../services/api';
+import {updateUserField,readUserField,getUserEmail} from '../../services/api';
 
 const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -63,10 +63,11 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
 
     
     
-    const userName = sessionStorage.getItem("userName");
-    const firstName = userName ? userName.split(" ")[0] : "";
-    const lastName = userName ? userName.split(" ")[1] : "";
-    const userEmail = sessionStorage.getItem("userEmail");
+    const userEmail = getUserEmail(); // Get the email first
+    const userName = readUserField(userEmail, "name");
+    
+    // const firstName = userName ? userName.split(" ")[0] : "";
+    // const lastName = userName ? userName.split(" ")[1] : "";
 
     try {
       // Prepare payment details
@@ -74,8 +75,9 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
         order_id: `ORDER-${Date.now()}`,
         amount: "5.00",
         currency: "USD",
-        first_name: firstName,
-        last_name: lastName,
+        // first_name: firstName,
+        // last_name: lastName,
+        name:userName,
         email: userEmail,
         phone: "",
         address: "",

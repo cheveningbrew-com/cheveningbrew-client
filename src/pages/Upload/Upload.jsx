@@ -5,7 +5,7 @@ import Uploader from "../../components/Uploader/Uploader";
 import PaymentBox from "../../components/PaymentBox/PaymentBox";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
-import { readUserField } from "../../services/api";
+import { readUserField ,getUserEmail} from "../../services/api";
 
 const Upload = () => {
   const [_, setFilePath] = useState(null);
@@ -17,7 +17,7 @@ const Upload = () => {
 
   useEffect(() => {
     const checkPaymentStatus = async () => {
-      const userEmail = sessionStorage.getItem("userEmail");
+      const userEmail = getUserEmail();
       if (!userEmail) {
         navigate("/");
         return;

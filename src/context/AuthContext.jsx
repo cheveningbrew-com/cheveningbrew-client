@@ -1,6 +1,7 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { validateToken, clearAuthData } from '../utils/auth';
+import {readUserField,getUserEmail,updateUserField} from '../services/api'
 
 const AuthContext = createContext(null);
 
@@ -19,13 +20,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
 
     // Log token for debugging
-    const token = sessionStorage.getItem('authToken');
+    const userEmail = getUserEmail();
+
+    const token = readUserField(userEmail, "auth_token");
     console.log("Token exists:", !!token);
 
     if (validateToken()) {
       console.log("Token is valid, setting authenticated");
       setIsAuthenticated(true);
-      setUserName(sessionStorage.getItem('userName'));
+      setUserName(readUserField(userEmail, "name"));
     } else {
       console.log("Token is invalid or missing");
       clearAuthData();
