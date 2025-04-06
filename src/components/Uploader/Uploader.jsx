@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import styles from "./Uploader.module.css";
+import { updateUserField } from "../../services/api"; // Assuming you have this function to update user fields
 
 const Uploader = ({ onUploadSuccess }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -62,8 +63,12 @@ const Uploader = ({ onUploadSuccess }) => {
       // Call the callback with the file path if provided
       if (onUploadSuccess) {
         onUploadSuccess(result.interview_questions);
-        sessionStorage.setItem("interviewQuestions", JSON.stringify(result.interview_questions));
+        updateUserField("interview_questions", JSON.stringify(result.interview_questions));
       }
+
+      // // Update user field in session storage
+      // updateUserField("interview_questions", result.interview_questions)
+
     } catch (error) {
       console.error("Upload error:", error);
       setUploadProgress(null);

@@ -3,7 +3,7 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import axios from "axios";
-import { updateUserField } from "../../services/api";
+import { updateUserField,getUserEmail,readUserField } from "../../services/api";
 import ReactMarkdown from "react-markdown";
 
 const Feedback = () => {
@@ -14,8 +14,9 @@ const Feedback = () => {
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
+        const userEmail = getUserEmail(); // Assuming you have a function to get the user email from sessionStorage
         // First, check if feedback exists in sessionStorage
-        const cachedFeedback = sessionStorage.getItem("cachedFeedback");
+        const cachedFeedback = await readUserField("cachedFeedback",userEmail);
 
         if (cachedFeedback) {
           // Use the cached feedback if available
@@ -47,7 +48,7 @@ const Feedback = () => {
         const newFeedback = response.data.feedback;
 
         // Store the feedback in sessionStorage for future use
-        sessionStorage.setItem("cachedFeedback", newFeedback);
+        // sessionStorage.setItem("cachedFeedback", newFeedback);
         updateUserField("cached_feedback", newFeedback);
 
         setFeedback(newFeedback);

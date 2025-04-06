@@ -6,6 +6,7 @@ import Footer from "../../components/Footer/Footer";
 import g from "../../assets/images/G.webp";
 import { useGoogleLogin } from "@react-oauth/google";
 import {useAuth} from '../../context/AuthContext';
+import { createUser } from "../../services/api"; // Assuming you have this function to create a user
 
 
 const LandingPage = () => {
@@ -27,75 +28,62 @@ const LandingPage = () => {
   }, [authSuccess, navigate]);
 
   const googleLogin = useGoogleLogin({
-    onSuccess: (tokenResponse) => {
-      setIsLoading(true);
-      fetch(`${process.env.REACT_APP_USER_AUTH_SERVER}/api/auth/google`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ code: tokenResponse.code }),
-      })
-
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        console.log("Response:", response);
-        return response.json();
-      })
-      .then(data => {
-        if (data.authenticated) {
-
-            // Call the auth context login
-            if (data.user && data.user.name && data.user.email) {
-              authLogin(data.authToken, data.user.name, data.user.email); // Now using the renamed function
-            } else {
-              authLogin(data.authToken);
-            }
-
-          //  connect_backend_end_point
-            fetch(`${process.env.REACT_APP_DB_SERVER_URL}/create_user`, {
-              method: "POST",
-              headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${data.authToken}`,
-              },
-              body: JSON.stringify(data.user),
-            })
-              .then((response) => {
-                if (!response.ok) {
-                  throw new Error("Network response was not ok");
-                }
-                console.log("Response:", response);
-                return response.json();
-              })
-              .then((data) => {
-                console.log("User data saved:", data);
-              })
-              .catch((error) => {
-                console.error("User data save error:", error);
-              });
-
-            console.log("Authentication successful");
-            setIsLoading(false);
-            setAuthSuccess(true);
-          } else {
-            setIsLoading(false);
-            setError("Authentication failed");
-          }
-        })
-        .catch((error) => {
-          console.error("Authentication error:", error);
-          setIsLoading(false);
-          setError("Authentication failed");
+    onSuccess: async (tokenResponse) => {
+      try {
+        setIsLoading(true);
+  
+        // Step 1: Send Google auth code to backend
+        const response = await fetch(`${process.env.REACT_APP_USER_AUTH_SERVER}/api/auth/google`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code: tokenResponse.code }),
         });
+  
+        if (!response.ok) {
+          throw new Error("Google authentication failed");
+        }
+  
+        const data = await response.json();
+  
+        if (data.authenticated) {
+          console.log("Authentication successful:", data);
+  
+          // Step 2: Call auth context login
+          if (data.user && data.user.name && data.user.email) {
+            authLogin(data.authToken, data.user.name, data.user.email);
+          } else {
+            authLogin(data.authToken);
+          }
+  
+          // Step 3: Save user in the database
+          const savedUser = await createUser(
+            data.user.email, 
+            data.user.name, 
+            data.user.id, 
+            data.user.picture, 
+            data.authToken // Pass token if needed
+          );
+  
+          console.log("User saved in DB:", savedUser);
+  
+          setAuthSuccess(true);
+        } else {
+          setError("Authentication failed");
+        }
+      } catch (error) {
+        console.error("Authentication error:", error);
+        setError("Authentication failed");
+      } finally {
+        setIsLoading(false);
+      }
     },
+  
     onError: (error) => {
-      console.error("Authentication error:", error);
+      console.error("Google Authentication error:", error);
       setIsLoading(false);
       setError("Authentication failed");
     },
+  
     flow: "auth-code",
   });
 

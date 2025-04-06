@@ -1,5 +1,5 @@
-const API_BASE_URL = process.env.REACT_APP_DB_SERVER_URL || "http://localhost:8000";
-const REACT_APP_DB_SERVER_URL = 'http://localhost:8000'; // Ensure this is in your .env
+const API_BASE_URL = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || 'https://www.cheveningbrew.com/'; 
+const REACT_APP_DB_SERVER_URL = 'http://localhost:5002'; // Ensure this is in your .env
 
 export const uploadEssay = async (file) => {
     const formData = new FormData();
@@ -28,7 +28,7 @@ export const readUserField = async (email, field) => {
         }
 
         const data = await response.json();
-        console.log("User Field:", data);
+        // console.log("User Field:", data);
 
         // Ensure boolean values are properly handled
         if (field === "payment_completed" && data[field] === null) {
@@ -146,4 +146,26 @@ export const SignOut_clearUser = async () => {
 };
 
 
-
+// Create a user (if not exists, update last login)
+export const createUser = async (email, name, id, picture, auth_token) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/create_user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, name, id, picture, auth_token}), // Convert to JSON
+      });
+  
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating user:", error.message);
+      throw error;
+    }
+  };
+  

@@ -18,7 +18,7 @@ import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
-import { updateUserField, readUserField } from "../../services/api";
+import { updateUserField, readUserField,getUserEmail } from "../../services/api";
 // Main Page component
 function Page() {
   const [connectionDetails, updateConnectionDetails] = useState(null);
@@ -37,8 +37,9 @@ function Page() {
 
     const checkInterviewStatus = async () => {
       try {
-        const interviewDone = await readUserField("interview_done");
-        const paymentCompleted = await readUserField("payment_completed");
+        const userEmail = getUserEmail();
+        const interviewDone = await readUserField(userEmail,"interview_done");
+        const paymentCompleted = await readUserField(userEmail,"payment_completed");
 
         console.log("Interview done from DB:", interviewDone);
         console.log("Payment completed DB:", paymentCompleted);
@@ -116,12 +117,18 @@ function Page() {
 
   const onConnectButtonClicked = useCallback(async () => {
     try {
-      const userName = sessionStorage.getItem("userName");
-      const userQuestions = sessionStorage.getItem("interviewQuestions");
+      const userEmail = getUserEmail();
+      const userName = readUserField(userEmail,"name");
+      const userQuestions = readUserField(userEmail,"interview_questions");
       // using userName and time, generate a unique file path for saving chat history
       // no space allowed in file name. No special characters allowed in file name except underscore
-      const sanitizedUserName = userName.replace(/[^a-zA-Z0-9]/g, "_");
+      const sanitizedUserName =
+        typeof userName === "string"
+          ? userName.replace(/[^a-zA-Z0-9]/g, "_")
+          : "unknown_user";
+
       const chatHistoryPath = `${sanitizedUserName}_${Date.now()}.txt`;
+
 
       // store the chat history path in local storage
       sessionStorage.setItem("chatHistoryPath", chatHistoryPath);
