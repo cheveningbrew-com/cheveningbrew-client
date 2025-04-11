@@ -12,6 +12,58 @@ export const uploadEssay = async (file) => {
     return response.json();
 };
 
+export const startInterview = async () => {
+    const response = await fetch(`${API_BASE_URL}/interview`, {
+        method: 'POST',
+    });
+    return response.json();
+};
+
+export const getFeedback = async (sessionId) => {
+    const response = await fetch(`${API_BASE_URL}/feedback?session_id=${sessionId}`);
+    return response.json();
+};
+
+export const sendAudioChunk = async (audioBlob, sessionId) => {
+    const formData = new FormData();
+    formData.append('audio', audioBlob);
+    formData.append('session_id', sessionId);
+
+    const response = await fetch(`${API_BASE_URL}/interview/audio`, {
+        method: 'POST',
+        body: formData,
+    });
+    return response.json();
+};
+
+
+// Create a user (if not exists, update last login)
+export const createUser = async (email, name, id, picture, auth_token) => {
+    try {
+      const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/create_user`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email, name, id, picture, auth_token}), // Convert to JSON
+      });
+  
+      if (!response.ok) {
+        throw new Error("Network response was not ok");
+      }
+  
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error creating user:", error.message);
+      throw error;
+    }
+  };
+
+// Get user Email from session storage
+export const getUserEmail = () => sessionStorage.getItem("userEmail");
+
+// Get user details from database
 export const readUserField = async (email, field) => {
     try {
         const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/read_user_field`, {
@@ -42,34 +94,7 @@ export const readUserField = async (email, field) => {
     }
 };
 
-export const getUserEmail = () => sessionStorage.getItem("userEmail");
-
-
-
-export const startInterview = async () => {
-    const response = await fetch(`${API_BASE_URL}/interview`, {
-        method: 'POST',
-    });
-    return response.json();
-};
-
-export const getFeedback = async (sessionId) => {
-    const response = await fetch(`${API_BASE_URL}/feedback?session_id=${sessionId}`);
-    return response.json();
-};
-
-export const sendAudioChunk = async (audioBlob, sessionId) => {
-    const formData = new FormData();
-    formData.append('audio', audioBlob);
-    formData.append('session_id', sessionId);
-
-    const response = await fetch(`${API_BASE_URL}/interview/audio`, {
-        method: 'POST',
-        body: formData,
-    });
-    return response.json();
-};
-
+// Update user field in database storage
 export const updateUserField = async (field, value) => {
     const userEmail = getUserEmail();
 
@@ -96,7 +121,7 @@ export const updateUserField = async (field, value) => {
     return response.json();
 };
 
-
+// Clear user data from session storage and database
 export const clearUser = async () => {
     const userEmail = getUserEmail();
 
@@ -117,7 +142,7 @@ export const clearUser = async () => {
     return response.json();
 };
 
-
+// Clear user data like without name,email and id  from   database
 export const SignOut_clearUser = async () => {
     try {
         const userEmail = getUserEmail();
@@ -146,26 +171,4 @@ export const SignOut_clearUser = async () => {
 };
 
 
-// Create a user (if not exists, update last login)
-export const createUser = async (email, name, id, picture, auth_token) => {
-    try {
-      const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/create_user`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, name, id, picture, auth_token}), // Convert to JSON
-      });
-  
-      if (!response.ok) {
-        throw new Error("Network response was not ok");
-      }
-  
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      console.error("Error creating user:", error.message);
-      throw error;
-    }
-  };
   
