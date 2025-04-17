@@ -2,6 +2,7 @@ import React from "react";
 import SupportPagesLayout from "../../../layouts/SupportPagesLayout";
 import ActionBox from "../../../components/ActionBox/ActionBox";
 import styles from "../SupportPages.module.css";
+import Price from "../../../components/Price_Popup/Price";
 
 const Pricing = () => {
   return (
@@ -15,18 +16,7 @@ const Pricing = () => {
             Chevening interview.
           </p>
           <div className={styles.pricingContainer}>
-            <div className={styles.pricingContent}>
-              <h3 className={styles.pricingTitle}>Basic</h3>
-              Two slots for $10
-            </div>
-            <div className={styles.pricingContent}>
-              <h3 className={styles.pricingTitle}>Standard</h3>
-              Five slots for $20
-            </div>
-            <div className={styles.pricingContent}>
-              <h3 className={styles.pricingTitle}>Premium</h3>
-              Ten slots for $30
-            </div>
+           <Price/>
           </div>
         </div>
       </ActionBox>

@@ -6,6 +6,7 @@ import PaymentBox from "../../components/PaymentBox/PaymentBox";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
 import { readUserField ,getUserEmail} from "../../services/api";
+import Price from "../../components/Price_Popup/Price";
 
 const Upload = () => {
   const [_, setFilePath] = useState(null);
@@ -89,25 +90,7 @@ const Upload = () => {
               <Uploader onUploadSuccess={handleUploadSuccess} />
             ) : (
               showPaymentPopup && (
-                <div className={styles.paymentPopupOverlay}>
-                  <div className={styles.paymentPopup}>
-                    <div className={styles.paymentPopupHeader}>
-                      <h2 className={styles.h2}>One-time payment required</h2>
-                    </div>
-                    <div className={`${styles.pricingContent} customScroll`}>
-                      <div className={styles.pricingCard}>
-                        <p className={styles.pricingText}>
-                          Access the app by paying a one-time fee of $5 for a 20 min interview
-                        </p>
-                      </div>
-                      <PaymentBox
-                        onPaymentComplete={handlePaymentComplete}
-                        onPaymentError={handlePaymentError}
-                        onPaymentDismissed={handlePaymentDismissed}
-                      />
-                    </div>
-                  </div>
-                </div>
+                <Price/>
               )
             )}
 

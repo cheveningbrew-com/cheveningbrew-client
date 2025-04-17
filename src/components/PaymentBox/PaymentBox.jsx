@@ -150,7 +150,7 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
           </span>
         ) : (
           <span>
-            <i className={styles.paymentIcon}></i> Pay $5 Now
+            <i className={styles.paymentIcon}></i> Pay $10 Now
           </span>
         )}
       </button>
