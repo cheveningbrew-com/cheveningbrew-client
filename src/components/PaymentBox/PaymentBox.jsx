@@ -1,9 +1,10 @@
+// PaymentBox.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
-import {updateUserField,readUserField,getUserEmail} from '../../services/api';
+import { updateUserField, readUserField, getUserEmail, subscribeUser } from '../../services/api';
 
-const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
+const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [payHereLoaded, setPayHereLoaded] = useState(false);
 
@@ -26,16 +27,19 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
     loadPayHereScript();
   }, []);
 
-  // Handle payment completion
-  const handlePaymentComplete = useCallback((orderId) => {
-    console.log("Payment completed. Order ID:", orderId);
-    // Store payment status in sessionStorage
-    // sessionStorage.setItem("paymentCompleted", "true");
-    updateUserField("payment_completed", true);
-    onPaymentComplete(orderId);
-    
-    setIsProcessing(false);
-  }, [onPaymentComplete]);
+  const handlePaymentComplete = useCallback(async (orderId) => {
+    try {
+      const userEmail = getUserEmail();
+      // const userEmail = await readUserField(userEmail, "email");
+      await subscribeUser({ email: userEmail, plan: plan.id, price: plan.amount, attempts: plan.attempts });
+      updateUserField("payment_completed", true);
+      onPaymentComplete(orderId);
+    } catch (err) {
+      onPaymentError(err);
+    } finally {
+      setIsProcessing(false);
+    }
+  }, [onPaymentComplete, onPaymentError, plan]);
 
   // Handle payment errors
   const handlePaymentError = useCallback((error) => {
@@ -58,22 +62,15 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
       alert("Payment system not loaded. Please refresh the page and try again.");
       return;
     }
+setIsProcessing(true);
 
-    setIsProcessing(true);
-
-    
-    
     const userEmail = getUserEmail(); // Get the email first
     const userName = readUserField(userEmail, "name");
-    
-    // const firstName = userName ? userName.split(" ")[0] : "";
-    // const lastName = userName ? userName.split(" ")[1] : "";
-
     try {
       // Prepare payment details
       const paymentDetails = {
         order_id: `ORDER-${Date.now()}`,
-        amount: "5.00",
+        amount: plan.amount,
         currency: "USD",
         // first_name: firstName,
         // last_name: lastName,
@@ -135,9 +132,10 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
       alert("There was an error initializing the payment. Please try again.");
       setIsProcessing(false);
     }
-  }, [isProcessing, handlePaymentComplete, handlePaymentDismissed, handlePaymentError]);
 
-   return (
+  }, [isProcessing, handlePaymentComplete, handlePaymentDismissed, handlePaymentError, plan]);
+
+  return (
     <div className={styles.paymentBox}>
       <button
         className={styles.paymentButton}
@@ -145,13 +143,9 @@ const PaymentBox = ({ onPaymentComplete, onPaymentError, onPaymentDismissed }) =
         disabled={!payHereLoaded || isProcessing}
       >
         {isProcessing ? (
-          <span>
-            <i className={styles.loadingIcon}></i> Processing Payment...
-          </span>
+          <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
         ) : (
-          <span>
-            <i className={styles.paymentIcon}></i> Pay $10 Now
-          </span>
+          <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
         )}
       </button>
       {!payHereLoaded && <p className={styles.loadingMessage}>Loading payment system...</p>}

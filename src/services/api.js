@@ -153,9 +153,7 @@ export const SignOut_clearUser = async () => {
 
         const response = await fetch(`${REACT_APP_DB_SERVER_URL}/SignOut_user`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email: userEmail }),
         });
 
@@ -170,5 +168,65 @@ export const SignOut_clearUser = async () => {
     }
 };
 
+// Accept user subscription details as parameters
+export const subscribeUser = async ({ email, plan, price, attempts }) => {
+    if (!email || !plan || price == null || attempts == null) {
+        throw new Error("Missing subscription details");
+    }
 
-  
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscribe_user`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, plan, price, attempts }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Subscription failed");
+    }
+
+    return response.json();
+};
+
+// Get a specific field from a user's subscription
+export const getUserSubscription = async ({ email, field }) => {
+    if (!email || !field) {
+        throw new Error("Missing id or field");
+    }
+
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/read_Subcription_field`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, field }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to read subscription field");
+    }
+
+    return response.json();
+};
+
+// Update a specific field in a user's subscription
+export const updateUserSubscription = async ({ id, field, value }) => {
+    const email = getUserEmail();
+
+    if (!email) {
+        throw new Error("User email not found in session storage");
+    }
+
+    if (!id || !field || value === undefined) {
+        throw new Error("Missing id, field, or value");
+    }
+
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/update_Subcription_field`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, id, field, value }),
+    });
+
+    if (!response.ok) {
+        throw new Error("Failed to update subscription");
+    }
+
+    return response.json();
+};

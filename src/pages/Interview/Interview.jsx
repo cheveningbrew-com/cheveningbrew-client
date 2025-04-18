@@ -18,7 +18,7 @@ import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
-import { updateUserField, readUserField,getUserEmail } from "../../services/api";
+import { updateUserField, readUserField,getUserEmail,getUserSubscription } from "../../services/api";
 // Main Page component
 function Page() {
   const [connectionDetails, updateConnectionDetails] = useState(null);
@@ -269,21 +269,53 @@ function ControlBar(props) {
       props.onDisconnect();
     }
   };
-  const handleInterviewEnd = () => {
-    if (props.onDisconnect) {
-      updateUserField("interview_done", true);
-      // sessionStorage.setItem("interviewDone", "true");
-      props.onDisconnect(true);
-      props.onConnectButtonClicked();
-    }
-  }
+
+
+    const [attemptsLeft, setAttemptsLeft] = useState(null);
+  
+    useEffect(() => {
+      const fetchAttempts = async () => {
+        const email = getUserEmail();
+        if (!email) {
+          console.error("No user email found.");
+          return;
+        }
+  
+        try {
+          const result = await getUserSubscription({ email, field: "attempts" });
+          setAttemptsLeft(result?.attempts ?? 0); // default to 0 if missing
+        } catch (error) {
+          console.error("Error fetching attempts:", error);
+          setAttemptsLeft(0); // fallback
+        }
+      };
+  
+      fetchAttempts();
+    }, []);
+  
+    const handleInterviewEnd = () => {
+      if (attemptsLeft > 1) {
+        const newAttempts = attemptsLeft - 1;
+        setAttemptsLeft(newAttempts);
+        updateUserField("attempts", newAttempts);
+      } else if (attemptsLeft === 1) {
+        updateUserField("interview_done", true);
+        updateUserField("attempts", 0);
+        setAttemptsLeft(0);
+        if (props.onDisconnect) {
+          props.onDisconnect(true);
+          props.onConnectButtonClicked();
+        }
+      }
+    };
+  
 
   return (
     <div className="flex justify-center items-center gap-4">
       <button
       onClick={handleInterviewEnd}
       className="startButton"
-      >Finish Interview</button>
+      > Finish Interview ({attemptsLeft} left)</button>
     </div>
 
 

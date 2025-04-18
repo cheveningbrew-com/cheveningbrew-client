@@ -5,7 +5,7 @@ import Uploader from "../../components/Uploader/Uploader";
 import PaymentBox from "../../components/PaymentBox/PaymentBox";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
-import { readUserField ,getUserEmail} from "../../services/api";
+import { readUserField, getUserEmail } from "../../services/api";
 import Price from "../../components/Price_Popup/Price";
 
 const Upload = () => {
@@ -42,7 +42,7 @@ const Upload = () => {
         const hasUserPaid = sessionStorage.getItem("payment_completed") === "true";
         setpayment_completed(hasUserPaid);
         if (!hasUserPaid) {
-          setShowPaymentPopup(true);
+        setShowPaymentPopup(true);
         }
       } finally {
         setIsLoading(false);
@@ -69,12 +69,14 @@ const Upload = () => {
     setShowPaymentPopup(false);
   };
 
-  const handlePaymentError = () => {
-    alert("There was an error with the payment. Please try again.");
+  const handlePaymentError = (error) => {
+    console.error("Payment failed:", error);
+    alert("Payment failed. Please try again.");
   };
 
   const handlePaymentDismissed = () => {
-    console.log("Payment dismissed by user");
+    console.log("User dismissed the payment popup.");
+    setShowPaymentPopup(false);
   };
 
   return (
@@ -90,7 +92,11 @@ const Upload = () => {
               <Uploader onUploadSuccess={handleUploadSuccess} />
             ) : (
               showPaymentPopup && (
-                <Price/>
+                <Price
+                  onPaymentComplete={handlePaymentComplete}
+                  onPaymentError={handlePaymentError}
+                  onPaymentDismissed={handlePaymentDismissed}
+                />
               )
             )}
 
@@ -98,24 +104,24 @@ const Upload = () => {
               <div className={styles.paymentPopupOverlay}>
                 <div className={styles.paymentPopup}>
                   <div className={styles.paymentPopupHeader}>
-                    <h2 className={styles.h2}>Important: interview rules</h2>
+                    <h2 className={styles.h2}>Important: Interview Rules</h2>
                   </div>
                   <div className={`${styles.rulesContent} customScroll`}>
                     <ol className={styles.rulesList}>
                       <li>
-                        * If you quit the interview prematurely before the time is up, you will be graded up to the completion and feedback will be based on that.
+                        * If you quit the interview before time is up, you'll be graded up to that point.
                       </li>
                       <li>
-                        * This is a real-time voice AI platform, so you simply have to have a conversation. Press "Start Conversation" when you are ready.
+                        * This is a real-time voice AI platform. Press "Start Conversation" when you're ready.
                       </li>
                       <li>
-                        * It will take up to ~10 secs for the AI interviewer to connect with you upon pressing "Start Conversation".
+                        * It may take up to ~10 secs to connect the AI interviewer.
                       </li>
                       <li>
-                        * Wait if the interviewer is taking some time (couple of seconds) to respond. This is normal.
+                        * Wait patiently if the interviewer takes a few seconds to respond — that’s normal.
                       </li>
                       <li>
-                        * If you want to change the default audio device, use the dropdown next to the mic.
+                        * You can change the default audio device via the dropdown next to the mic.
                       </li>
                     </ol>
                     <div className={styles.rulesActions}>
