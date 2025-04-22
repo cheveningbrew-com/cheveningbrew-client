@@ -5,6 +5,8 @@ import axios from "axios";
 import { NoAgentNotification } from "../../components/NoAgentNotification";
 import { CloseIcon } from "../../components/CloseIcon";
 import styles from "./Interview.module.css";
+import SignOutPopup from "../../components/SignoutPopup/SignoutPopup";
+import { handleSignOut } from "../../components/SignOut/SignOutHelper";
 import {
   BarVisualizer,
   DisconnectButton,
@@ -18,7 +20,8 @@ import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
-import { updateUserField, readUserField,getUserEmail,getUserSubscription } from "../../services/api";
+import { updateUserField, readUserField,getUserEmail,getUserSubscription,updateUserSubscription } from "../../services/api";
+import { useAuth } from "../../context/AuthContext";
 // Main Page component
 function Page() {
   const [connectionDetails, updateConnectionDetails] = useState(null);
@@ -27,6 +30,9 @@ function Page() {
   const [timerActive, setTimerActive] = useState(false);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [isDisconnecting, setIsDisconnecting] = useState(false);
+  const [showSignOutPopup, setShowSignOutPopup] = useState(false);
+  const { logout, user } = useAuth();
+
 
   const navigate = useNavigate();
 
@@ -38,14 +44,15 @@ function Page() {
     const checkInterviewStatus = async () => {
       try {
         const userEmail = getUserEmail();
-        const interviewDone = await readUserField(userEmail,"interview_done");
-        const paymentCompleted = await readUserField(userEmail,"payment_completed");
-
+        const interviewDone = await readUserField(userEmail, "interview_done");
+        const paymentCompleted = await readUserField(userEmail, "payment_completed");
+    
         console.log("Interview done from DB:", interviewDone);
         console.log("Payment completed DB:", paymentCompleted);
-
+    
         if (interviewDone === true) {
-          navigate("/feedback");
+          // navigate("/feedback");
+          setShowSignOutPopup(true); // Show the popup instead of navigating directly
         } else if (paymentCompleted !== true) {
           navigate("/upload");
         }
@@ -53,7 +60,7 @@ function Page() {
         console.error("Error checking interview status:", error);
       }
     };
-
+    
     checkInterviewStatus();
   }, [navigate]);
 
@@ -163,8 +170,24 @@ function Page() {
     }
   }, []);
 
+  const handleSignOutConfirm = () => {
+    setShowSignOutPopup(false);
+    // navigate("/feedback");
+    handleSignOut(logout, navigate, user?.email);
+  };
+  
+  const handleSignOutCancel = () => {
+    setShowSignOutPopup(false);
+    navigate("/feedback");
+  };
+  
   return (
     <MainLayout>
+      <SignOutPopup
+        isOpen={showSignOutPopup}
+        onConfirm={handleSignOutConfirm}
+        onCancel={handleSignOutCancel}
+      />
       <ActionBox>
         <div className={`${styles.interviewContent} customScroll`}>
           {timerActive && (
@@ -297,10 +320,11 @@ function ControlBar(props) {
       if (attemptsLeft > 1) {
         const newAttempts = attemptsLeft - 1;
         setAttemptsLeft(newAttempts);
-        updateUserField("attempts", newAttempts);
+        updateUserSubscription({ field: "attempts", value: newAttempts });
       } else if (attemptsLeft === 1) {
         updateUserField("interview_done", true);
-        updateUserField("attempts", 0);
+        updateUserSubscription({ field: "attempts", value:0 });
+        // updateUserField("interview_done", true);
         setAttemptsLeft(0);
         if (props.onDisconnect) {
           props.onDisconnect(true);
@@ -308,15 +332,17 @@ function ControlBar(props) {
         }
       }
     };
-  
+
 
   return (
+    
     <div className="flex justify-center items-center gap-4">
       <button
       onClick={handleInterviewEnd}
       className="startButton"
       > Finish Interview ({attemptsLeft} left)</button>
     </div>
+    
 
 
   //   <div className="relative h-[100px]">

@@ -41,7 +41,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = (token, name, email) => {
     sessionStorage.setItem('authToken', token);
-    sessionStorage.setItem('userName', name || '');
+    // sessionStorage.setItem('userName', name || '');
     sessionStorage.setItem('userEmail', email || '');
     checkAuthStatus();
   };

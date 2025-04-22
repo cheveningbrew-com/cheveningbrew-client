@@ -2,11 +2,11 @@ import React, { useState, useEffect } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import Uploader from "../../components/Uploader/Uploader";
-import PaymentBox from "../../components/PaymentBox/PaymentBox";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
 import { readUserField, getUserEmail } from "../../services/api";
 import Price from "../../components/Price_Popup/Price";
+
 
 const Upload = () => {
   const [_, setFilePath] = useState(null);
@@ -50,7 +50,7 @@ const Upload = () => {
     };
 
     checkPaymentStatus();
-  }, []);
+  }, [isLoading]);
   
 
   const handleUploadSuccess = (path) => {
@@ -81,6 +81,7 @@ const Upload = () => {
 
   return (
     <MainLayout>
+      {/* <SignOutPopup/> */}
       <ActionBox>
         <div className={`${styles.uploadContainer} customScroll`}>
           <div>
@@ -90,6 +91,7 @@ const Upload = () => {
 
             {payment_completed ? (
               <Uploader onUploadSuccess={handleUploadSuccess} />
+              
             ) : (
               showPaymentPopup && (
                 <Price

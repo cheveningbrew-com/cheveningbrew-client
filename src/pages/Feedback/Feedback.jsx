@@ -46,7 +46,7 @@ const Feedback = () => {
         const newFeedback = response.data.feedback;
         
         // 3. Cache the new feedback
-        sessionStorage.setItem("cached_feedback", newFeedback);
+        // sessionStorage.setItem("cached_feedback", newFeedback);
         await updateUserField("cached_feedback", newFeedback);
 
         console.log("Feedback fetched and cached successfully.");

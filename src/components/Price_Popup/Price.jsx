@@ -5,9 +5,9 @@ import { updateUserField } from '../../services/api';
 
 const handlePaymentComplete = (orderId) => {
   console.log("Payment completed. Order ID:", orderId);
-  sessionStorage.setItem("payment_completed", "true");
+  // sessionStorage.setItem("payment_completed", "true");
   updateUserField("payment_completed", true);
-  alert("Payment successful! You can now access the app.");
+  // alert("Payment successful! You can now access the app.");
 };
 
 const handlePaymentError = (error) => {

@@ -207,21 +207,25 @@ export const getUserSubscription = async ({ email, field }) => {
 };
 
 // Update a specific field in a user's subscription
-export const updateUserSubscription = async ({ id, field, value }) => {
-    const email = getUserEmail();
+export const updateUserSubscription = async ({ field, value }) => {
+    const userEmail = getUserEmail();
 
-    if (!email) {
-        throw new Error("User email not found in session storage");
-    }
+    // Debug log for quick inspection
+    console.log("updateUserSubscription called with:", {
+        email: userEmail,
+        field,
+        value,
+    });
 
-    if (!id || !field || value === undefined) {
-        throw new Error("Missing id, field, or value");
+    // Proper null/undefined checks
+    if (userEmail == null || field == null || value === undefined) {
+        throw new Error("Missing email, field, or value");
     }
 
     const response = await fetch(`${REACT_APP_DB_SERVER_URL}/update_Subcription_field`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, id, field, value }),
+        body: JSON.stringify({ email: userEmail, field, value }),
     });
 
     if (!response.ok) {
