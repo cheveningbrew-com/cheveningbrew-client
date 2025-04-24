@@ -4,7 +4,7 @@ import ActionBox from "../../components/ActionBox/ActionBox";
 import Uploader from "../../components/Uploader/Uploader";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
-import { readUserField, getUserEmail } from "../../services/api";
+import { readUserField, getUserId } from "../../services/api";
 import Price from "../../components/Price_Popup/Price";
 
 
@@ -18,15 +18,15 @@ const Upload = () => {
 
   useEffect(() => {
     const checkPaymentStatus = async () => {
-      const userEmail = getUserEmail();
-      if (!userEmail) {
+      const user_id = getUserId();
+      if (!user_id) {
         navigate("/");
         return;
       }
 
       try {
         // Check payment status from database
-        const dbPaymentStatus = await readUserField(userEmail, "payment_completed");
+        const dbPaymentStatus = await readUserField(user_id, "payment_completed");
         
         // Use database status if available, otherwise fallback to sessionStorage
         const hasUserPaid = dbPaymentStatus;

@@ -20,7 +20,7 @@ import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
 import { AnimatePresence, motion } from "framer-motion";
 import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
-import { updateUserField, readUserField,getUserEmail,getUserSubscription,updateUserSubscription } from "../../services/api";
+import { completeInterview,createInterview, readUserField,getUserId,getUserSubscription,updateUserSubscription,interviewReadUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 // Main Page component
 function Page() {
@@ -43,15 +43,16 @@ function Page() {
 
     const checkInterviewStatus = async () => {
       try {
-        const userEmail = getUserEmail();
-        const interviewDone = await readUserField(userEmail, "interview_done");
-        const paymentCompleted = await readUserField(userEmail, "payment_completed");
+        const user_id = getUserId();
+        const interviewDone = await interviewReadUserField(user_id, "is_completed");
+        const paymentCompleted = await readUserField(user_id, "payment_completed");
     
         console.log("Interview done from DB:", interviewDone);
         console.log("Payment completed DB:", paymentCompleted);
     
         if (interviewDone === true) {
           // navigate("/feedback");
+
           setShowSignOutPopup(true); // Show the popup instead of navigating directly
         } else if (paymentCompleted !== true) {
           navigate("/upload");
@@ -97,7 +98,7 @@ function Page() {
 
     setIsDisconnecting(true);
     // sessionStorage.setItem("interviewDone", "true");
-    updateUserField("interview_done", true);
+    completeInterview("is_completed", true);
     updateConnectionDetails(null);
 
     setTimeout(() => {
@@ -123,10 +124,11 @@ function Page() {
   };
 
   const onConnectButtonClicked = useCallback(async () => {
+    
     try {
-      const userEmail = getUserEmail();
-      const userName = readUserField(userEmail,"name");
-      const userQuestions = readUserField(userEmail,"interview_questions");
+      const user_id = getUserId();
+      const userName = await readUserField(user_id, "name");
+      const userQuestions = await interviewReadUserField(user_id, "questions");      
       // using userName and time, generate a unique file path for saving chat history
       // no space allowed in file name. No special characters allowed in file name except underscore
       const sanitizedUserName =
@@ -134,12 +136,13 @@ function Page() {
           ? userName.replace(/[^a-zA-Z0-9]/g, "_")
           : "unknown_user";
 
-      const chatHistoryPath = `${sanitizedUserName}_${Date.now()}.txt`;
+      const chatHistoryPath = `${encodeURIComponent(sanitizedUserName)}_${Date.now()}.txt`;
+
 
 
       // store the chat history path in local storage
       // sessionStorage.setItem("chatHistoryPath", chatHistoryPath);
-      sessionStorage.setItem("chatHistoryPath", "sample.txt");
+      sessionStorage.setItem("chatHistoryPath", chatHistoryPath);
 
       // clear cachedFeedback from local storage if it exists
       sessionStorage.removeItem("cachedFeedback");
@@ -173,7 +176,7 @@ function Page() {
   const handleSignOutConfirm = () => {
     setShowSignOutPopup(false);
     // navigate("/feedback");
-    handleSignOut(logout, navigate, user?.email);
+    handleSignOut(logout, navigate, user?.user_id);
   };
   
   const handleSignOutCancel = () => {
@@ -298,14 +301,14 @@ function ControlBar(props) {
   
     useEffect(() => {
       const fetchAttempts = async () => {
-        const email = getUserEmail();
-        if (!email) {
+        const user_id = getUserId();
+        if (!user_id) {
           console.error("No user email found.");
           return;
         }
   
         try {
-          const result = await getUserSubscription({ email, field: "attempts" });
+          const result = await getUserSubscription({ user_id, field: "attempts" });
           setAttemptsLeft(result?.attempts ?? 0); // default to 0 if missing
         } catch (error) {
           console.error("Error fetching attempts:", error);
@@ -321,8 +324,9 @@ function ControlBar(props) {
         const newAttempts = attemptsLeft - 1;
         setAttemptsLeft(newAttempts);
         updateUserSubscription({ field: "attempts", value: newAttempts });
+        createInterview("is_completed", true);
       } else if (attemptsLeft === 1) {
-        updateUserField("interview_done", true);
+        completeInterview("is_completed", true);
         updateUserSubscription({ field: "attempts", value:0 });
         // updateUserField("interview_done", true);
         setAttemptsLeft(0);
@@ -336,48 +340,48 @@ function ControlBar(props) {
 
   return (
     
-    <div className="flex justify-center items-center gap-4">
-      <button
-      onClick={handleInterviewEnd}
-      className="startButton"
-      > Finish Interview ({attemptsLeft} left)</button>
-    </div>
+    // <div className="flex justify-center items-center gap-4">
+    //   <button
+    //   onClick={handleInterviewEnd}
+    //   className="startButton"
+    //   > Finish Interview ({attemptsLeft} left)</button>
+    // </div>
     
 
 
-  //   <div className="relative h-[100px]">
-  //     <AnimatePresence>
-  //       {props.agentState === "disconnected" && (
-  //         <motion.button
-  //           initial={{ opacity: 0, top: 0 }}
-  //           animate={{ opacity: 1 }}
-  //           exit={{ opacity: 0, top: "-10px" }}
-  //           transition={{ duration: 1, ease: [0.09, 1.04, 0.245, 1.055] }}
-  //           className="startButton"
-  //           onClick={props.onConnectButtonClicked}
-  //         >
-  //           Start your interview
-  //         </motion.button>
-  //       )}
-  //     </AnimatePresence>
-  //     <AnimatePresence>
-  //       {props.agentState !== "disconnected" &&
-  //         props.agentState !== "connecting" && (
-  //           <motion.div
-  //             initial={{ opacity: 0, top: "10px" }}
-  //             animate={{ opacity: 1, top: 0 }}
-  //             exit={{ opacity: 0, top: "-10px" }}
-  //             transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
-  //             className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
-  //           >
-  //             <VoiceAssistantControlBar controls={{ leave: false }} />
-  //             <DisconnectButton onClick={handleDisconnect}>
-  //               <CloseIcon />
-  //             </DisconnectButton>
-  //           </motion.div>
-  //         )}
-  //     </AnimatePresence>
-  //   </div>
+    <div className="relative h-[100px]">
+      <AnimatePresence>
+        {props.agentState === "disconnected" && (
+          <motion.button
+            initial={{ opacity: 0, top: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0, top: "-10px" }}
+            transition={{ duration: 1, ease: [0.09, 1.04, 0.245, 1.055] }}
+            className="startButton"
+            onClick={props.onConnectButtonClicked}
+          >
+            Start your interview
+          </motion.button>
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {props.agentState !== "disconnected" &&
+          props.agentState !== "connecting" && (
+            <motion.div
+              initial={{ opacity: 0, top: "10px" }}
+              animate={{ opacity: 1, top: 0 }}
+              exit={{ opacity: 0, top: "-10px" }}
+              transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
+              className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
+            >
+              <VoiceAssistantControlBar controls={{ leave: false }} />
+              <DisconnectButton onClick={handleDisconnect}>
+                <CloseIcon />
+              </DisconnectButton>
+            </motion.div>
+          )}
+      </AnimatePresence>
+    </div>
    );
 }
 

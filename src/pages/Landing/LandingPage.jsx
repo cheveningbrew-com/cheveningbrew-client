@@ -49,8 +49,8 @@ const LandingPage = () => {
           console.log("Authentication successful:", data);
   
           // Step 2: Call auth context login
-          if (data.user && data.user.name && data.user.email) {
-            authLogin(data.authToken, data.user.name, data.user.email);
+          if (data.user && data.user.name && data.user.id) {
+            authLogin(data.authToken, data.user.name, data.user.id);
           } else {
             authLogin(data.authToken);
           }

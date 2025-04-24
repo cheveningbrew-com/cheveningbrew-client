@@ -40,7 +40,7 @@ export const sendAudioChunk = async (audioBlob, sessionId) => {
 // Create a user (if not exists, update last login)
 export const createUser = async (email, name, id, picture, auth_token) => {
     try {
-      const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/create_user`, {
+      const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/create`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -61,17 +61,17 @@ export const createUser = async (email, name, id, picture, auth_token) => {
   };
 
 // Get user Email from session storage
-export const getUserEmail = () => sessionStorage.getItem("userEmail");
+export const getUserId = () => sessionStorage.getItem("user_id");
 
 // Get user details from database
-export const readUserField = async (email, field) => {
+export const readUserField = async (user_id, field) => {
     try {
-        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/read_user_field`, {
+        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/read_field`, {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
-            body: JSON.stringify({ email, field }),
+            body: JSON.stringify({ user_id, field }),
         });
 
         if (!response.ok) {
@@ -96,19 +96,19 @@ export const readUserField = async (email, field) => {
 
 // Update user field in database storage
 export const updateUserField = async (field, value) => {
-    const userEmail = getUserEmail();
+    const user_id = getUserId();
 
-    if (!userEmail) {
+    if (!user_id) {
         throw new Error("User email not found in session storage");
     }
 
-    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/update_user_field`, {
+    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/update_field`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            email: userEmail,  // Ensure the email is sent
+            user_id: user_id,  // Ensure the email is sent
             field,
             value: typeof value === 'object' ? JSON.stringify(value) : value,
         }),
@@ -123,9 +123,8 @@ export const updateUserField = async (field, value) => {
 
 // Clear user data from session storage and database
 export const clearUser = async () => {
-    const userEmail = getUserEmail();
-
-    if (!userEmail) {
+    const user_id = getUserId();
+    if (!user_id) {
         throw new Error("User email not found in session storage");
     }
 
@@ -135,7 +134,7 @@ export const clearUser = async () => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            email: userEmail,
+            id: user_id,
         }),
     });
 
@@ -145,16 +144,16 @@ export const clearUser = async () => {
 // Clear user data like without name,email and id  from   database
 export const SignOut_clearUser = async () => {
     try {
-        const userEmail = getUserEmail();
+        const user_id = getUserId();
 
-        if (!userEmail) {
+        if (!user_id) {
             throw new Error("User email not found in session storage");
         }
 
-        const response = await fetch(`${REACT_APP_DB_SERVER_URL}/SignOut_user`, {
+        const response = await fetch(`${REACT_APP_DB_SERVER_URL}/users/signout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email: userEmail }),
+            body: JSON.stringify({ user_id: user_id }),
         });
 
         if (!response.ok) {
@@ -169,15 +168,15 @@ export const SignOut_clearUser = async () => {
 };
 
 // Accept user subscription details as parameters
-export const subscribeUser = async ({ email, plan, price, attempts }) => {
-    if (!email || !plan || price == null || attempts == null) {
+export const subscribeUser = async ({ user_id, plan, price, attempts }) => {
+    if (!user_id || !plan || price == null || attempts == null) {
         throw new Error("Missing subscription details");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscribe_user`, {
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscriptions/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, plan, price, attempts }),
+        body: JSON.stringify({ user_id, plan, price, attempts }),
     });
 
     if (!response.ok) {
@@ -188,15 +187,15 @@ export const subscribeUser = async ({ email, plan, price, attempts }) => {
 };
 
 // Get a specific field from a user's subscription
-export const getUserSubscription = async ({ email, field }) => {
-    if (!email || !field) {
+export const getUserSubscription = async ({ user_id, field }) => {
+    if (!user_id || !field) {
         throw new Error("Missing id or field");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/read_Subcription_field`, {
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscriptions/read_field`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, field }),
+        body: JSON.stringify({ user_id, field }),
     });
 
     if (!response.ok) {
@@ -208,24 +207,24 @@ export const getUserSubscription = async ({ email, field }) => {
 
 // Update a specific field in a user's subscription
 export const updateUserSubscription = async ({ field, value }) => {
-    const userEmail = getUserEmail();
+    const user_id = getUserId();
 
     // Debug log for quick inspection
     console.log("updateUserSubscription called with:", {
-        email: userEmail,
+        user_id: user_id,
         field,
         value,
     });
 
     // Proper null/undefined checks
-    if (userEmail == null || field == null || value === undefined) {
-        throw new Error("Missing email, field, or value");
+    if (user_id == null || field == null || value === undefined) {
+        throw new Error("Missing id, field, or value");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/update_Subcription_field`, {
+    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscriptions/update_field`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email: userEmail, field, value }),
+        body: JSON.stringify({ user_id: user_id, field, value }),
     });
 
     if (!response.ok) {
@@ -233,4 +232,75 @@ export const updateUserSubscription = async ({ field, value }) => {
     }
 
     return response.json();
+};
+
+// # interview questions APi end poiny
+export const createInterview = async (user_id, questions) => {
+    const res = await fetch(`${REACT_APP_DB_SERVER_URL}/interviews/create`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id, questions }),
+    });
+    if (!res.ok) throw new Error("Failed to create interview");
+    return await res.json();
+  }
+
+
+
+  export const completeInterview = async (field, value) => {
+    const user_id = getUserId();
+
+    if (!user_id) {
+        throw new Error("User email not found in session storage");
+    }
+
+    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/interviews/complete`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            user_id: user_id,  // Ensure the email is sent
+            field,
+            value: typeof value === 'object' ? JSON.stringify(value) : value,
+        }),
+    });
+
+    if (!response.ok) {
+        throw new Error(`Failed to update user field: ${response.statusText}`);
+    }
+
+    return response.json();
+};
+
+
+
+export const interviewReadUserField = async (user_id, field) => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/interviews/get_user_interviews`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id, field }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch: ${response.status} - ${response.statusText}, Details: ${errorText}`);
+        }
+
+        const data = await response.json();
+        // console.log("User Field:", data);
+
+        // Ensure boolean values are properly handled
+        if (field === "payment_completed" && data[field] === null) {
+            return false; // Convert null to false
+        }
+
+        return data[field]; 
+    } catch (error) {
+        console.error("Error fetching user field:", error.message);
+        return null;
+    }
 };

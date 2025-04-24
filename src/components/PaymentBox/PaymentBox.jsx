@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
-import { updateUserField, readUserField, getUserEmail, subscribeUser } from '../../services/api';
+import { updateUserField, readUserField, getUserId, subscribeUser } from '../../services/api';
 
 const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
@@ -29,9 +29,9 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
   const handlePaymentComplete = useCallback(async (orderId) => {
     try {
-      const userEmail = getUserEmail();
+      const user_id = getUserId();
       // const userEmail = await readUserField(userEmail, "email");
-      await subscribeUser({ email: userEmail, plan: plan.id, price: plan.amount, attempts: plan.attempts });
+      await subscribeUser({ user_id: user_id, plan: plan.id, price: plan.amount, attempts: plan.attempts });
       updateUserField("payment_completed", true);
       onPaymentComplete(orderId);
     } catch (err) {
@@ -64,7 +64,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
     }
 setIsProcessing(true);
 
-    const userEmail = getUserEmail(); // Get the email first
+    const userEmail = getUserId(); // Get the email first
     const userName = readUserField(userEmail, "name");
     try {
       // Prepare payment details

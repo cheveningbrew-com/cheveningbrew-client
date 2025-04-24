@@ -1,7 +1,7 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { validateToken, clearAuthData } from '../utils/auth';
-import {readUserField,getUserEmail,updateUserField} from '../services/api'
+import {readUserField,getUserId,updateUserField} from '../services/api'
 
 const AuthContext = createContext(null);
 
@@ -20,15 +20,15 @@ export const AuthProvider = ({ children }) => {
     setLoading(true);
 
     // Log token for debugging
-    const userEmail = getUserEmail();
+    const user_id = getUserId();
 
-    const token = readUserField(userEmail, "auth_token");
+    const token = readUserField(user_id, "auth_token");
     console.log("Token exists:", !!token);
 
     if (validateToken()) {
       console.log("Token is valid, setting authenticated");
       setIsAuthenticated(true);
-      setUserName(readUserField(userEmail, "name"));
+      setUserName(readUserField(user_id, "name"));
     } else {
       console.log("Token is invalid or missing");
       clearAuthData();
@@ -39,10 +39,10 @@ export const AuthProvider = ({ children }) => {
     setLoading(false);
   };
 
-  const login = (token, name, email) => {
+  const login = (token, name, id) => {
     sessionStorage.setItem('authToken', token);
     // sessionStorage.setItem('userName', name || '');
-    sessionStorage.setItem('userEmail', email || '');
+    sessionStorage.setItem('user_id', id || '');
     checkAuthStatus();
   };
 
@@ -55,7 +55,7 @@ export const AuthProvider = ({ children }) => {
       'interviewQuestions',
       'lk-user-choices',
       'paymentCompleted',
-      'userEmail',
+      'user_id',
       'userName',
       'authToken',
       'cachedFeedback'

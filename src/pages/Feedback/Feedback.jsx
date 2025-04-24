@@ -3,7 +3,7 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import axios from "axios";
-import { updateUserField, getUserEmail, readUserField } from "../../services/api";
+import { completeInterview, getUserId, readUserField } from "../../services/api";
 import ReactMarkdown from "react-markdown";
 
 const Feedback = () => {
@@ -14,10 +14,10 @@ const Feedback = () => {
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const userEmail = getUserEmail();
+        const user_id = getUserId();
         
         // 1. Check for cached feedback first
-        const cachedFeedback = await readUserField(userEmail, "cached_feedback");
+        const cachedFeedback = await readUserField(user_id, "cached_feedback");
         if (cachedFeedback) {
           console.log("Using cached feedback");
           setFeedback(cachedFeedback);
@@ -47,7 +47,7 @@ const Feedback = () => {
         
         // 3. Cache the new feedback
         // sessionStorage.setItem("cached_feedback", newFeedback);
-        await updateUserField("cached_feedback", newFeedback);
+        await completeInterview("feedback", newFeedback);
 
         console.log("Feedback fetched and cached successfully.");
         

@@ -5,16 +5,16 @@ import Logo from "../components/Logo/Logo";
 import NameDisplay from "../components/NameDisplay/NameDisplay";
 import SignOUt from "../components/SignOut/SignOut";
 import styles from "./layout.module.css";
-import {getUserEmail,readUserField} from "../services/api"
+import {getUserId,readUserField} from "../services/api"
 
 const MainLayout = ({ children }) => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
     const fetchUserName = async () => {
-      const userEmail = getUserEmail();
-      if (userEmail) {
-        const storedName = await readUserField(userEmail, "name");
+      const user_id = getUserId();
+      if (user_id) {
+        const storedName = await readUserField(user_id, "name");
         if (storedName) {
           setUserName(storedName);
         }
