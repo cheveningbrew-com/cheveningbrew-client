@@ -40,30 +40,30 @@ function Page() {
   useEffect(() => {
     // const interviewDone = sessionStorage.getItem("interviewDone") === "true";
     // const paymentCompleted = sessionStorage.getItem("paymentCompleted") === "true";
-
-    const checkInterviewStatus = async () => {
-      try {
-        const user_id = getUserId();
-        const interviewDone = await interviewReadUserField(user_id, "is_completed");
-        const paymentCompleted = await readUserField(user_id, "payment_completed");
+      const checkInterviewStatus = async () => {
+        try {
+          const user_id = getUserId();
+          const interviewDone = await interviewReadUserField(user_id, "is_completed");
+          const paymentCompleted = await readUserField(user_id, "payment_completed");
+          const attemptsLeft = await getUserSubscription({ user_id, field: "attempts" });
     
-        console.log("Interview done from DB:", interviewDone);
-        console.log("Payment completed DB:", paymentCompleted);
+          console.log("Interview done from DB:", interviewDone);
+          console.log("Payment completed DB:", paymentCompleted);
     
-        if (interviewDone === true) {
-          // navigate("/feedback");
-
-          setShowSignOutPopup(true); // Show the popup instead of navigating directly
-        } else if (paymentCompleted !== true) {
-          navigate("/upload");
+          if (interviewDone === true && attemptsLeft === 0) {
+            // navigate("/feedback");
+            setShowSignOutPopup(true); // Show the popup instead of navigating directly
+          } else if (paymentCompleted !== true) {
+            navigate("/upload");
+          }
+        } catch (error) {
+          console.error("Error checking interview status:", error);
         }
-      } catch (error) {
-        console.error("Error checking interview status:", error);
-      }
-    };
+      };
     
-    checkInterviewStatus();
-  }, [navigate]);
+      checkInterviewStatus();
+    }, [navigate]);
+    
 
   // Timer countdown effect
   useEffect(() => {
@@ -142,7 +142,7 @@ function Page() {
 
       // store the chat history path in local storage
       // sessionStorage.setItem("chatHistoryPath", chatHistoryPath);
-      sessionStorage.setItem("chatHistoryPath", chatHistoryPath);
+      sessionStorage.setItem("chatHistoryPath", "sample.txt");
 
       // clear cachedFeedback from local storage if it exists
       sessionStorage.removeItem("cachedFeedback");
@@ -318,13 +318,13 @@ function ControlBar(props) {
   
       fetchAttempts();
     }, []);
-  
+    const navigate = useNavigate();
     const handleInterviewEnd = () => {
       if (attemptsLeft > 1) {
         const newAttempts = attemptsLeft - 1;
         setAttemptsLeft(newAttempts);
         updateUserSubscription({ field: "attempts", value: newAttempts });
-        createInterview("is_completed", true);
+        navigate("/feedback");
       } else if (attemptsLeft === 1) {
         completeInterview("is_completed", true);
         updateUserSubscription({ field: "attempts", value:0 });
@@ -340,48 +340,48 @@ function ControlBar(props) {
 
   return (
     
-    // <div className="flex justify-center items-center gap-4">
-    //   <button
-    //   onClick={handleInterviewEnd}
-    //   className="startButton"
-    //   > Finish Interview ({attemptsLeft} left)</button>
-    // </div>
+    <div className="flex justify-center items-center gap-4">
+      <button
+      onClick={handleInterviewEnd}
+      className="startButton"
+      > Finish Interview ({attemptsLeft} left)</button>
+    </div>
     
 
 
-    <div className="relative h-[100px]">
-      <AnimatePresence>
-        {props.agentState === "disconnected" && (
-          <motion.button
-            initial={{ opacity: 0, top: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0, top: "-10px" }}
-            transition={{ duration: 1, ease: [0.09, 1.04, 0.245, 1.055] }}
-            className="startButton"
-            onClick={props.onConnectButtonClicked}
-          >
-            Start your interview
-          </motion.button>
-        )}
-      </AnimatePresence>
-      <AnimatePresence>
-        {props.agentState !== "disconnected" &&
-          props.agentState !== "connecting" && (
-            <motion.div
-              initial={{ opacity: 0, top: "10px" }}
-              animate={{ opacity: 1, top: 0 }}
-              exit={{ opacity: 0, top: "-10px" }}
-              transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
-              className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
-            >
-              <VoiceAssistantControlBar controls={{ leave: false }} />
-              <DisconnectButton onClick={handleDisconnect}>
-                <CloseIcon />
-              </DisconnectButton>
-            </motion.div>
-          )}
-      </AnimatePresence>
-    </div>
+    // <div className="relative h-[100px]">
+    //   <AnimatePresence>
+    //     {props.agentState === "disconnected" && (
+    //       <motion.button
+    //         initial={{ opacity: 0, top: 0 }}
+    //         animate={{ opacity: 1 }}
+    //         exit={{ opacity: 0, top: "-10px" }}
+    //         transition={{ duration: 1, ease: [0.09, 1.04, 0.245, 1.055] }}
+    //         className="startButton"
+    //         onClick={props.onConnectButtonClicked}
+    //       >
+    //         Start your interview
+    //       </motion.button>
+    //     )}
+    //   </AnimatePresence>
+    //   <AnimatePresence>
+    //     {props.agentState !== "disconnected" &&
+    //       props.agentState !== "connecting" && (
+    //         <motion.div
+    //           initial={{ opacity: 0, top: "10px" }}
+    //           animate={{ opacity: 1, top: 0 }}
+    //           exit={{ opacity: 0, top: "-10px" }}
+    //           transition={{ duration: 0.4, ease: [0.09, 1.04, 0.245, 1.055] }}
+    //           className="flex h-8 absolute left-1/2 -translate-x-1/2  justify-center"
+    //         >
+    //           <VoiceAssistantControlBar controls={{ leave: false }} />
+    //           <DisconnectButton onClick={handleDisconnect}>
+    //             <CloseIcon />
+    //           </DisconnectButton>
+    //         </motion.div>
+    //       )}
+    //   </AnimatePresence>
+    // </div>
    );
 }
 
