@@ -23,7 +23,7 @@ import { useNavigate } from "react-router-dom";
 import { completeInterview,createInterview, readUserField,getUserId,getUserSubscription,updateUserSubscription,interviewReadUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 // Main Page component
-function Page() {
+function Page(props) {
   const [connectionDetails, updateConnectionDetails] = useState(null);
   const [agentState, setAgentState] = useState("disconnected");
   const [timeRemaining, setTimeRemaining] = useState(20 * 60); // 15 minutes in seconds
@@ -32,6 +32,11 @@ function Page() {
   const [isDisconnecting, setIsDisconnecting] = useState(false);
   const [showSignOutPopup, setShowSignOutPopup] = useState(false);
   const { logout, user } = useAuth();
+  const [interviewDone, setInterviewDone] = useState(false);
+const [paymentCompleted, setPaymentCompleted] = useState(false);
+const [attemptsLeft, setAttemptsLeft] = useState(0);
+const [paymentStatus, setPaymentStatus] = useState(false)
+
 
 
   const navigate = useNavigate();
@@ -46,15 +51,18 @@ function Page() {
         const user_id = getUserId();
         const interviewDone = await interviewReadUserField(user_id, "is_completed");
         const paymentCompleted = await readUserField(user_id, "payment_completed");
+        const subscription = await getUserSubscription({ user_id, field: "attempts" });
+
+        setInterviewDone(interviewDone === true);
+        setPaymentCompleted(paymentCompleted === true);
+        setAttemptsLeft(subscription);
     
         console.log("Interview done from DB:", interviewDone);
         console.log("Payment completed DB:", paymentCompleted);
     
-        if (interviewDone === true) {
-          // navigate("/feedback");
-
-          setShowSignOutPopup(true); // Show the popup instead of navigating directly
-        } else if (paymentCompleted !== true) {
+        if (interviewDone || subscription === 0 ) {
+          setShowSignOutPopup(true);
+        } else if (paymentCompleted === false) {
           navigate("/upload");
         }
       } catch (error) {
@@ -127,6 +135,31 @@ function Page() {
     
     try {
       const user_id = getUserId();
+
+      
+    if (attemptsLeft > 1) {
+      const newAttempts = attemptsLeft - 1;
+      setAttemptsLeft(newAttempts);
+      await updateUserSubscription({ field: "attempts", value: newAttempts });
+    } else if (attemptsLeft === 1) {
+      await updateUserSubscription({ field: "attempts", value: 0 });
+      setAttemptsLeft(0);
+
+      // Mark interview as completed AFTER interview actually finishes
+      // Not immediately here unless it's intended behavior
+
+      if (!interviewDone) {
+        setShowSignOutPopup(true);
+      }
+
+      if (props?.onDisconnect) {
+        props.onDisconnect(true);
+        props.onConnectButtonClicked?.();
+      }
+    }
+  
+
+      // Fetch user name and questions from the backend API
       const userName = await readUserField(user_id, "name");
       const userQuestions = await interviewReadUserField(user_id, "questions");      
       // using userName and time, generate a unique file path for saving chat history
@@ -319,23 +352,6 @@ function ControlBar(props) {
       fetchAttempts();
     }, []);
   
-    const handleInterviewEnd = () => {
-      if (attemptsLeft > 1) {
-        const newAttempts = attemptsLeft - 1;
-        setAttemptsLeft(newAttempts);
-        updateUserSubscription({ field: "attempts", value: newAttempts });
-        createInterview("is_completed", true);
-      } else if (attemptsLeft === 1) {
-        completeInterview("is_completed", true);
-        updateUserSubscription({ field: "attempts", value:0 });
-        // updateUserField("interview_done", true);
-        setAttemptsLeft(0);
-        if (props.onDisconnect) {
-          props.onDisconnect(true);
-          props.onConnectButtonClicked();
-        }
-      }
-    };
 
 
   return (
@@ -360,7 +376,7 @@ function ControlBar(props) {
             className="startButton"
             onClick={props.onConnectButtonClicked}
           >
-            Start your interview
+            Start your interview({attemptsLeft} left)
           </motion.button>
         )}
       </AnimatePresence>
