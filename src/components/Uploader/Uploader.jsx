@@ -63,7 +63,8 @@ const Uploader = ({ onUploadSuccess }) => {
       // Call the callback with the file path if provided
       if (onUploadSuccess) {
     onUploadSuccess(result.interview_questions);
-        createInterview(getUserId(), JSON.stringify(result.interview_questions));
+    // createInterview(getUserId(), JSON.stringify(result.interview_questions));
+    sessionStorage.setItem("interview_questions", JSON.stringify(result.interview_questions));
       }
 
       // // Update user field in session storage

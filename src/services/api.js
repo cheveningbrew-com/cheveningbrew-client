@@ -235,23 +235,24 @@ export const updateUserSubscription = async ({ field, value }) => {
 };
 
 // # interview questions APi end poiny
-export const createInterview = async (user_id, questions) => {
+export const createInterview = async ( interview_id,user_id, questions) => {
     const res = await fetch(`${REACT_APP_DB_SERVER_URL}/interviews/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id, questions }),
+      body: JSON.stringify({ interview_id,user_id, questions }),
     });
     if (!res.ok) throw new Error("Failed to create interview");
     return await res.json();
   }
 
 
-
+  
   export const completeInterview = async (field, value) => {
+    const interview_id = sessionStorage.getItem("interview_Id");
     const user_id = getUserId();
-
-    if (!user_id) {
-        throw new Error("User email not found in session storage");
+    console.log("interview_id", interview_id);
+    if (!interview_id) {
+        throw new Error("User interview_id not found in session storage");
     }
 
     const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/interviews/complete`, {
@@ -260,7 +261,8 @@ export const createInterview = async (user_id, questions) => {
             'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-            user_id: user_id,  // Ensure the email is sent
+            interview_id: interview_id,  // Ensure the email is sent
+            user_id: user_id,
             field,
             value: typeof value === 'object' ? JSON.stringify(value) : value,
         }),

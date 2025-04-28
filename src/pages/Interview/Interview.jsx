@@ -55,13 +55,15 @@ const [paymentStatus, setPaymentStatus] = useState(false)
 
         setInterviewDone(interviewDone === true);
         setPaymentCompleted(paymentCompleted === true);
-        setAttemptsLeft(subscription);
+        setAttemptsLeft(subscription.attempts);
     
         console.log("Interview done from DB:", interviewDone);
         console.log("Payment completed DB:", paymentCompleted);
+        console.log("Subscription attempts left:", subscription);
     
-        if (interviewDone || subscription === 0 ) {
+        if (interviewDone && subscription.attempts === 0 ) {
           setShowSignOutPopup(true);
+          console.log("User has no attempts left and interview is done.");
         } else if (paymentCompleted === false) {
           navigate("/upload");
         }
@@ -97,22 +99,40 @@ const [paymentStatus, setPaymentStatus] = useState(false)
       .padStart(2, "0")}`;
   };
 
-  const handleInterviewEnd = (forceEnd = false) => {
-    // If timer hasn't expired and not forcing end, show confirmation
+  const handleInterviewEnd = async (forceEnd = false) => {
     if (timeRemaining > 0 && !forceEnd && timerActive) {
       setShowConfirmDialog(true);
       return;
     }
+  
+    if (attemptsLeft > 1) {
+      const newAttempts = attemptsLeft - 1;
+      await updateUserSubscription({ field: "attempts", value: newAttempts });
+      console.log("Attempts left:", newAttempts);
+      
+      setAttemptsLeft(newAttempts);
+    } else if (attemptsLeft === 1) {
+      await updateUserSubscription({ field: "attempts", value: 0 });
+      setAttemptsLeft(0);
+  
+      if (!interviewDone) {
+        setShowSignOutPopup(true);
+      }
+  
+      props?.onDisconnect?.(true);
+      props?.onConnectButtonClicked?.();
+    }
 
     setIsDisconnecting(true);
-    // sessionStorage.setItem("interviewDone", "true");
     completeInterview("is_completed", true);
     updateConnectionDetails(null);
-
+  
+    // Delay for a smooth transition
     setTimeout(() => {
-      navigate("/feedback");
+        navigate("/feedback");
     }, 1000);
   };
+  
 
   const handleRoomDisconnect = () => {
     // Only handle the disconnection if we're not already showing the confirmation
@@ -137,31 +157,12 @@ const [paymentStatus, setPaymentStatus] = useState(false)
       const user_id = getUserId();
 
       
-    if (attemptsLeft > 1) {
-      const newAttempts = attemptsLeft - 1;
-      setAttemptsLeft(newAttempts);
-      await updateUserSubscription({ field: "attempts", value: newAttempts });
-    } else if (attemptsLeft === 1) {
-      await updateUserSubscription({ field: "attempts", value: 0 });
-      setAttemptsLeft(0);
 
-      // Mark interview as completed AFTER interview actually finishes
-      // Not immediately here unless it's intended behavior
-
-      if (!interviewDone) {
-        setShowSignOutPopup(true);
-      }
-
-      if (props?.onDisconnect) {
-        props.onDisconnect(true);
-        props.onConnectButtonClicked?.();
-      }
-    }
   
 
       // Fetch user name and questions from the backend API
       const userName = await readUserField(user_id, "name");
-      const userQuestions = await interviewReadUserField(user_id, "questions");      
+      const userQuestions = await sessionStorage.getItem("interview_questions");      
       // using userName and time, generate a unique file path for saving chat history
       // no space allowed in file name. No special characters allowed in file name except underscore
       const sanitizedUserName =
@@ -196,7 +197,15 @@ const [paymentStatus, setPaymentStatus] = useState(false)
         chatHistoryPath: chatHistoryPath,
       }); // Make GET request to your endpoint
       console.log("Connection details:", response.data);
-      updateConnectionDetails(response.data); // Update the connection details with the API response
+      updateConnectionDetails(response.data);
+      // Store the connection details in session storage
+      sessionStorage.setItem("interview_Id", response.data.roomName); // Store the interview ID in session storage // Update the connection details with the API response
+      createInterview(
+       response.data.roomName,
+        user_id,
+        userQuestions
+      );
+      console.log("Interview created:", response.data.roomName, user_id, userQuestions);
 
       // Start the timer when connection is established
       setTimerActive(true);
@@ -219,12 +228,12 @@ const [paymentStatus, setPaymentStatus] = useState(false)
   
   return (
     <MainLayout>
+      <ActionBox>
       <SignOutPopup
         isOpen={showSignOutPopup}
         onConfirm={handleSignOutConfirm}
         onCancel={handleSignOutCancel}
       />
-      <ActionBox>
         <div className={`${styles.interviewContent} customScroll`}>
           {timerActive && (
             <div className="bg-white bg-opacity-80 px-3 py-1 rounded text-black font-mono font-bold inline-block mx-auto">
