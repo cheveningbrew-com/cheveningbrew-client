@@ -226,6 +226,7 @@ const [paymentStatus, setPaymentStatus] = useState(false)
     navigate("/feedback");
   };
   
+  
   return (
     <MainLayout>
       <ActionBox>
@@ -233,6 +234,7 @@ const [paymentStatus, setPaymentStatus] = useState(false)
         isOpen={showSignOutPopup}
         onConfirm={handleSignOutConfirm}
         onCancel={handleSignOutCancel}
+        
       />
         <div className={`${styles.interviewContent} customScroll`}>
           {timerActive && (

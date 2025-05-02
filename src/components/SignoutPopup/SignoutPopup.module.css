@@ -9,50 +9,91 @@
     justify-content: center;
     align-items: center;
     z-index: 999;
-  }
-  
-  .popup_box {
-    background:linear-gradient(to bottom right,
-    #4b0082,
-    #800080);
-    padding: 2rem;
+}
+
+.popup_box {
+    position: relative;
+    background: linear-gradient(to bottom right, #4b0082, #800080);
+    padding: 50px;
     border-radius: 12px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
-    max-width: 400px;
+    max-width: 700px;
     width: 90%;
     text-align: center;
-  }
-  
-  .popup_actions {
+    
+}
+
+.popup_actions {
     margin-top: 1.5rem;
     display: flex;
     justify-content: space-around;
-  }
-  
-  .btn {
-    padding: 0.6rem 1.2rem;
+    width: 100%;
+}
+
+.btn {
+    padding: 10px 20px;
     border: none;
     border-radius: 8px;
     cursor: pointer;
     font-weight: 600;
     transition: background 0.3s;
-  }
-  
-  .btn.confirm {
-    background-color: #e74c3c;
+}
+
+.btn.download,
+.btn.confirm {
+    background-color: #dd0c7e;
     color: white;
-  }
+    border: none;
+    width: 30%;
+    padding: 0.6rem 1.2rem;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn.download:hover,
+.btn.confirm:hover {
+    background-color: #5a1d7a;
+}
+
+.btn.cancel {
+    background-color: #f0f0f0;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.btn.cancel:hover {
+    background-color: #e0e0e0;
+}
+
+.popup_header {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.close_icon {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: transparent;
+  border: 1px solid white;
+  border-radius: 20%;
+  font-size: 24px;
+  font-weight: bold;
+  color: rgb(211, 198, 198);
+  cursor: pointer;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
   
-  .btn.cancel {
-    background-color: #bdc3c7;
-    color: #2c3e50;
-  }
-  
-  .btn.confirm:hover {
-    background-color: #c0392b;
-  }
-  
-  .btn.cancel:hover {
-    background-color: #95a5a6;
-  }
-  
+}
+
+.close_icon:hover {
+  background-color: #dd0c7e;
+  border: none;
+
+}

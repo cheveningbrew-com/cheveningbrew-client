@@ -35,6 +35,7 @@ const App = () => {
               <Route path="/upload" element={<Upload />} />
               <Route path="/interview" element={<Interview />} />
               <Route path="/feedback" element={<Feedback />} />
+              
             </Route>
           </Routes>
         </AuthProvider>

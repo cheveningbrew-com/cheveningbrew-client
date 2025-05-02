@@ -27,21 +27,21 @@ const plans = [
     name: 'Basic',
     amount: '5.00',
     attempts: 1,
-    description: 'One-time fee of $5 for a 15 min interview',
+    description: '1 attempt\n20 minutes\nquick practice!',
   },
   {
     id: 'standard',
     name: 'Standard',
     amount: '10.00',
     attempts: 3,
-    description: 'One-time fee of $10 for a 30 min interview',
+    description: '3 attempts\n60 minutes\nrefining answers!',
   },
   {
     id: 'premium',
     name: 'Premium',
     amount: '15.00',
     attempts: 5,
-    description: 'One-time fee of $15 for a 50 min interview',
+    description: '5 attempts\n100 minutes\nserious prep!',
   },
 ];
 

@@ -94,7 +94,6 @@ export const readUserField = async (user_id, field) => {
     }
 };
 
-// Update user field in database storage
 export const updateUserField = async (field, value) => {
     const user_id = getUserId();
 
@@ -102,23 +101,36 @@ export const updateUserField = async (field, value) => {
         throw new Error("User email not found in session storage");
     }
 
-    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/update_field`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            user_id: user_id,  // Ensure the email is sent
-            field,
-            value: typeof value === 'object' ? JSON.stringify(value) : value,
-        }),
-    });
-
-    if (!response.ok) {
-        throw new Error(`Failed to update user field: ${response.statusText}`);
+    // Prepare the final value to send
+    let finalValue = value;
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+        finalValue = JSON.stringify(value);
     }
 
-    return response.json();
+    try {
+        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/update_field`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                user_id,
+                field,
+                value: finalValue,
+            }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Error details:', errorData);
+            throw new Error(`Failed to update user field: ${response.statusText}`);
+        }
+
+        return response.json();
+    } catch (error) {
+        console.error('Update user field error:', error);
+        throw error;
+    }
 };
 
 // Clear user data from session storage and database
@@ -304,5 +316,37 @@ export const interviewReadUserField = async (user_id, field) => {
     } catch (error) {
         console.error("Error fetching user field:", error.message);
         return null;
+    }
+};
+
+
+
+
+// export const getUserInterviews = async (userId) => {
+//   const API_URL = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || "http://localhost:5002";
+//   const response = await axios.get(`${API_URL}/interviews/user/${userId}`);
+//   return response.data; // List of { attempt_number, feedback }
+// };
+  
+export const getUserInterviews = async (userId) => {
+    try {
+        
+        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/interviews/user/${userId}`, {
+        
+            headers: {
+                "Accept": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to fetch: ${response.status} - ${response.statusText}, Details: ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data; // List of { attempt_number, feedback }
+    } catch (error) {
+        console.error("Error fetching user interviews:", error.message);
+        return [];
     }
 };

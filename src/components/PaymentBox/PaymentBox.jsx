@@ -3,10 +3,13 @@ import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
 import { updateUserField, readUserField, getUserId, subscribeUser } from '../../services/api';
+import Popup from './Popup';
+
 
 const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [payHereLoaded, setPayHereLoaded] = useState(false);
+  const [showPaidPopup, setShowPaidPopup] = useState(false);
 
   // Load PayHere script
   useEffect(() => {
@@ -57,25 +60,47 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
   // Initiate payment
   const initiatePayment = useCallback(async () => {
-    if (!window.payhere || isProcessing) {
-      console.error("PayHere not loaded or payment already processing");
-      alert("Payment system not loaded. Please refresh the page and try again.");
+    const userId = getUserId();
+
+    // Case 1: If user_id not in sessionStorage
+    if (!userId) {
+      window.location.href = "/"; // Redirect to landing
       return;
     }
-setIsProcessing(true);
 
-    const userEmail = getUserId(); // Get the email first
-    const userName = readUserField(userEmail, "name");
     try {
-      // Prepare payment details
+      // Check if user exists and payment status
+      const userExists = await readUserField(userId, "id"); // if null → doesn't exist
+      const paymentCompleted = await readUserField(userId, "payment_completed");
+
+      if (!userExists) {
+        // Case 1: user_id not in table
+        window.location.href = "/";
+        return;
+      }
+
+      if (paymentCompleted === true) {
+        setShowPaidPopup(true);
+        return;
+      }
+
+      // Case 2: user exists and payment_completed === false → proceed to payment
+      if (!window.payhere || isProcessing) {
+        alert("Payment system not loaded. Please refresh the page and try again.");
+        return;
+      }
+
+      setIsProcessing(true);
+
+      const userName = await readUserField(userId, "name");
+      const userEmail = await readUserField(userId, "email");
+
       const paymentDetails = {
         order_id: `ORDER-${Date.now()}`,
         amount: plan.amount,
         currency: "USD",
-        // first_name: firstName,
-        // last_name: lastName,
-        name:userName,
-        email: userEmail,
+        name: userName || "User",
+        email: userEmail || "test@example.com",
         phone: "",
         address: "",
         city: "",
@@ -84,7 +109,6 @@ setIsProcessing(true);
         custom_2: "one_time",
       };
 
-      // Get hash from server
       const API_URL = process.env.REACT_APP_PAYMENTS_SERVER_URL || "http://localhost:4001";
       const hashResponse = await axios.post(`${API_URL}/payment/start`, paymentDetails);
 
@@ -93,11 +117,8 @@ setIsProcessing(true);
       }
 
       const { hash, merchant_id } = hashResponse.data;
-      console.log("Sandbox variable value", process.env.REACT_APP_SANDBOX);
       const isSandbox = process.env.REACT_APP_SANDBOX !== "false";
-      console.log("Sandbox", isSandbox);
 
-      // Configure payment object with hash from server
       const payment = {
         sandbox: isSandbox,
         merchant_id: merchant_id,
@@ -109,8 +130,8 @@ setIsProcessing(true);
         amount: paymentDetails.amount,
         currency: paymentDetails.currency,
         hash: hash,
-        first_name: paymentDetails.first_name,
-        last_name: paymentDetails.last_name,
+        first_name: paymentDetails.name,
+        last_name: "",
         email: paymentDetails.email,
         phone: paymentDetails.phone,
         address: paymentDetails.address,
@@ -125,14 +146,14 @@ setIsProcessing(true);
       window.payhere.onDismissed = handlePaymentDismissed;
       window.payhere.onError = handlePaymentError;
 
-      // Start PayHere payment
+      // Start payment
       window.payhere.startPayment(payment);
+
     } catch (error) {
       console.error("Payment initialization error:", error);
       alert("There was an error initializing the payment. Please try again.");
       setIsProcessing(false);
     }
-
   }, [isProcessing, handlePaymentComplete, handlePaymentDismissed, handlePaymentError, plan]);
 
   return (
@@ -149,6 +170,13 @@ setIsProcessing(true);
         )}
       </button>
       {!payHereLoaded && <p className={styles.loadingMessage}>Loading payment system...</p>}
+      
+      {showPaidPopup && (
+      <Popup
+        message="You have already paid."
+        onClose={() => setShowPaidPopup(false)}
+      />
+    )}
     </div>
   );
 };

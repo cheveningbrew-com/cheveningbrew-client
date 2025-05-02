@@ -3,20 +3,37 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import axios from "axios";
-import { completeInterview, getUserId, readUserField } from "../../services/api";
+import { completeInterview, getUserId, readUserField, getUserInterviews } from "../../services/api";
 import ReactMarkdown from "react-markdown";
+import { downloadFeedbackPDFs } from "../../utils/downloadFeedback";
 
 const Feedback = () => {
   const [feedback, setFeedback] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [interviewList, setInterviewList] = useState([]);
+  const [selectedAttempt, setSelectedAttempt] = useState(null);
 
+  // Load list of interviews
+  useEffect(() => {
+    const loadAttempts = async () => {
+      try {
+        const userId = getUserId();
+        const data = await getUserInterviews(userId);
+        setInterviewList(data);
+      } catch (err) {
+        console.error("Failed to load interview list", err);
+      }
+    };
+    loadAttempts();
+  }, []);
+
+  // Try to fetch feedback from session or cache
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
         const user_id = getUserId();
-        
-        // 1. Check for cached feedback first
+
         const cachedFeedback = await readUserField(user_id, "cached_feedback");
         if (cachedFeedback) {
           console.log("Using cached feedback");
@@ -25,10 +42,11 @@ const Feedback = () => {
           return;
         }
 
-        // 2. If no cached feedback, fetch from server
         const chatHistoryPath = sessionStorage.getItem("chatHistoryPath");
         if (!chatHistoryPath) {
-          throw new Error("Chat history path not found in session storage.");
+          console.warn("No chat history path found. Skipping feedback fetch.");
+          setLoading(false);
+          return;
         }
 
         console.log("Fetching feedback from server...");
@@ -36,7 +54,7 @@ const Feedback = () => {
         const response = await axios.post(
           `${API_URL}/feedback_from_server`,
           { chatHistoryPath },
-          { timeout: 10000 } // Timeout after 10 seconds
+          { timeout: 10000 }
         );
 
         if (!response.data?.feedback) {
@@ -44,13 +62,10 @@ const Feedback = () => {
         }
 
         const newFeedback = response.data.feedback;
-        
-        // 3. Cache the new feedback
-        // sessionStorage.setItem("cached_feedback", newFeedback);
-        await completeInterview("feedback", newFeedback);
 
+        await completeInterview("feedback", newFeedback);
         console.log("Feedback fetched and cached successfully.");
-        
+
         setFeedback(newFeedback);
       } catch (err) {
         console.error("Error fetching feedback:", err);
@@ -66,6 +81,20 @@ const Feedback = () => {
 
     fetchFeedback();
   }, []);
+
+  // Auto-select the latest interview if none selected and chatHistoryPath is unavailable
+  useEffect(() => {
+    if (interviewList.length > 0 && !feedback && selectedAttempt === null) {
+      const latest = interviewList[interviewList.length - 1];
+      setSelectedAttempt(latest.attempt_number);
+      setFeedback(latest.feedback);
+    }
+  }, [interviewList, feedback, selectedAttempt]);
+
+  // Generate and download PDFs for each feedback attempt
+  const handleDownloadAll = () => {
+    downloadFeedbackPDFs(interviewList);
+  };
 
   // Loading State
   if (loading) {
@@ -89,8 +118,8 @@ const Feedback = () => {
           <div className={`${styles.feedbackContent} customScroll`}>
             <h2>Oops! Something went wrong</h2>
             <p>{error}</p>
-            <button 
-              className={styles.retryButton} 
+            <button
+              className={styles.retryButton}
               onClick={() => window.location.reload()}
             >
               Retry
@@ -118,6 +147,34 @@ const Feedback = () => {
           )}
         </div>
       </ActionBox>
+
+      {/* Combined Attempt Selector + Download Button */}
+      {interviewList.length > 0 && (
+        <div className={styles.bottomContainer}>
+          <div className={styles.attemptGroup}>
+            <div className={styles.attemptTitle}>Select Attempt:</div>
+            <div className={styles.attemptButtons}>
+              {interviewList.map((item) => (
+                <button
+                  key={item.attempt_number}
+                  className={`${styles.attemptButton} ${
+                    selectedAttempt === item.attempt_number ? styles.active : ""
+                  }`}
+                  onClick={() => {
+                    setSelectedAttempt(item.attempt_number);
+                    setFeedback(item.feedback);
+                  }}
+                >
+                  {item.attempt_number}
+                </button>
+              ))}
+            </div>
+          </div>
+          <button onClick={handleDownloadAll} className={styles.downloadButton}>
+            Download All Attempts (PDF)
+          </button>
+        </div>
+      )}
     </MainLayout>
   );
 };

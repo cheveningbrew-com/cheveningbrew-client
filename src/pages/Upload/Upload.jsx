@@ -23,34 +23,25 @@ const Upload = () => {
         navigate("/");
         return;
       }
-
+  
       try {
-        // Check payment status from database
         const dbPaymentStatus = await readUserField(user_id, "payment_completed");
-        
-        // Use database status if available, otherwise fallback to sessionStorage
-        const hasUserPaid = dbPaymentStatus;
-
-        if (!hasUserPaid) {
+  
+        if (!dbPaymentStatus) {
           setShowPaymentPopup(true);
         } else {
           setpayment_completed(true);
         }
       } catch (error) {
         console.error("Error checking payment status:", error);
-        // Fallback to sessionStorage if database check fails
-        const hasUserPaid = sessionStorage.getItem("payment_completed") === "true";
-        setpayment_completed(hasUserPaid);
-        if (!hasUserPaid) {
-        setShowPaymentPopup(true);
-        }
+        setShowPaymentPopup(true); // fallback: show popup if unsure
       } finally {
         setIsLoading(false);
       }
     };
-
+  
     checkPaymentStatus();
-  }, [isLoading]);
+  }, []);
   
 
   const handleUploadSuccess = (path) => {
@@ -64,9 +55,24 @@ const Upload = () => {
     navigate("/interview");
   };
 
-  const handlePaymentComplete = () => {
-    setpayment_completed(true);
-    setShowPaymentPopup(false);
+  const handlePaymentComplete = async () => {
+    try {
+      const user_id = getUserId();
+      if (!user_id) return;
+  
+      // Re-check the backend after payment
+      const dbPaymentStatus = await readUserField(user_id, "payment_completed");
+  
+      if (dbPaymentStatus) {
+        setpayment_completed(true);
+        setShowPaymentPopup(false);
+      } else {
+        console.warn("Payment not yet marked complete in DB.");
+        alert("Please wait a few seconds and try again.");
+      }
+    } catch (error) {
+      console.error("Error verifying payment after completion:", error);
+    }
   };
 
   const handlePaymentError = (error) => {
@@ -81,7 +87,6 @@ const Upload = () => {
 
   return (
     <MainLayout>
-      {/* <SignOutPopup/> */}
       <ActionBox>
         <div className={`${styles.uploadContainer} customScroll`}>
           <div>
@@ -89,17 +94,14 @@ const Upload = () => {
               Download your Chevening Application as a PDF file and upload it here.
             </h1>
 
-            {payment_completed ? (
-              <Uploader onUploadSuccess={handleUploadSuccess} />
-              
-            ) : (
-              showPaymentPopup && (
-                <Price
-                  onPaymentComplete={handlePaymentComplete}
-                  onPaymentError={handlePaymentError}
-                  onPaymentDismissed={handlePaymentDismissed}
-                />
-              )
+            {payment_completed && <Uploader onUploadSuccess={handleUploadSuccess} />}
+
+            {!payment_completed && showPaymentPopup && (
+              <Price
+                onPaymentComplete={handlePaymentComplete}
+                onPaymentError={handlePaymentError}
+                onPaymentDismissed={handlePaymentDismissed}
+              />
             )}
 
             {showRulesPopup && (

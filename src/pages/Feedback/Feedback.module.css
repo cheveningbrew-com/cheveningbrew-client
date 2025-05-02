@@ -41,6 +41,141 @@
   transition: width 0.3s ease;
 }
 
+.attemptSelectorContainer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  background: transparent; /* This line causes readability issues */
+  z-index: 10;
+  padding: 70px;
+  text-align: center;
+}
+
+.attemptSelector {
+  display: flex;
+  /* padding-left: 700px; */
+  justify-content: center;
+  align-items: center;
+}
+
+.attemptTitle {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-right: 15px;
+  color: white;
+}
+
+.attemptButtons {
+  display: flex;
+  gap: 10px; /* Add spacing between buttons */
+}
+
+.attemptButton {
+  width: 40px;
+  height: 40px;
+  border-radius: 20%;
+  /* background-color: #333; */
+  color: white;
+  font-weight: bold;
+  /* border: 2px solid #888; */
+  cursor: pointer;
+  transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.attemptButton:hover {
+  /* background-color: #555; */
+  transform: scale(1.05);
+}
+
+.attemptButton.active {
+  background-color: #dd0c7e;
+  border-color: #ca1582;
+}
+
+
+.feedbackContent {
+  background-color: #6D2493;
+  color: white;
+  padding: 30px;
+  border-radius: 12px;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.markdownContent {
+  font-size: 16px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.markdownContent h2 {
+  font-size: 20px;
+  margin-top: 20px;
+  color: white;
+}
+
+.markdownContent strong {
+  font-weight: bold;
+}
+
+.markdownContent em {
+  font-style: italic;
+}
+
+.downloadContainer {
+  position: fixed;
+  bottom: 0;
+  right: 1;
+  width: 100%;
+  background: transparent; /* This line causes readability issues */
+  z-index: 10;
+  padding: 70px;
+  text-align: center;
+} 
+
+.downloadButton {
+  padding: 10px 20px;
+  /* background-color: #dd0c7e; */
+  color: white;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: background-color 0.2s ease;
+}
+
+.downloadButton:hover {
+  background-color: #884d83;
+}
+
+.bottomContainer {
+  position: fixed;
+  bottom: 40px;
+  width: 53%;
+  /* background-color: #6D2493; */
+  color: rgb(202, 40, 151);
+  border-radius: 12px;
+  padding: 20px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  justify-items: center;
+  z-index: 10;
+  /* box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.3); */
+  border: 1px solid rgba(255, 255, 255, 0.8);
+  
+}
+
+.attemptGroup {
+  display: flex;
+  align-items: center;
+}
 
 @media screen and (max-width: 768px) {
 
@@ -49,3 +184,4 @@
 @media screen and (max-width: 480px) {
 
 }
+
