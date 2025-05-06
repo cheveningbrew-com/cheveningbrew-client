@@ -4,9 +4,11 @@ import ActionBox from "../../components/ActionBox/ActionBox";
 import Uploader from "../../components/Uploader/Uploader";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
-import { readUserField, getUserId } from "../../services/api";
+import { readUserField, getUserId, getUserSubscription, interviewReadUserField } from "../../services/api";
 import Price from "../../components/Price_Popup/Price";
-
+import SignOutPopup from "../../components/SignoutPopup/SignoutPopup";
+import { handleSignOut } from "../../components/SignOut/SignOutHelper";
+import { useAuth } from "../../context/AuthContext";
 
 const Upload = () => {
   const [_, setFilePath] = useState(null);
@@ -15,9 +17,14 @@ const Upload = () => {
   const [showRulesPopup, setShowRulesPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const [fileUploaded, setFileUploaded] = useState(false);
+  const [showSignOutPopup, setShowSignOutPopup] = useState(false);
+  const [attemptsLeft, setAttemptsLeft] = useState(0);
+  const [interviewDone, setInterviewDone] = useState(false);
+  const { logout, user } = useAuth();
 
   useEffect(() => {
-    const checkPaymentStatus = async () => {
+    const checkUserStatus = async () => {
       const user_id = getUserId();
       if (!user_id) {
         navigate("/");
@@ -25,28 +32,51 @@ const Upload = () => {
       }
   
       try {
+        // Check payment status
         const dbPaymentStatus = await readUserField(user_id, "payment_completed");
-  
+        // Check interview status and attempts
+        const interviewDone = await interviewReadUserField(user_id, "is_completed");
+        const subscription = await getUserSubscription({ user_id, field: "attempts" });
+
+        setInterviewDone(interviewDone === true);
+        setAttemptsLeft(subscription.attempts);
+        
         if (!dbPaymentStatus) {
           setShowPaymentPopup(true);
         } else {
           setpayment_completed(true);
         }
+
+        // Show sign out popup if no attempts left and interview is done
+        if (interviewDone && subscription.attempts === 0) {
+          setShowSignOutPopup(true);
+        }
       } catch (error) {
-        console.error("Error checking payment status:", error);
+        console.error("Error checking user status:", error);
         setShowPaymentPopup(true); // fallback: show popup if unsure
       } finally {
         setIsLoading(false);
       }
     };
   
-    checkPaymentStatus();
+    checkUserStatus();
+  }, [navigate]);
+
+  useEffect(() => {
+    const uploadStatus = sessionStorage.getItem("upload_completed");
+    if (uploadStatus === "true") {
+      setFileUploaded(true);
+    }
   }, []);
-  
 
   const handleUploadSuccess = (path) => {
     setFilePath(path);
     console.log("File path:", path);
+
+    // Mark upload as completed
+    sessionStorage.setItem("upload_completed", "true");
+    setFileUploaded(true);
+
     setShowRulesPopup(true);
   };
 
@@ -59,16 +89,24 @@ const Upload = () => {
     try {
       const user_id = getUserId();
       if (!user_id) return;
-  
-      // Re-check the backend after payment
-      const dbPaymentStatus = await readUserField(user_id, "payment_completed");
-  
+
+      let attempts = 0;
+      let dbPaymentStatus = false;
+
+      // Retry mechanism: Check payment status up to 5 times with a 1-second delay
+      while (attempts < 5) {
+        dbPaymentStatus = await readUserField(user_id, "payment_completed");
+        if (dbPaymentStatus) break;
+        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
+        attempts++;
+      }
+
       if (dbPaymentStatus) {
         setpayment_completed(true);
-        setShowPaymentPopup(false);
+        setShowPaymentPopup(false); // Hide the popup
       } else {
-        console.warn("Payment not yet marked complete in DB.");
-        alert("Please wait a few seconds and try again.");
+        console.warn("Payment not yet marked complete in DB after retries.");
+        alert("Payment may take a few seconds to complete. Please refresh the page if needed.");
       }
     } catch (error) {
       console.error("Error verifying payment after completion:", error);
@@ -85,13 +123,28 @@ const Upload = () => {
     setShowPaymentPopup(false);
   };
 
+  const handleSignOutConfirm = () => {
+    setShowSignOutPopup(false);
+    handleSignOut(logout, navigate, user?.user_id);
+  };
+  
+  const handleSignOutCancel = () => {
+    setShowSignOutPopup(false);
+    navigate("/feedback");
+  };
+
   return (
     <MainLayout>
       <ActionBox>
+        <SignOutPopup
+          isOpen={showSignOutPopup}
+          onConfirm={handleSignOutConfirm}
+          onCancel={handleSignOutCancel}
+        />
         <div className={`${styles.uploadContainer} customScroll`}>
           <div>
             <h1 className={styles.title}>
-              Download your Chevening Application as a PDF file and upload it here.
+              Download your Chevening Application as a PDF file and upload it here before start interview.
             </h1>
 
             {payment_completed && <Uploader onUploadSuccess={handleUploadSuccess} />}
@@ -122,7 +175,7 @@ const Upload = () => {
                         * It may take up to ~10 secs to connect the AI interviewer.
                       </li>
                       <li>
-                        * Wait patiently if the interviewer takes a few seconds to respond — that’s normal.
+                        * Wait patiently if the interviewer takes a few seconds to respond — that's normal.
                       </li>
                       <li>
                         * You can change the default audio device via the dropdown next to the mic.
@@ -145,3 +198,4 @@ const Upload = () => {
 };
 
 export default Upload;
+

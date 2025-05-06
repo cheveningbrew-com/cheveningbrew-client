@@ -17,11 +17,11 @@ export const downloadFeedbackPDFs = async (interviewList) => {
     content.style.fontSize = "16px";
     content.style.lineHeight = "1.8";
     content.style.padding = "0 30px";
-    content.innerHTML = item.feedback
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      .replace(/## (.*?)(\n|$)/g, "<h2 style='font-size:20px;margin-top:20px;'>$1</h2>")
-      .replace(/\n/g, "<br />");
+    content.innerHTML = (item.feedback || '')
+  .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
+  .replace(/\*(.*?)\*/g, "<em>$1</em>")
+  .replace(/## (.*?)(\n|$)/g, "<h2 style='font-size:20px;margin-top:20px;'>$1</h2>")
+  .replace(/\n/g, "<br />");
 
     document.body.appendChild(content);
 

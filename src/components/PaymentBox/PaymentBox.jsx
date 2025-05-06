@@ -1,4 +1,3 @@
-// PaymentBox.jsx
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
@@ -33,11 +32,26 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
   const handlePaymentComplete = useCallback(async (orderId) => {
     try {
       const user_id = getUserId();
-      // const userEmail = await readUserField(userEmail, "email");
-      await subscribeUser({ user_id: user_id, plan: plan.id, price: plan.amount, attempts: plan.attempts });
-      updateUserField("payment_completed", true);
+      if (!user_id) {
+        console.error("User ID not found.");
+        return;
+      }
+
+      // Subscribe the user and update payment status
+      await subscribeUser({
+        user_id: user_id,
+        plan: plan.id,
+        price: parseFloat(plan.amount),
+        attempts: plan.attempts,
+      });
+      await updateUserField(user_id, "payment_completed", true);
+
+      console.log("Payment completed successfully. Order ID:", orderId);
+
+      // Call the parent's completion handler
       onPaymentComplete(orderId);
     } catch (err) {
+      console.error("Error during payment completion:", err);
       onPaymentError(err);
     } finally {
       setIsProcessing(false);
@@ -182,3 +196,4 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 };
 
 export default PaymentBox;
+

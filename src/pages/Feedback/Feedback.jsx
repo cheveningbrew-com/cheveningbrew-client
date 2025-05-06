@@ -91,12 +91,10 @@ const Feedback = () => {
     }
   }, [interviewList, feedback, selectedAttempt]);
 
-  // Generate and download PDFs for each feedback attempt
   const handleDownloadAll = () => {
     downloadFeedbackPDFs(interviewList);
   };
 
-  // Loading State
   if (loading) {
     return (
       <MainLayout>
@@ -110,7 +108,6 @@ const Feedback = () => {
     );
   }
 
-  // Error State
   if (error) {
     return (
       <MainLayout>
@@ -130,51 +127,51 @@ const Feedback = () => {
     );
   }
 
-  // Success State
   return (
     <MainLayout>
-      <ActionBox>
-        <div className={`${styles.feedbackContent} customScroll`}>
-          <div className={styles.title}>Interview Performance Feedback</div>
-          {feedback ? (
-            <div className={styles.markdownContent}>
-              <ReactMarkdown>{feedback}</ReactMarkdown>
-            </div>
-          ) : (
-            <div className={styles.feedbackSections}>
-              <p>No feedback available.</p>
-            </div>
-          )}
-        </div>
-      </ActionBox>
-
-      {/* Combined Attempt Selector + Download Button */}
-      {interviewList.length > 0 && (
-        <div className={styles.bottomContainer}>
-          <div className={styles.attemptGroup}>
-            <div className={styles.attemptTitle}>Select Attempt:</div>
-            <div className={styles.attemptButtons}>
-              {interviewList.map((item) => (
-                <button
-                  key={item.attempt_number}
-                  className={`${styles.attemptButton} ${
-                    selectedAttempt === item.attempt_number ? styles.active : ""
-                  }`}
-                  onClick={() => {
-                    setSelectedAttempt(item.attempt_number);
-                    setFeedback(item.feedback);
-                  }}
-                >
-                  {item.attempt_number}
-                </button>
-              ))}
-            </div>
+      <div className={styles.feedbackWrapper}>
+        <ActionBox>
+          <div className={`${styles.feedbackContent} customScroll`}>
+            <div className={styles.title}>Interview Performance Feedback</div>
+            {feedback ? (
+              <div className={styles.markdownContent}>
+                <ReactMarkdown>{feedback}</ReactMarkdown>
+              </div>
+            ) : (
+              <div className={styles.feedbackSections}>
+                <p>No feedback available.</p>
+              </div>
+            )}
           </div>
-          <button onClick={handleDownloadAll} className={styles.downloadButton}>
-            Download All Attempts (PDF)
-          </button>
-        </div>
-      )}
+        </ActionBox>
+
+        {interviewList.length > 0 && (
+          <div className={styles.bottomContainer}>
+            <div className={styles.attemptGroup}>
+              <div className={styles.attemptTitle}>Select Attempt:</div>
+              <div className={styles.attemptButtons}>
+                {interviewList.map((item) => (
+                  <button
+                    key={item.attempt_number}
+                    className={`${styles.attemptButton} ${
+                      selectedAttempt === item.attempt_number ? styles.active : ""
+                    }`}
+                    onClick={() => {
+                      setSelectedAttempt(item.attempt_number);
+                      setFeedback(item.feedback);
+                    }}
+                  >
+                    {item.attempt_number}
+                  </button>
+                ))}
+              </div>
+            </div>
+            <button onClick={handleDownloadAll} className={styles.downloadButton}>
+              Download All Attempts (PDF)
+            </button>
+          </div>
+        )}
+      </div>
     </MainLayout>
   );
 };

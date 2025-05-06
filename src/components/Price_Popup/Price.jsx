@@ -1,13 +1,23 @@
 import React from 'react';
 import styles from './Price.module.css';
 import PaymentBox from '../PaymentBox/PaymentBox';
-import { updateUserField } from '../../services/api';
+import { updateUserField, getUserId } from '../../services/api';
 
-const handlePaymentComplete = (orderId) => {
-  console.log("Payment completed. Order ID:", orderId);
-//   // sessionStorage.setItem("payment_completed", "true");
-  updateUserField("payment_completed", true);
-//   // alert("Payment successful! You can now access the app.");
+const handlePaymentComplete = async (orderId) => {
+  try {
+    console.log("Payment completed. Order ID:", orderId);
+    const user_id = getUserId();
+    if (!user_id) {
+      console.error("User ID not found.");
+      return;
+    }
+
+    // Update the user's payment status in the database
+    await updateUserField(user_id, "payment_completed", true);
+    console.log("User payment status updated successfully.");
+  } catch (error) {
+    console.error("Error updating user payment status:", error);
+  }
 };
 
 const handlePaymentError = (error) => {
@@ -19,7 +29,6 @@ const handlePaymentDismissed = () => {
   console.log("Payment dismissed.");
   alert("Payment dismissed. Please try again.");
 };
-
 
 const plans = [
   {
@@ -45,7 +54,7 @@ const plans = [
   },
 ];
 
-export default function Price() {
+export default function Price({ onPaymentComplete, onPaymentError, onPaymentDismissed }) {
   return (
     <div className={styles.paymentPopupOverlay}>
       <div className={styles.priceBox}>
@@ -60,7 +69,10 @@ export default function Price() {
               </div>
               <PaymentBox
                 plan={plan}
-                onPaymentComplete={handlePaymentComplete}
+                onPaymentComplete={async (orderId) => {
+                  await handlePaymentComplete(orderId);
+                  onPaymentComplete(orderId); // Notify the parent component
+                }}
                 onPaymentError={handlePaymentError}
                 onPaymentDismissed={handlePaymentDismissed}
               />

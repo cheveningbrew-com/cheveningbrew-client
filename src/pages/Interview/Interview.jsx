@@ -22,6 +22,9 @@ import { MediaDeviceFailure } from "livekit-client";
 import { useNavigate } from "react-router-dom";
 import { completeInterview,createInterview, readUserField,getUserId,getUserSubscription,updateUserSubscription,interviewReadUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import Popup from "../../components/PaymentBox/Popup";
+
+
 // Main Page component
 function Page(props) {
   const [connectionDetails, updateConnectionDetails] = useState(null);
@@ -33,9 +36,11 @@ function Page(props) {
   const [showSignOutPopup, setShowSignOutPopup] = useState(false);
   const { logout, user } = useAuth();
   const [interviewDone, setInterviewDone] = useState(false);
-const [paymentCompleted, setPaymentCompleted] = useState(false);
-const [attemptsLeft, setAttemptsLeft] = useState(0);
-const [paymentStatus, setPaymentStatus] = useState(false)
+  const [paymentCompleted, setPaymentCompleted] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
+  const [popupMessage, setPopupMessage] = useState("");
+  const [attemptsLeft, setAttemptsLeft] = useState(0);
+  const [paymentStatus, setPaymentStatus] = useState(false);
 
 
 
@@ -43,37 +48,58 @@ const [paymentStatus, setPaymentStatus] = useState(false)
 
   // Check if interview has been completed already
   useEffect(() => {
-    // const interviewDone = sessionStorage.getItem("interviewDone") === "true";
-    // const paymentCompleted = sessionStorage.getItem("paymentCompleted") === "true";
-
     const checkInterviewStatus = async () => {
       try {
         const user_id = getUserId();
-        const interviewDone = await interviewReadUserField(user_id, "is_completed");
-        const paymentCompleted = await readUserField(user_id, "payment_completed");
-        const subscription = await getUserSubscription({ user_id, field: "attempts" });
-
-        setInterviewDone(interviewDone === true);
-        setPaymentCompleted(paymentCompleted === true);
-        setAttemptsLeft(subscription.attempts);
+        if (!user_id) {
+          console.error("No user ID found");
+          return;
+        }
     
-        console.log("Interview done from DB:", interviewDone);
-        console.log("Payment completed DB:", paymentCompleted);
-        console.log("Subscription attempts left:", subscription);
+        // Fetch all data in parallel
+        const [interviewDoneRaw, paymentCompletedRaw, subscription] = await Promise.all([
+          interviewReadUserField(user_id, "is_completed"),
+          readUserField(user_id, "payment_completed"),
+          getUserSubscription({ user_id, field: "attempts" }).catch(() => ({ attempts: 0 })), // Handle 404 error
+        ]);
     
-        if (interviewDone && subscription.attempts === 0 ) {
-          setShowSignOutPopup(true);
-          console.log("User has no attempts left and interview is done.");
-        } else if (paymentCompleted === false) {
+        console.log("Payment status from DB:", paymentCompletedRaw);
+        console.log("Subscription attempts from DB:", subscription?.attempts);
+    
+        // Parse boolean values
+        const interviewDone = interviewDoneRaw === true || interviewDoneRaw === "true";
+        const paymentCompleted = paymentCompletedRaw === true || paymentCompletedRaw === "true";
+    
+        console.log("Parsed interviewDone:", interviewDone);
+        console.log("Parsed paymentCompleted:", paymentCompleted);
+    
+        // Update state
+        setInterviewDone(interviewDone);
+        setPaymentCompleted(paymentCompleted);
+        setAttemptsLeft(subscription?.attempts || 0);
+    
+        // Check payment status first
+        if (!paymentCompleted) {
+          console.log("Payment not completed, redirecting to upload");
           navigate("/upload");
+          return;
+        }
+    
+        // Then check interview status and attempts
+        if (interviewDone && (subscription?.attempts === 0 || !subscription)) {
+          console.log("User has no attempts left and interview is done.");
+          setShowSignOutPopup(true);
         }
       } catch (error) {
         console.error("Error checking interview status:", error);
+        // If there's an error checking payment status, redirect to upload as fallback
+        navigate("/upload");
       }
     };
-    
+  
     checkInterviewStatus();
   }, [navigate]);
+  
 
   // Timer countdown effect
   useEffect(() => {
@@ -156,6 +182,15 @@ const [paymentStatus, setPaymentStatus] = useState(false)
     try {
       const user_id = getUserId();
 
+      // ✅ Check if document is uploaded
+    // const documentUploaded = await readUserField(user_id, "document_uploaded");
+    const documentUploaded = sessionStorage.getItem('upload_completed');
+    if (!documentUploaded) {
+      setPopupMessage("Please upload your PDF before starting the interview.");
+      setShowPopup(true);
+      return;
+    }
+
       
 
   
@@ -213,7 +248,7 @@ const [paymentStatus, setPaymentStatus] = useState(false)
       console.error("Error fetching connection details", error);
       alert("Failed to fetch connection details");
     }
-  }, []);
+  }, [navigate]);
 
   const handleSignOutConfirm = () => {
     setShowSignOutPopup(false);
@@ -236,6 +271,15 @@ const [paymentStatus, setPaymentStatus] = useState(false)
         onCancel={handleSignOutCancel}
         
       />
+      {showPopup && (
+        <Popup
+          message={popupMessage}
+          onClose={() => {
+            setShowPopup(false);
+            navigate("/upload");
+          }}
+        />
+      )}
         <div className={`${styles.interviewContent} customScroll`}>
           {timerActive && (
             <div className="bg-white bg-opacity-80 px-3 py-1 rounded text-black font-mono font-bold inline-block mx-auto">

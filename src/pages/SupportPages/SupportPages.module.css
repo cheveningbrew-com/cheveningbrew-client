@@ -171,12 +171,14 @@
   text-align: left;
 }
 
+/* Pricing container styles */
 .pricingContainer {
   display: flex;
   flex-wrap: wrap;
-  justify-content: space-between;
   gap: 20px;
-  width: 100%;
+  justify-content: center;
+  align-items: flex-start;
+  margin-top: 20px;
 }
 
 .pricingContent {
@@ -194,7 +196,8 @@
   );
 }
 
-@media screen and (max-width: 768px) {
+/* Scrollable styles for mobile */
+@media (max-width: 768px) {
   .pageTitle {
     font-size: 1.8rem;
   }
@@ -205,6 +208,33 @@
 
   .markdownContent h2 {
     font-size: 1.4rem;
+  }
+
+  .pricingContainer {
+    display: block; /* Switch to block layout for better scrolling */
+    height: 400px; /* Set a fixed height for the scrollable area */
+    overflow-y: auto; /* Enable vertical scrolling */
+    overflow-x: hidden; /* Prevent horizontal scrolling */
+    padding: 10px; /* Add padding for better spacing */
+    border: 1px solid #ddd; /* Optional: Add a border for visual separation */
+    border-radius: 8px; /* Optional: Add rounded corners */
+  }
+
+  .pricingContainer::-webkit-scrollbar {
+    width: 8px; /* Width of the scrollbar */
+  }
+
+  .pricingContainer::-webkit-scrollbar-thumb {
+    background-color: #dd0c7e; /* Scrollbar thumb color */
+    border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+  }
+
+  .pricingContainer::-webkit-scrollbar-thumb:hover {
+    background-color: #ca1582; /* Darker color on hover */
+  }
+
+  .pricingContainer::-webkit-scrollbar-track {
+    background-color: #f0f0f0; /* Scrollbar track color */
   }
 }
 

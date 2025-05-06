@@ -1,3 +1,4 @@
+/* Popup overlay styles */
 .popup_overlay {
     position: fixed;
     top: 0;
@@ -11,6 +12,7 @@
     z-index: 999;
 }
 
+/* Popup box styles */
 .popup_box {
     position: relative;
     background: linear-gradient(to bottom right, #4b0082, #800080);
@@ -20,16 +22,18 @@
     max-width: 700px;
     width: 90%;
     text-align: center;
-    
 }
 
+/* Popup actions container */
 .popup_actions {
     margin-top: 1.5rem;
     display: flex;
     justify-content: space-around;
     width: 100%;
+    gap: 10px; /* Add spacing between buttons */
 }
 
+/* Button styles */
 .btn {
     padding: 10px 20px;
     border: none;
@@ -44,7 +48,7 @@
     background-color: #dd0c7e;
     color: white;
     border: none;
-    width: 30%;
+    width: 30%; /* Default width for larger screens */
     padding: 0.6rem 1.2rem;
     border-radius: 8px;
     font-weight: 600;
@@ -67,33 +71,41 @@
     background-color: #e0e0e0;
 }
 
-.popup_header {
-    display: flex;
-    justify-content: flex-end;
-}
-
+/* Close icon styles */
 .close_icon {
-  position: absolute;
-  top: 15px;
-  right: 15px;
-  background: transparent;
-  border: 1px solid white;
-  border-radius: 20%;
-  font-size: 24px;
-  font-weight: bold;
-  color: rgb(211, 198, 198);
-  cursor: pointer;
-  width: 36px;
-  height: 36px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: 1px solid white;
+    border-radius: 20%;
+    font-size: 24px;
+    font-weight: bold;
+    color: rgb(211, 198, 198);
+    cursor: pointer;
+    width: 36px;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 .close_icon:hover {
-  background-color: #dd0c7e;
-  border: none;
+    background-color: #dd0c7e;
+    border: none;
+}
 
+/* Responsive styles for mobile screens */
+@media (max-width: 768px) {
+    .popup_actions {
+        flex-direction: column; /* Stack buttons vertically */
+        align-items: center; /* Center align buttons */
+        gap: 15px; /* Add spacing between buttons */
+    }
+
+    .btn.download,
+    .btn.confirm {
+        width: 100%; /* Full width for mobile screens */
+    }
 }

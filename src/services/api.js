@@ -94,45 +94,37 @@ export const readUserField = async (user_id, field) => {
     }
 };
 
-export const updateUserField = async (field, value) => {
-    const user_id = getUserId();
-
+// FIXED: Accept user_id, field, and value
+export const updateUserField = async (user_id, field, value) => {
     if (!user_id) {
-        throw new Error("User email not found in session storage");
+      throw new Error("User ID is required");
     }
-
-    // Prepare the final value to send
+  
     let finalValue = value;
     if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-        finalValue = JSON.stringify(value);
+      finalValue = JSON.stringify(value);
     }
-
+  
     try {
-        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/update_field`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                user_id,
-                field,
-                value: finalValue,
-            }),
-        });
-
-        if (!response.ok) {
-            const errorData = await response.json();
-            console.error('Error details:', errorData);
-            throw new Error(`Failed to update user field: ${response.statusText}`);
-        }
-
-        return response.json();
+      const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/update_field`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user_id, field, value: finalValue }),
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error details:', errorData);
+        throw new Error(`Failed to update user field: ${response.statusText}`);
+      }
+  
+      return response.json();
     } catch (error) {
-        console.error('Update user field error:', error);
-        throw error;
+      console.error('Update user field error:', error);
+      throw error;
     }
-};
-
+  };
+  
 // Clear user data from session storage and database
 export const clearUser = async () => {
     const user_id = getUserId();
