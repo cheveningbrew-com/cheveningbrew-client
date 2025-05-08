@@ -1,354 +1,135 @@
-.paymentPopupOverlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.11);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-  .priceBox {
-    display: flex;
-    background: linear-gradient(to bottom right,
-    #4b0082,
-    #800080);
-    justify-content: center;
-    align-items: center;
-    height: auto;
-    max-width: 800px;
-    padding: 50px;
-    border-radius: 10px;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.352);
-  }
-  .paymentPopup {
-    margin-left: 10px;
-    border-radius: 8px;
-    height: auto;
-    max-height: fit-content;
-    width: 90%;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.182);
+/* Base styles */
+.priceSection {
+  width: 100%;
+}
+
+.priceContainerBox {
+  background: linear-gradient(to bottom right, #4b0082, #800080);
+  border-radius: 10px;
+  padding: 30px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.352);
+  margin: 20px 0;
+}
+
+.priceGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+  width: 100%;
+}
+
+.priceCard {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.priceHeader {
+  padding: 16px;
+  background-color: rgba(76, 0, 130, 0.04);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
+}
+
+.priceTitle {
+  margin: 0;
+  font-size: 20px;
+  color: var(--accent);
+}
+
+.priceContent {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.priceDescription {
+  margin-bottom: 20px;
+  flex-grow: 1;
+}
+
+.priceText {
+  color: var(--neutral-100);
+  margin: 10px 0;
+  text-align: center;
+  line-height: 1.5;
+  white-space: pre-line;
+}
+
+/* Tablet styles */
+@media screen and (max-width: 1024px) {
+  .priceGrid {
+    grid-template-columns: repeat(2, 1fr);
   }
   
-  .paymentPopupHeader {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    background-color: #4c00820a;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+  .priceCard:last-child {
+    grid-column: span 2;
   }
   
-  .paymentPopupHeader h2 {
-    margin: auto;
-    text-align: center;
-    font-size: 20px;
-    color: var(--accent);
-  }
-  
-  .paymentPopupBody {
+  .priceContainerBox {
     padding: 20px;
   }
-  
-  .pricingText {
-    color: var(--neutral-100);
-    margin-top: 10px;
-    padding: 5px;
-    text-align: center;
+}
+
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+  .priceGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
   }
   
-  .pricingContent{
-    height: calc(100% - 100px);
-    padding: 20px;
-    /* max-height: 250px; */
-    overflow-y: auto;
+  .priceCard:last-child {
+    grid-column: span 1;
   }
   
-  .pricingCard {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 20px;
+  .priceContainerBox {
+    padding: 15px;
+    margin: 15px 0;
   }
   
-  .paymentPopupBody p {
-    margin-bottom: 20px;
-    color: #555;
-    align-items: center;
-  
+  .priceHeader {
+    padding: 12px;
   }
   
-
-  @media screen and (max-width: 1200px) {
-  
-
-    .priceBox {
-      flex-direction: column;
-      padding: 20px;
-      width: 100%;
-      height: 100%;
-      max-width: 90%;
-
-    }
-    .paymentPopup {
-      width: 100%;
-      max-height: 100%;
-    }
-    .paymentPopupHeader {
-      padding: 16px 10px;
-    }
-    .paymentPopupHeader h2 {
-      font-size: 18px;
-    }
-    .paymentPopupBody {
-      max-height: fit-content;
-      padding: 10px;
-    }
-    .pricingText {
-      font-size: 14px;
-    }
-    .pricingContent {
-      padding: 10px;
-      height: calc(100% - 50px);
-    }
+  .priceTitle {
+    font-size: 18px;
   }
-
-  /* Mobile-specific styles */
-  @media screen and (max-width: 768px) {
-    .priceBox {
-      flex-direction: column; /* Stack items vertically */
-      padding: 15px;
-      width: 100%;
-      height: 90%; /* Full height for the screen */
-      max-width: 100%; /* Ensure it fits within the screen */
-      overflow-y: auto; /* Enable vertical scrolling for the entire page */
-      overflow-x: hidden; /* Prevent horizontal scrolling */
-      box-sizing: border-box; /* Include padding in width/height */
-      
-    }
   
-    .paymentPopup {
-      width: 100%; /* Full width for mobile */
-      height: auto; /* Allow dynamic height */
-      padding: 15px;
-      box-sizing: border-box;
-    }
-  
-    .paymentPopupHeader {
-      padding: 10px; /* Reduce padding for smaller screens */
-    }
-  
-    .paymentPopupHeader h2 {
-      font-size: 16px; /* Adjust font size for mobile */
-    }
-  
-    .paymentPopupBody {
-      padding: 10px; /* Reduce padding for mobile */
-      height: auto; /* Allow content to adjust dynamically */
-    }
-  
-    .pricingText {
-      font-size: 13px; /* Adjust font size for better readability */
-      padding: 5px;
-    }
-  
-    .pricingContent {
-      padding: 10px;
-      height: auto; /* Allow content to adjust dynamically */
-      overflow-y: visible; /* Disable inner scrolling */
-    }
-  
-    .pricingCard {
-      padding: 10px; /* Reduce padding for mobile */
-      margin-bottom: 15px; /* Add spacing between cards */
-    }
+  .priceContent {
+    padding: 15px;
   }
+}
 
-  /* Tablet-specific styles */
-  @media screen and (min-width: 768px) and (max-width: 1200px) {
-    .priceBox {
-      flex-direction: column; /* Stack items vertically */
-      padding: 20px;
-      width: 100%;
-      height: 100%; /* Full height for the screen */
-      max-width: 90%; /* Ensure it fits within the screen */
-      overflow-y: auto; /* Enable vertical scrolling for the entire page */
-      overflow-x: hidden; /* Prevent horizontal scrolling */
-      box-sizing: border-box; /* Include padding in width/height */
-    }
-  
-    .paymentPopup {
-      width: 100%; /* Full width for tablet */
-      height: auto; /* Allow dynamic height */
-      max-height: 500px; /* Limit the height for scrolling */
-      padding: 20px;
-      box-sizing: border-box;
-      overflow-y: auto; /* Enable vertical scrolling */
-    }
-  
-    .paymentPopupHeader {
-      padding: 15px; /* Adjust padding for tablet screens */
-    }
-  
-    .paymentPopupHeader h2 {
-      font-size: 18px; /* Adjust font size for tablet */
-    }
-  
-    .paymentPopupBody {
-      padding: 15px; /* Adjust padding for tablet */
-      height: auto; /* Allow content to adjust dynamically */
-      max-height: 400px; /* Limit height for scrolling */
-      overflow-y: auto; /* Enable scrolling for the body */
-    }
-  
-    .pricingText {
-      font-size: 14px; /* Adjust font size for better readability */
-      padding: 10px;
-    }
-  
-    .pricingContent {
-      padding: 15px;
-      height: auto; /* Allow content to adjust dynamically */
-      max-height: 400px; /* Limit height for scrolling */
-      overflow-y: auto; /* Enable scrolling */
-    }
-  
-    .pricingCard {
-      padding: 15px; /* Adjust padding for tablet */
-      margin-bottom: 20px; /* Add spacing between cards */
-    }
+/* Small mobile styles */
+@media screen and (max-width: 480px) {
+  .priceGrid {
+    gap: 12px;
   }
-
-  /* Tablet and Mobile-specific styles */
-  @media screen and (max-width: 1200px) {
-    .priceBox {
-      flex-direction: column; /* Stack items vertically */
-      padding: 20px;
-      width: 100%;
-      height: 100%; /* Full height for the screen */
-      max-width: 90%; /* Ensure it fits within the screen */
-      overflow-y: auto; /* Enable vertical scrolling for the entire page */
-      overflow-x: hidden; /* Prevent horizontal scrolling */
-      box-sizing: border-box; /* Include padding in width/height */
-    }
   
-    .paymentPopup {
-      width: 100%; /* Full width for tablet and mobile */
-      height: auto; /* Allow dynamic height */
-      padding: 20px;
-      box-sizing: border-box;
-    }
-  
-    .paymentPopupHeader {
-      padding: 15px; /* Adjust padding for smaller screens */
-    }
-  
-    .paymentPopupHeader h2 {
-      font-size: 18px; /* Adjust font size for smaller screens */
-    }
-  
-    .paymentPopupBody {
-      padding: 15px; /* Adjust padding for smaller screens */
-      height: auto; /* Allow content to adjust dynamically */
-      
-    }
-  
-    .pricingText {
-      font-size: 14px; /* Adjust font size for better readability */
-      padding: 10px;
-    }
-  
-    .pricingContent {
-      
-      padding: 1px;
-      height: auto; /* Allow content to adjust dynamically */
-      overflow-y: visible; /* Disable inner scrolling */
-    }
-  
-    .pricingCard {
-      padding: 15px; /* Adjust padding for smaller screens */
-      margin-bottom: 20px; /* Add spacing between cards */
-    }
+  .priceContainerBox {
+    padding: 12px;
+    margin: 12px 0;
   }
-
-
-  @media screen and (max-width: 431px) {
   
-
-    .priceBox {
-      flex-direction: column;
-      padding-top: 330px;
-      width: 100%;
-      height: 100%;
-      max-width: 90%;
-
-    }
-    .paymentPopup {
-      width: 100%;
-      max-height: 100%;
-      
-    }
-    .paymentPopupHeader {
-      padding: 16px 10px;
-    }
-    .paymentPopupHeader h2 {
-      font-size: 18px;
-    }
-    .paymentPopupBody {
-      max-height: fit-content;
-      padding: 10px;
-    }
-    .pricingText {
-      font-size: 14px;
-    }
-    .pricingContent {
-      padding: 10px;
-      height: calc(100% - 50px);
-    }
+  .priceHeader {
+    padding: 10px;
   }
-
-
-  @media screen and (max-width: 376px) {
-    .priceBox {
-      flex-direction: column;
-      padding-top: 20px;
-      width: 100%;
-      height: 100%;
-      max-width: 90%;
-    }
   
-    .paymentPopup {
-      width: 100%;
-      max-height: 100%;
-    }
-  
-    .paymentPopupHeader {
-      padding: 16px 10px;
-    }
-  
-    .paymentPopupHeader h2 {
-      font-size: 18px;
-    }
-  
-    .paymentPopupBody {
-      max-height: fit-content;
-      padding: 10px;
-    }
-  
-    .pricingText {
-      font-size: 14px;
-    }
-  
-    .pricingContent {
-      padding: 10px;
-      height: calc(100% - 50px); /* Maintain dynamic height */
-      overflow-y: auto; /* Enable vertical scrolling */
-      overflow-x: hidden; /* Prevent horizontal scrolling */
-    }
+  .priceTitle {
+    font-size: 16px;
   }
-
+  
+  .priceContent {
+    padding: 12px;
+  }
+  
+  .priceText {
+    font-size: 14px;
+    margin: 8px 0;
+  }
+}
