@@ -96,8 +96,38 @@
     border: none;
 }
 
+/* Responsive styles for tablet screens */
+@media (max-width: 1024px) {
+    .popup_box {
+        padding: 40px; /* Reduce padding for tablets */
+        max-width: 600px; /* Adjust max width for tablets */
+    }
+
+    .popup_actions {
+        gap: 15px; /* Increase spacing between buttons */
+    }
+
+    .btn.download,
+    .btn.confirm {
+        width: 40%; /* Adjust button width for tablets */
+    }
+
+    .close_icon {
+        top: 10px;
+        right: 10px;
+        width: 32px;
+        height: 32px;
+        font-size: 20px; /* Adjust size for tablets */
+    }
+}
+
 /* Responsive styles for mobile screens */
 @media (max-width: 768px) {
+    .popup_box {
+        padding: 30px; /* Reduce padding for mobile */
+        max-width: 90%; /* Use most of the screen width */
+    }
+
     .popup_actions {
         flex-direction: column; /* Stack buttons vertically */
         align-items: center; /* Center align buttons */
@@ -107,5 +137,39 @@
     .btn.download,
     .btn.confirm {
         width: 100%; /* Full width for mobile screens */
+    }
+
+    .close_icon {
+        top: 10px;
+        right: 10px;
+        width: 28px;
+        height: 28px;
+        font-size: 18px; /* Adjust size for mobile */
+    }
+}
+
+/* Responsive styles for small mobile screens */
+@media (max-width: 480px) {
+    .popup_box {
+        padding: 20px; /* Further reduce padding for small screens */
+        max-width: 95%; /* Use almost full screen width */
+    }
+
+    .popup_actions {
+        gap: 10px; /* Reduce spacing between buttons */
+    }
+
+    .btn.download,
+    .btn.confirm {
+        font-size: 14px; /* Adjust font size for smaller screens */
+        padding: 8px 16px; /* Adjust padding for smaller buttons */
+    }
+
+    .close_icon {
+        top: 8px;
+        right: 8px;
+        width: 24px;
+        height: 24px;
+        font-size: 16px; /* Adjust size for small screens */
     }
 }

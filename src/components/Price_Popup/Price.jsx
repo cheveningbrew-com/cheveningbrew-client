@@ -11,8 +11,6 @@ const handlePaymentComplete = async (orderId) => {
       console.error("User ID not found.");
       return;
     }
-
-    // Update the user's payment status in the database
     await updateUserField(user_id, "payment_completed", true);
     console.log("User payment status updated successfully.");
   } catch (error) {
@@ -54,32 +52,71 @@ const plans = [
   },
 ];
 
-export default function Price({ onPaymentComplete = () => {}, onPaymentError = () => {}, onPaymentDismissed = () => {} }) {
+export default function Price({ 
+  onPaymentComplete = () => {}, 
+  onPaymentError = () => {}, 
+  onPaymentDismissed = () => {},
+  showContainerBox = true // New prop to control container box visibility
+}) {
   return (
-    <div className={styles.paymentPopupOverlay}>
-      <div className={styles.priceBox}>
-        {plans.map((plan) => (
-          <div key={plan.id} className={styles.paymentPopup}>
-            <div className={styles.paymentPopupHeader}>
-              <h2 className={styles.h2}>{plan.name}</h2>
-            </div>
-            <div className={`${styles.pricingContent} customScroll`}>
-              <div className={styles.pricingCard}>
-                <p className={styles.pricingText}>{plan.description}</p>
+    <div className={`${styles.priceSection} ${showContainerBox ? styles.withContainer : ''}`}>
+      {showContainerBox && (
+        <div className={styles.priceContainerBox}>
+          <div className={styles.priceGrid}>
+            {plans.map((plan) => (
+              <div key={plan.id} className={styles.priceCard}>
+                <div className={styles.priceHeader}>
+                  <h2 className={styles.priceTitle}>{plan.name}</h2>
+                </div>
+                <div className={styles.priceContent}>
+                  <div className={styles.priceDescription}>
+                    {plan.description.split('\n').map((line, i) => (
+                      <p key={i} className={styles.priceText}>{line}</p>
+                    ))}
+                  </div>
+                  <PaymentBox
+                    plan={plan}
+                    onPaymentComplete={async (orderId) => {
+                      await handlePaymentComplete(orderId);
+                      onPaymentComplete(orderId);
+                    }}
+                    onPaymentError={handlePaymentError}
+                    onPaymentDismissed={handlePaymentDismissed}
+                  />
+                </div>
               </div>
-              <PaymentBox
-                plan={plan}
-                onPaymentComplete={async (orderId) => {
-                  await handlePaymentComplete(orderId);
-                  onPaymentComplete(orderId); // Notify the parent component
-                }}
-                onPaymentError={handlePaymentError}
-                onPaymentDismissed={handlePaymentDismissed}
-              />
-            </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      )}
+
+      {!showContainerBox && (
+        <div className={styles.priceGrid}>
+          {plans.map((plan) => (
+            <div key={plan.id} className={styles.priceCard}>
+              <div className={styles.priceHeader}>
+                <h2 className={styles.priceTitle}>{plan.name}</h2>
+              </div>
+              <div className={styles.priceContent}>
+                <div className={styles.priceDescription}>
+                  {plan.description.split('\n').map((line, i) => (
+                    <p key={i} className={styles.priceText}>{line}</p>
+                  ))}
+                </div>
+                <PaymentBox
+                  plan={plan}
+                  onPaymentComplete={async (orderId) => {
+                    await handlePaymentComplete(orderId);
+                    onPaymentComplete(orderId);
+                  }}
+                  onPaymentError={handlePaymentError}
+                  onPaymentDismissed={handlePaymentDismissed}
+                />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

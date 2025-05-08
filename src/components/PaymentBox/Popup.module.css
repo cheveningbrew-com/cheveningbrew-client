@@ -43,4 +43,56 @@
   .popup_actions button:hover {
     background-color: #f2f2f2;
   }
-  
+
+/* Responsive styles for tablet screens */
+@media (max-width: 1024px) {
+  .popup_box {
+    padding: 1.5rem; /* Reduce padding for tablets */
+    max-width: 350px; /* Adjust max width for tablets */
+  }
+
+  .popup_actions {
+    gap: 10px; /* Add spacing between buttons */
+  }
+
+  .popup_actions button {
+    padding: 0.5rem 1rem; /* Adjust button padding for tablets */
+    font-size: 0.9rem; /* Slightly reduce font size */
+  }
+}
+
+/* Responsive styles for mobile screens */
+@media (max-width: 768px) {
+  .popup_box {
+    padding: 1rem; /* Further reduce padding for mobile */
+    max-width: 90%; /* Use most of the screen width */
+  }
+
+  .popup_actions {
+    flex-direction: column; /* Stack buttons vertically */
+    gap: 15px; /* Add spacing between buttons */
+  }
+
+  .popup_actions button {
+    width: 100%; /* Full width for mobile screens */
+    padding: 0.5rem 1rem; /* Adjust padding */
+    font-size: 0.85rem; /* Reduce font size for mobile */
+  }
+}
+
+/* Responsive styles for small mobile screens */
+@media (max-width: 480px) {
+  .popup_box {
+    padding: 0.8rem; /* Further reduce padding for small screens */
+    max-width: 95%; /* Use almost full screen width */
+  }
+
+  .popup_actions {
+    gap: 10px; /* Reduce spacing between buttons */
+  }
+
+  .popup_actions button {
+    font-size: 0.8rem; /* Adjust font size for smaller screens */
+    padding: 0.4rem 0.8rem; /* Adjust padding for smaller buttons */
+  }
+}
