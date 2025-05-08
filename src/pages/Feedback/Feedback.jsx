@@ -143,34 +143,34 @@ const Feedback = () => {
               </div>
             )}
           </div>
-        </ActionBox>
-
-        {interviewList.length > 0 && (
-          <div className={styles.bottomContainer}>
-            <div className={styles.attemptGroup}>
-              <div className={styles.attemptTitle}>Select Attempt:</div>
-              <div className={styles.attemptButtons}>
-                {interviewList.map((item) => (
-                  <button
-                    key={item.attempt_number}
-                    className={`${styles.attemptButton} ${
-                      selectedAttempt === item.attempt_number ? styles.active : ""
-                    }`}
-                    onClick={() => {
-                      setSelectedAttempt(item.attempt_number);
-                      setFeedback(item.feedback);
-                    }}
-                  >
-                    {item.attempt_number}
-                  </button>
-                ))}
+          {/* Always visible bottomContainer */}
+          {interviewList.length > 0 && (
+            <div className={styles.bottomContainer}>
+              <div className={styles.attemptGroup}>
+                <div className={styles.attemptTitle}>Select Attempt:</div>
+                <div className={styles.attemptButtons}>
+                  {interviewList.map((item) => (
+                    <button
+                      key={item.attempt_number}
+                      className={`${styles.attemptButton} ${
+                        selectedAttempt === item.attempt_number ? styles.active : ""
+                      }`}
+                      onClick={() => {
+                        setSelectedAttempt(item.attempt_number);
+                        setFeedback(item.feedback);
+                      }}
+                    >
+                      {item.attempt_number}
+                    </button>
+                  ))}
+                </div>
               </div>
+              <button onClick={handleDownloadAll} className={styles.downloadButton}>
+                Download All Attempts (PDF)
+              </button>
             </div>
-            <button onClick={handleDownloadAll} className={styles.downloadButton}>
-              Download All Attempts (PDF)
-            </button>
-          </div>
-        )}
+          )}
+        </ActionBox>
       </div>
     </MainLayout>
   );
