@@ -35,9 +35,11 @@
 }
 
 .actionBox > * {
-  position: relative;
-  z-index: 1;
+  position: relative; 
+   z-index: 1; 
 }
+
+
 
 @media screen and (max-width: 760px) {
   .actionBox {
@@ -49,5 +51,13 @@
   .actionBox {
     padding: var(--spacing-md);
   }
+}
+
+@media screen and (max-width: 375px) {
+  .actionBox {
+    padding: var(--spacing-sm);
+   
+  }
+
 }
 

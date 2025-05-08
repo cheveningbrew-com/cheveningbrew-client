@@ -1,8 +1,11 @@
 /* Ensure the parent container stacks elements vertically */
 .feedbackWrapper {
   display: flex;
-  flex-direction: column; /* Default to vertical stacking */
-  gap: 20px; /* Add spacing between feedbackContent and bottomContainer */
+  flex-direction: column;
+  gap: 20px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
 }
 
 /* Feedback content styles */
@@ -12,33 +15,30 @@
   color: white;
   border-radius: 12px;
   margin-bottom: 20px;
-  height: 400px; /* Set a fixed height for the scrollable area */
-  min-height: 400px; /* Ensure the box maintains the same size */
+  max-height: 400px; /* Restrict height to enable scrolling */
+  min-height: 300px; /* Ensure a minimum height */
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */
   display: flex;
-  flex-direction: column; /* Ensure content stacks vertically */
-  justify-content: center; /* Center content vertically when empty */
-  align-items: center; /* Center content horizontally */
-  box-sizing: border-box; /* Include padding and border in width/height */
+  flex-direction: column;
+  justify-content: flex-start; /* Align content to the top */
+  align-items: center;
+  box-sizing: border-box;
 }
 
-/* Custom scroll styles */
+/* Scrollbar styles */
 .feedbackContent::-webkit-scrollbar {
-  width: 8px; /* Width of the scrollbar */
+  width: 8px;
 }
-
 .feedbackContent::-webkit-scrollbar-thumb {
-  background-color: #ffe585; /* Scrollbar thumb color */
-  border-radius: 4px; /* Rounded corners for the scrollbar thumb */
+  background-color: #ffe585;
+  border-radius: 4px;
 }
-
 .feedbackContent::-webkit-scrollbar-thumb:hover {
-  background-color: #ca1582; /* Darker color on hover */
+  background-color: #ca1582;
 }
-
 .feedbackContent::-webkit-scrollbar-track {
-  background-color: #4a1b63; /* Scrollbar track color */
+  background-color: #4a1b63;
 }
 
 /* Title styles */
@@ -55,7 +55,6 @@
   line-height: 1.8;
   white-space: pre-wrap;
 }
-
 .markdownContent h2 {
   font-size: 20px;
   margin-top: 20px;
@@ -81,19 +80,16 @@
   flex-direction: column; /* Default to vertical stacking */
   gap: 10px;
 }
-
 .attemptTitle {
   font-size: 1rem;
   font-weight: bold;
   color: white;
 }
-
 .attemptButtons {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
 }
-
 .attemptButton {
   width: 40px;
   height: 40px;
@@ -105,12 +101,10 @@
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.2s ease;
 }
-
 .attemptButton:hover {
   background-color: #555;
   transform: scale(1.05);
 }
-
 .attemptButton.active {
   background-color: #dd0c7e;
   border-color: #ca1582;
@@ -126,36 +120,158 @@
   cursor: pointer;
   border-radius: 8px;
   transition: background-color 0.2s ease;
-  width: 100%; /* Full width by default */
+  width: 100%;
 }
-
 .downloadButton:hover {
   background-color: #ca1582;
 }
 
-/* Responsive styles for all screen sizes */
-@media (max-width: 768px) {
-  .feedbackContent {
-    padding: 15px;
-    margin-bottom: 15px;
-  }
 
+
+
+
+
+/* ========== Small Devices (376px to 414px width) ========== */
+@media (max-width: 376px) {
   .title {
     font-size: 20px;
   }
-
   .markdownContent {
     font-size: 14px;
   }
-
-  .bottomContainer {
+  .feedbackContent {
+    min-height: 260px;
     padding: 15px;
-    margin-top: 15px;
+  }
+
+  /* Bottom container styles */
+  .bottomContainer {
+    width: 100%;
+    background-color: rgba(109, 36, 147, 0.9);
+    color: white;
+    border-radius: 12px;
+    padding: 10px; /* Reduced padding */
+    display: flex;
+    flex-direction: column; /* Default to vertical stacking */
+    gap: 10px;
+    box-sizing: border-box;
+    height: 100px; /* Allow dynamic height based on content */
+  }
+
+  /* Attempt group styles */
+  .attemptGroup {
+    display: flex;
+    flex-direction: row; /* Align title and buttons horizontally */
+    align-items: center; /* Vertically align items */
+    gap: 10px; /* Add spacing between title and buttons */
+  }
+  .attemptTitle {
+    font-size: 15px;
+    font-weight: bold;
+    color: white;
+  }
+  .attemptButtons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+  .attemptButton {
+    width: 20px;
+    height: 20px;
+    border-radius: 20%;
+    background-color: #333;
+    color: white;
+    font-weight: bold;
+    border: 2px solid #888;
+    cursor: pointer;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+  }
+  .attemptButton:hover {
+    background-color: #555;
+    transform: scale(1.05);
+  }
+  .attemptButton.active {
+    background-color: #dd0c7e;
+    border-color: #ca1582;
+  }
+
+  /* Download button styles */
+  .downloadButton {
+    padding: 8px 8px;
+    background-color: #dd0c7e;
+    color: white;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+    width: 100%;
+    padding-bottom: 5px;
+    font-size: 12PX;
+  }
+  .downloadButton:hover {
+    background-color: #ca1582;
   }
 }
 
-/* Responsive styles for larger screens */
-@media (min-width: 769px) {
+/* ========== Medium Phones (415px to 540px width) ========== */
+@media (min-width: 415px) and (max-width: 540px) {
+  .title {
+    font-size: 20px;
+  }
+  .markdownContent {
+    font-size: 14px;
+  }
+  .feedbackContent {
+    min-height: 300px;
+    padding: 15px;
+  }
+  .attemptButton {
+    width: 36px;
+    height: 36px;
+  }
+}
+
+/* ========== Compact Height Devices (height <= 740px) ========== */
+@media (max-height: 740px)  {
+  .feedbackContent {
+    max-height: 300px;
+  }
+  .bottomContainer {
+    padding: 12px;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .markdownContent {
+    font-size: 13.5px;
+  }
+}
+
+
+/* ========== Narrow Tablet Landscape (e.g., 1024x600) ========== */
+@media (min-width: 900px) and (max-width: 1024px) and (max-height: 600px) {
+  .feedbackContent {
+    height: auto;
+    max-height: 280px;
+    padding: 16px;
+  }
+  .bottomContainer {
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Horizontal layout for large screens */
+@media (min-width: 1024px) {
+
+  .feedbackContent {
+    padding: 15px; /* Reduce padding for smaller screens */
+    margin-bottom: 20px;
+    max-height: 450px; /* Adjust height for smaller screens */
+    overflow-y: auto; /* Ensure scrolling is enabled */
+  }
+
   .bottomContainer {
     flex-direction: row; /* Switch to horizontal layout */
     justify-content: space-between; /* Space between the two sections */
@@ -172,10 +288,9 @@
   .downloadButton {
     width: auto; /* Adjust width to fit content */
   }
-
-  .feedbackWrapper {
-    max-width: 900px; /* Set a consistent maximum width for large screens */
-    width: 100%; /* Ensure it takes full width of the container */
-    margin: 0 auto; /* Center the ActionBox horizontally */
-  }
 }
+
+
+
+
+

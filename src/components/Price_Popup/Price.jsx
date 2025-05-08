@@ -54,7 +54,7 @@ const plans = [
   },
 ];
 
-export default function Price({ onPaymentComplete, onPaymentError, onPaymentDismissed }) {
+export default function Price({ onPaymentComplete = () => {}, onPaymentError = () => {}, onPaymentDismissed = () => {} }) {
   return (
     <div className={styles.paymentPopupOverlay}>
       <div className={styles.priceBox}>
