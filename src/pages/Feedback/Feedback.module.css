@@ -126,10 +126,46 @@
   background-color: #ca1582;
 }
 
+.noAttemptsMessage {
+  text-align: center;
+  color: #ffe585;
+  font-size: 1.1rem;
+  padding: 1rem;
+  background: rgba(109, 36, 147, 0.3);
+  border-radius: 8px;
+  margin: 0;
+}
 
+.retryButton {
+  background-color: #dd0c7e;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 1rem;
+  transition: background-color 0.2s ease;
+}
 
+.retryButton:hover {
+  background-color: #ca1582;
+}
 
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ffe585;
+  border-top: 4px solid #dd0c7e;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 1rem;
+}
 
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
 /* ========== Small Devices (376px to 414px width) ========== */
 @media (max-width: 376px) {
