@@ -121,7 +121,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         city: "",
         country: "Sri Lanka",
         custom_1: "interview_prep",
-        custom_2: "userId",
+        custom_2: "user_id",
       };
 
       const API_URL = process.env.REACT_APP_PAYMENTS_SERVER_URL || "http://localhost:4001";

@@ -15,6 +15,8 @@
     "ajv": "^8.17.1",
     "axios": "^1.8.2",
     "framer-motion": "^11.18.2",
+    "html2canvas": "^1.4.1",
+    "jspdf": "^3.0.1",
     "livekit-client": "^2.8.0",
     "livekit-server-sdk": "^2.9.7",
     "pdf-parse": "^1.1.1",
@@ -30,7 +32,7 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "PORT=3001 react-scripts start",
+    "start": "cross-env PORT=3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
@@ -56,6 +58,7 @@
   "devDependencies": {
     "@tailwindcss/postcss": "^4.0.12",
     "autoprefixer": "^10.4.21",
+    "cross-env": "^7.0.3",
     "postcss": "^8.5.3",
     "postcss-loader": "^8.1.1",
     "tailwindcss": "^4.0.12"
