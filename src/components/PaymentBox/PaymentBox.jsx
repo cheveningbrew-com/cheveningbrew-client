@@ -47,6 +47,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       await updateUserField(user_id, "payment_completed", true);
 
       console.log("Payment completed successfully. Order ID:", orderId);
+     
 
       // Call the parent's completion handler
       onPaymentComplete(orderId);
@@ -120,7 +121,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         city: "",
         country: "Sri Lanka",
         custom_1: "interview_prep",
-        custom_2: "one_time",
+        custom_2: "userId",
       };
 
       const API_URL = process.env.REACT_APP_PAYMENTS_SERVER_URL || "http://localhost:4001";
@@ -153,6 +154,8 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         country: paymentDetails.country,
         custom_1: paymentDetails.custom_1,
         custom_2: paymentDetails.custom_2,
+
+        authorization: 1 // This enables authorization mode
       };
 
       // Set up PayHere event handlers

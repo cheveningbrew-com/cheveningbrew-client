@@ -1,9 +1,14 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import axios from "axios";
-import { completeInterview, getUserId, readUserField, getUserInterviews } from "../../services/api";
+import {
+  completeInterview,
+  getUserId,
+  readUserField,
+  getUserInterviews,
+} from "../../services/api";
 import ReactMarkdown from "react-markdown";
 import { downloadFeedbackPDFs } from "../../utils/downloadFeedback";
 
@@ -19,81 +24,117 @@ const Feedback = () => {
     const loadAttempts = async () => {
       try {
         const userId = getUserId();
+        if (!userId) throw new Error("User not authenticated");
+
         const data = await getUserInterviews(userId);
-        setInterviewList(data);
+        if (data && data.length > 0) {
+          setInterviewList(data);
+          setSelectedAttempt(data[data.length - 1].attempt_number);
+        } else {
+          setInterviewList([]);
+        }
       } catch (err) {
         console.error("Failed to load interview list", err);
+        setError("Failed to load interview attempts");
+      } finally {
+        setLoading(false);
       }
     };
+
     loadAttempts();
   }, []);
 
-  // Try to fetch feedback from session or cache
+  // Fetch feedback when selected attempt changes
   useEffect(() => {
-    const fetchFeedback = async () => {
+    const loadFeedback = async () => {
+      if (!selectedAttempt || interviewList.length === 0) return;
+
+      const selected = interviewList.find(
+        (i) => i.attempt_number === selectedAttempt
+      );
+
+      if (selected?.feedback) {
+        setFeedback(selected.feedback);
+        return;
+      }
+
+      const user_id = getUserId();
+      if (!user_id) {
+        setError("User not authenticated");
+        return;
+      }
+
       try {
-        const user_id = getUserId();
-
-        const cachedFeedback = await readUserField(user_id, "cached_feedback");
-        if (cachedFeedback) {
-          console.log("Using cached feedback");
-          setFeedback(cachedFeedback);
-          setLoading(false);
-          return;
-        }
-
         const chatHistoryPath = sessionStorage.getItem("chatHistoryPath");
         if (!chatHistoryPath) {
-          console.warn("No chat history path found. Skipping feedback fetch.");
-          setLoading(false);
+          console.warn("No chat history path found");
+          setFeedback(null);
           return;
         }
 
-        console.log("Fetching feedback from server...");
-        const API_URL = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || "http://localhost:8001";
+        const API_URL =
+          process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || "http://localhost:8001";
+
         const response = await axios.post(
           `${API_URL}/feedback_from_server`,
           { chatHistoryPath },
           { timeout: 10000 }
         );
 
-        if (!response.data?.feedback) {
-          throw new Error("No feedback data received from server.");
-        }
-
-        const newFeedback = response.data.feedback;
+        const newFeedback = response.data?.feedback;
+        if (!newFeedback) throw new Error("No feedback data received");
 
         await completeInterview("feedback", newFeedback);
-        console.log("Feedback fetched and cached successfully.");
-
         setFeedback(newFeedback);
+
+        // Update local interviewList with new feedback
+        setInterviewList((prev) =>
+          prev.map((item) =>
+            item.attempt_number === selectedAttempt
+              ? { ...item, feedback: newFeedback }
+              : item
+          )
+        );
       } catch (err) {
         console.error("Error fetching feedback:", err);
         setError(
           err.response?.data?.message ||
-          err.message ||
-          "Failed to load feedback. Please try again later."
+            err.message ||
+            "Failed to load feedback. Please try again later."
         );
-      } finally {
-        setLoading(false);
       }
     };
 
-    fetchFeedback();
+    loadFeedback();
+  }, [selectedAttempt, interviewList]);
+
+  // Try to fetch cached feedback only once on mount
+  useEffect(() => {
+    const checkCachedFeedback = async () => {
+      const userId = getUserId();
+      if (!userId) return;
+
+      try {
+        const cached = await readUserField(userId, "cached_feedback");
+        if (cached) {
+          console.log("Using cached feedback");
+          setFeedback(cached);
+        }
+      } catch (err) {
+        console.warn("No cached feedback found", err);
+      }
+    };
+    checkCachedFeedback();
   }, []);
 
-  // Auto-select the latest interview if none selected and chatHistoryPath is unavailable
-  useEffect(() => {
-    if (interviewList.length > 0 && !feedback && selectedAttempt === null) {
-      const latest = interviewList[interviewList.length - 1];
-      setSelectedAttempt(latest.attempt_number);
-      setFeedback(latest.feedback);
+  const handleDownloadAll = useCallback(() => {
+    const available = interviewList.filter((item) => item.feedback);
+    if (available.length > 0) {
+      downloadFeedbackPDFs(available);
+    } else {
+      alert("No feedback available for download.");
     }
-  }, [interviewList, feedback, selectedAttempt]);
-
-  const handleDownloadAll = () => {
-    downloadFeedbackPDFs(interviewList);
-  };
+  }, [interviewList]);
 
   if (loading) {
     return (
@@ -137,13 +178,14 @@ const Feedback = () => {
               <div className={styles.markdownContent}>
                 <ReactMarkdown>{feedback}</ReactMarkdown>
               </div>
+            ) : interviewList.length === 0 ? (
+              <p>No interviews found</p>
             ) : (
-              <div className={styles.feedbackSections}>
-                <p>No feedback available.</p>
-              </div>
+              <p>No feedback available</p>
             )}
           </div>
-          {/* Always visible bottomContainer */}
+
+          {/* Bottom Controls */}
           {interviewList.length > 0 && (
             <div className={styles.bottomContainer}>
               <div className={styles.attemptGroup}>
@@ -157,7 +199,6 @@ const Feedback = () => {
                       }`}
                       onClick={() => {
                         setSelectedAttempt(item.attempt_number);
-                        setFeedback(item.feedback);
                       }}
                     >
                       {item.attempt_number}
@@ -165,8 +206,11 @@ const Feedback = () => {
                   ))}
                 </div>
               </div>
-              <button onClick={handleDownloadAll} className={styles.downloadButton}>
-                Download All Attempts (PDF)
+              <button
+                onClick={handleDownloadAll}
+                className={styles.downloadButton}
+              >
+                Download All Feedback (PDF)
               </button>
             </div>
           )}
