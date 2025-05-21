@@ -132,7 +132,7 @@ export const clearUser = async () => {
         throw new Error("User email not found in session storage");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/remove_user`, {
+    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/remove_user`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -154,7 +154,7 @@ export const SignOut_clearUser = async () => {
             throw new Error("User email not found in session storage");
         }
 
-        const response = await fetch(`${REACT_APP_DB_SERVER_URL}/users/signout`, {
+        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/signout`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id: user_id }),
@@ -177,7 +177,7 @@ export const subscribeUser = async ({ user_id, plan, price, attempts }) => {
         throw new Error("Missing subscription details");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscriptions/create`, {
+    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/subscriptions/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id, plan, price, attempts }),
@@ -196,7 +196,7 @@ export const getUserSubscription = async ({ user_id, field }) => {
         throw new Error("Missing id or field");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscriptions/read_field`, {
+    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/subscriptions/read_field`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id, field }),
@@ -225,7 +225,7 @@ export const updateUserSubscription = async ({ field, value }) => {
         throw new Error("Missing id, field, or value");
     }
 
-    const response = await fetch(`${REACT_APP_DB_SERVER_URL}/subscriptions/update_field`, {
+    const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/subscriptions/update_field`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ user_id: user_id, field, value }),
@@ -240,7 +240,7 @@ export const updateUserSubscription = async ({ field, value }) => {
 
 // # interview questions APi end poiny
 export const createInterview = async ( interview_id,user_id, questions) => {
-    const res = await fetch(`${REACT_APP_DB_SERVER_URL}/interviews/create`, {
+    const res = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/interviews/create`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ interview_id,user_id, questions }),

@@ -14,27 +14,45 @@ const Feedback = () => {
   const [interviewList, setInterviewList] = useState([]);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
 
-  // Load list of interviews
+  // Load list of interviews with proper error handling
   useEffect(() => {
     const loadAttempts = async () => {
       try {
         const userId = getUserId();
+        if (!userId) {
+          setError("User session not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
+
         const data = await getUserInterviews(userId);
-        setInterviewList(data);
+        if (!data || data.length === 0) {
+          setInterviewList([]);
+          setError("No interview attempts found.");
+        } else {
+          setInterviewList(data);
+        }
       } catch (err) {
-        console.error("Failed to load interview list", err);
+        console.error("Failed to load interview list:", err);
+        setError("Failed to load interview history. Please try again later.");
       }
     };
     loadAttempts();
   }, []);
 
-  // Try to fetch feedback from session or cache
+  // Fetch feedback with proper error handling and state management
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const user_id = getUserId();
+        const userId = getUserId();
+        if (!userId) {
+          setError("User session not found. Please log in again.");
+          setLoading(false);
+          return;
+        }
 
-        const cachedFeedback = await readUserField(user_id, "cached_feedback");
+        // Check for cached feedback first
+        const cachedFeedback = await readUserField(userId, "cached_feedback");
         if (cachedFeedback) {
           console.log("Using cached feedback");
           setFeedback(cachedFeedback);
@@ -44,7 +62,7 @@ const Feedback = () => {
 
         const chatHistoryPath = sessionStorage.getItem("chatHistoryPath");
         if (!chatHistoryPath) {
-          console.warn("No chat history path found. Skipping feedback fetch.");
+          setError("No interview session found. Please start a new interview.");
           setLoading(false);
           return;
         }
@@ -62,10 +80,7 @@ const Feedback = () => {
         }
 
         const newFeedback = response.data.feedback;
-
         await completeInterview("feedback", newFeedback);
-        console.log("Feedback fetched and cached successfully.");
-
         setFeedback(newFeedback);
       } catch (err) {
         console.error("Error fetching feedback:", err);
@@ -82,7 +97,7 @@ const Feedback = () => {
     fetchFeedback();
   }, []);
 
-  // Auto-select the latest interview if none selected and chatHistoryPath is unavailable
+  // Auto-select the latest interview if none selected
   useEffect(() => {
     if (interviewList.length > 0 && !feedback && selectedAttempt === null) {
       const latest = interviewList[interviewList.length - 1];
@@ -92,6 +107,10 @@ const Feedback = () => {
   }, [interviewList, feedback, selectedAttempt]);
 
   const handleDownloadAll = () => {
+    if (interviewList.length === 0) {
+      setError("No interviews available to download.");
+      return;
+    }
     downloadFeedbackPDFs(interviewList);
   };
 
@@ -139,12 +158,11 @@ const Feedback = () => {
               </div>
             ) : (
               <div className={styles.feedbackSections}>
-                <p>No feedback available.</p>
+                <p>No feedback available. Please complete an interview to receive feedback.</p>
               </div>
             )}
           </div>
-          {/* Always visible bottomContainer */}
-          {interviewList.length > 0 && (
+          {interviewList.length > 0 ? (
             <div className={styles.bottomContainer}>
               <div className={styles.attemptGroup}>
                 <div className={styles.attemptTitle}>Select Attempt:</div>
@@ -168,6 +186,12 @@ const Feedback = () => {
               <button onClick={handleDownloadAll} className={styles.downloadButton}>
                 Download All Attempts (PDF)
               </button>
+            </div>
+          ) : (
+            <div className={styles.bottomContainer}>
+              <p className={styles.noAttemptsMessage}>
+                No interview attempts found. Start a new interview to receive feedback.
+              </p>
             </div>
           )}
         </ActionBox>

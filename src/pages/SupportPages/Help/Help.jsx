@@ -1,39 +1,78 @@
-import React from "react";
+import React, { useState } from "react";
 import SupportPagesLayout from "../../../layouts/SupportPagesLayout";
 import ActionBox from "../../../components/ActionBox/ActionBox";
 import styles from "../SupportPages.module.css";
 
 const Help = () => {
+  const [openSections, setOpenSections] = useState({});
+
+  const toggleSection = (sectionId) => {
+    setOpenSections(prev => ({
+      ...prev,
+      [sectionId]: !prev[sectionId]
+    }));
+  };
+
+  const faqSections = [
+    {
+      title: "Interview Retake",
+      content: "Simply, sign out and sign in again to retake the interview."
+    },
+    {
+      title: "Refund Process",
+      content: "Please email us at help@cheveningbrew.com with the topic \"REFUND REQUEST\" and we will get back to you."
+    },
+    {
+      title: "Contact Support",
+      content: (
+        <>
+          If you need any other assistance, please contact us at{" "}
+          <a href="mailto:help@cheveningbrew.com">
+            <strong>
+              <u>
+                <span className={styles.email}>help@cheveningbrew.com</span>
+              </u>
+            </strong>
+          </a>
+        </>
+      )
+    }
+  ];
+
   return (
     <SupportPagesLayout>
       <ActionBox>
         <div className={`${styles.supportContent} customScroll`}>
           <h1 className={styles.pageTitle}>FAQs and further help</h1>
-          <p className={styles.description}>
-            <br />
-            <br />
-            <strong> Q: I have done the interview once and I want to do it again. How can I do that? </strong>
-            <br />
-            A: Simply, sign out and sign in again to retake the interview.
-            <br />
-            <br />
-            <strong>Q: I have done my interview and I am unsatisfied. How do I get a refund?</strong>
-            <br />
-            A: Please email as at help@cheveningbrew.com with the topic "REFUND REQUEST" and we will get back to you.
-            <br />
-            <br />
-          </p>
+          <div className={styles.description}>
+            {/* Introduction section always visible */}
+            <div className={styles.termsContent}>
+              <p>
+                Welcome to our help center. Below you'll find answers to frequently asked questions and information about our services.
+              </p>
+            </div>
 
-          <p className={styles.description}>
-            If you need any other assistance, please contact us at{" "}
-            <a href="mailto:">
-              <strong>
-                <u>
-                  <span className={styles.email}>help@cheveningbrew.com</span>
-                </u>
-              </strong>
-            </a>
-          </p>
+            {/* FAQ sections as collapsible items */}
+            {faqSections.map((section, index) => {
+              const sectionId = `section-${index}`;
+              const isOpen = openSections[sectionId];
+
+              return (
+                <div key={sectionId} className={styles.termsSection}>
+                  <button 
+                    className={`${styles.termsHeader} ${isOpen ? styles.open : ''}`}
+                    onClick={() => toggleSection(sectionId)}
+                  >
+                    <span>{section.title}</span>
+                    <span className={styles.arrow}>{isOpen ? '▼' : '▶'}</span>
+                  </button>
+                  <div className={`${styles.termsContent} ${isOpen ? styles.open : ''}`}>
+                    {section.content}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </ActionBox>
     </SupportPagesLayout>

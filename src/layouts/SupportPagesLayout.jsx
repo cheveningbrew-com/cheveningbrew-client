@@ -13,7 +13,7 @@ const SupportPagesLayout = ({ children }) => {
     const fetchUserName = async () => {
       const user_id = getUserId()
       if (user_id) {
-        const storedName = await readUserField(user_id, 'userName');
+        const storedName = await readUserField(user_id, 'name');
         if (storedName) {
           setUserName(storedName);
         }

@@ -1,9 +1,11 @@
+import { STORAGE_KEYS } from '../constants/storage';
+
 /**
- * Validates the JWT token stored in sessionStorage
+ * Validates the JWT token
+ * @param {string} token - The token to validate
  * @returns {boolean} True if token is valid and not expired
  */
-export const validateToken = () => {
-    const token = sessionStorage.getItem('authToken');
+export const validateToken = (token) => {
     if (!token) return false;
 
     try {
@@ -25,11 +27,9 @@ export const validateToken = () => {
       console.error("Token validation error:", error);
       return false;
     }
-  };
+};
 
-  /* Clears all authentication data from sessionStorage*/
-  export const clearAuthData = () => {
-  sessionStorage.removeItem('authToken');
-  sessionStorage.removeItem('userName');
-  sessionStorage.removeItem('userEmail');
+/* Clears all authentication data from sessionStorage*/
+export const clearAuthData = () => {
+  Object.values(STORAGE_KEYS).forEach(key => sessionStorage.removeItem(key));
 };

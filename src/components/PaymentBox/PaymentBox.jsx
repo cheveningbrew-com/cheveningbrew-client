@@ -19,6 +19,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       script.onload = () => {
         console.log("PayHere script loaded successfully");
         setPayHereLoaded(true);
+        
       };
       script.onerror = () => {
         console.error("Failed to load PayHere script");
