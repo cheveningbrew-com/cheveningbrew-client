@@ -66,7 +66,12 @@ export const getUserId = () => sessionStorage.getItem("user_id");
 
 // Get user details from database
 export const readUserField = async (user_id, field) => {
+    if (!user_id) {
+        console.warn("readUserField called without a valid user_id");
+        return null;
+    }
     try {
+        console.log("Sending to read_field:", { user_id, field }); // <-- Add this line
         const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/read_field`, {
             method: "POST",
             headers: {
@@ -152,12 +157,10 @@ export const clearUser = async () => {
 };
 
 // Clear user data like without name,email and id  from   database
-export const SignOut_clearUser = async () => {
+export const SignOut_clearUser = async (user_id) => {  // Add user_id parameter
     try {
-        const user_id = getUserId();
-
         if (!user_id) {
-            throw new Error("User email not found in session storage");
+            throw new Error("User ID not provided");
         }
 
         const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/signout`, {
@@ -167,13 +170,34 @@ export const SignOut_clearUser = async () => {
         });
 
         if (!response.ok) {
-            throw new Error("Failed to sign out user");
+            const errorData = await response.json();
+            throw new Error(errorData.message || "Failed to sign out user");
         }
 
         return await response.json();
     } catch (error) {
         console.error("Error signing out:", error);
-        return { error: error.message };
+        throw error;  // Re-throw to handle in the calling function
+    }
+};
+
+export const Delete_suser = async (user_id) => {
+    try {
+        const response = await fetch(`${process.env.REACT_APP_DB_SERVER_URL}/users/delete`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Failed to delete user");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error deleting user:", error);
+        throw error;
     }
 };
 

@@ -18,6 +18,7 @@ const Feedback = () => {
   const [error, setError] = useState(null);
   const [interviewList, setInterviewList] = useState([]);
   const [selectedAttempt, setSelectedAttempt] = useState(null);
+  const [feedbackLoading, setFeedbackLoading] = useState(false);
 
   // Load list of interviews with proper error handling
   useEffect(() => {
@@ -54,27 +55,27 @@ const Feedback = () => {
 
   // Fetch feedback with proper error handling and state management
   // Fetch feedback when selected attempt changes
-// Fetch feedback when selected attempt changes
 useEffect(() => {
   const fetchFeedback = async () => {
+    setFeedbackLoading(true); // Start loading
     try {
       const userId = getUserId();
       if (!userId) {
         setError("User session not found. Please log in again.");
         setLoading(false);
+        setFeedbackLoading(false);
         return;
       }
 
       // Check for cached feedback first
       const cachedFeedback = await readUserField(userId, "cached_feedback");
       if (cachedFeedback) {
-        console.log("Using cached feedback");
         setFeedback(cachedFeedback);
         setLoading(false);
+        setFeedbackLoading(false);
         return;
       }
 
-      //  You defined loadFeedback but never called it
       const loadFeedback = async () => {
         if (!selectedAttempt || interviewList.length === 0) return;
 
@@ -84,12 +85,14 @@ useEffect(() => {
 
         if (selected?.feedback) {
           setFeedback(selected.feedback);
+          setFeedbackLoading(false);
           return;
         }
 
         const user_id = getUserId();
         if (!user_id) {
           setError("User not authenticated");
+          setFeedbackLoading(false);
           return;
         }
 
@@ -98,8 +101,8 @@ useEffect(() => {
           if (!chatHistoryPath) {
             setError("No interview session found. Please start a new interview.");
             setLoading(false);
-            console.warn("No chat history path found");
             setFeedback(null);
+            setFeedbackLoading(false);
             return;
           }
 
@@ -131,19 +134,19 @@ useEffect(() => {
             )
           );
         } catch (err) {
-          console.error("Error fetching feedback:", err);
           setError(
             err.response?.data?.message ||
               err.message ||
               "Failed to load feedback. Please try again later."
           );
+        } finally {
+          setFeedbackLoading(false);
         }
       };
 
-      // Fix: Call the inner function here
       await loadFeedback();
     } catch (err) {
-      console.error("Unexpected error in feedback loader:", err);
+      setFeedbackLoading(false);
     }
   };
 
@@ -172,12 +175,11 @@ useEffect(() => {
 
   // Auto-select the latest interview if none selected
   useEffect(() => {
-    if (interviewList.length > 0 && !feedback && selectedAttempt === null) {
+    if (interviewList.length > 0 && selectedAttempt === null) {
       const latest = interviewList[interviewList.length - 1];
       setSelectedAttempt(latest.attempt_number);
-      setFeedback(latest.feedback);
     }
-  }, [interviewList, feedback, selectedAttempt]);
+  }, [interviewList, selectedAttempt]);
 
   const handleDownloadAll = useCallback(() => {
     const available = interviewList.filter((item) => item.feedback);
@@ -226,7 +228,9 @@ useEffect(() => {
         <ActionBox>
           <div className={`${styles.feedbackContent} customScroll`}>
             <div className={styles.title}>Interview Performance Feedback</div>
-            {feedback ? (
+            {feedbackLoading ? (
+              <p>Loading feedback...</p>
+            ) : feedback ? (
               <div className={styles.markdownContent}>
                 <ReactMarkdown>{feedback}</ReactMarkdown>
               </div>
