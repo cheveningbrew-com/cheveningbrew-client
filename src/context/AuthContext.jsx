@@ -1,7 +1,7 @@
 // src/context/AuthContext.jsx
 import React, { createContext, useState, useEffect, useContext } from 'react';
 import { validateToken, clearAuthData } from '../utils/auth';
-import { readUserField, getUserId } from '../services/api';
+import { readUserField } from '../services/api';
 import { STORAGE_KEYS } from '../constants/storage';
 
 const AuthContext = createContext(null);
@@ -11,7 +11,6 @@ export const AuthProvider = ({ children }) => {
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus();
   }, []);
@@ -23,59 +22,60 @@ export const AuthProvider = ({ children }) => {
 
       const token = sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
       const user_id = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
-      const name = sessionStorage.getItem(STORAGE_KEYS.USER_NAME);
 
-      if (token && validateToken(token)) {
-        console.log("Token is valid, setting authenticated");
+      if (!token || !user_id) {
+        throw new Error("Missing token or user_id");
+      }
+
+      const isValid = await validateToken(token); // ✅ Awaiting async token validation
+
+      if (isValid) {
+        const name = await readUserField(user_id, "name"); // ✅ Awaiting async user field
+        sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
         setIsAuthenticated(true);
         setUserName(name);
       } else {
-        console.log("Token is invalid or missing");
-        clearAuthData();
-        setIsAuthenticated(false);
-        setUserName(null);
+        throw new Error("Invalid token");
       }
+
     } catch (error) {
       console.error("Error checking auth status:", error);
       clearAuthData();
       setIsAuthenticated(false);
       setUserName(null);
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ Ensures UI isn't stuck loading
     }
   };
 
   const login = async (token, name, id) => {
     try {
-      if (!id) {
-        throw new Error("Invalid user ID");
-      }
+      setLoading(true);
+      if (!id) throw new Error("Invalid user ID");
 
-      // Store all data in sessionStorage first
       sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       sessionStorage.setItem(STORAGE_KEYS.USER_ID, id);
-      if (name) {
-        sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
+
+      if (!name) {
+        name = await readUserField(id, "name"); // fallback if name not passed
       }
-      
-      // Update state directly without checking DB
+
+      sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
       setIsAuthenticated(true);
       setUserName(name);
+
     } catch (error) {
       console.error("Login error:", error);
       clearAuthData();
       setIsAuthenticated(false);
       setUserName(null);
     } finally {
-      setLoading(false);
+      setLoading(false); // ✅ Always called to update UI state
     }
   };
 
   const logout = () => {
-    // Clear all application-specific sessionStorage items
     Object.values(STORAGE_KEYS).forEach(key => sessionStorage.removeItem(key));
-
-    // Reset authentication state
     setIsAuthenticated(false);
     setUserName(null);
   };
