@@ -6,12 +6,12 @@ import { updateUserField, getUserId } from '../../services/api';
 const handlePaymentComplete = async (orderId) => {
   try {
     console.log("Payment completed. Order ID:", orderId);
-    const user_id = getUserId();
-    if (!user_id) {
+    const userId = getUserId();
+    if (!userId) {
       console.error("User ID not found.");
       return;
     }
-    await updateUserField(user_id, "payment_completed", true);
+    await updateUserField(userId, "payment_completed", true);
     console.log("User payment status updated successfully.");
   } catch (error) {
     console.error("Error updating user payment status:", error);

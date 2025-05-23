@@ -9,9 +9,9 @@ const Logo = () => {
 
   useEffect(() => {
     const fetchSessionToken = async () => {
-      const user_id = await getUserId();
+      const userId = await getUserId();
 
-      const sessionToken = await readUserField(user_id, "auth_token");
+      const sessionToken = await readUserField(userId, "auth_token");
 
       if (sessionToken) {
         setRedirectTo("/upload");

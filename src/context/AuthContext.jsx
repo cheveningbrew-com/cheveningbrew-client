@@ -21,17 +21,11 @@ export const AuthProvider = ({ children }) => {
       setLoading(true);
 
       const token = sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-      const user_id = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
+      const userId = sessionStorage.getItem(STORAGE_KEYS.userId);
+      const name = sessionStorage.getItem(STORAGE_KEYS.USER_NAME);
 
-      if (!token || !user_id) {
-        throw new Error("Missing token or user_id");
-      }
-
-      const isValid = await validateToken(token); // ✅ Awaiting async token validation
-
-      if (isValid) {
-        const name = await readUserField(user_id, "name"); // ✅ Awaiting async user field
-        sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
+      if (token && validateToken(token)) {
+        console.log("Token is valid, setting authenticated");
         setIsAuthenticated(true);
         setUserName(name);
       } else {
@@ -54,10 +48,9 @@ export const AuthProvider = ({ children }) => {
       if (!id) throw new Error("Invalid user ID");
 
       sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-      sessionStorage.setItem(STORAGE_KEYS.USER_ID, id);
-
-      if (!name) {
-        name = await readUserField(id, "name"); // fallback if name not passed
+      sessionStorage.setItem(STORAGE_KEYS.userId, id);
+      if (name) {
+        sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
       }
 
       sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);

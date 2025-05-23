@@ -3,6 +3,7 @@ import axios from 'axios';
 import styles from './PaymentBox.module.css';
 import { updateUserField, readUserField, getUserId, subscribeUser } from '../../services/api';
 import Popup from './Popup';
+import Price from '../PricePopUp/Price';
 
 
 const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
@@ -32,20 +33,20 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
   const handlePaymentComplete = useCallback(async (orderId) => {
     try {
-      const user_id = getUserId();
-      if (!user_id) {
+      const userId = getUserId();
+      if (!userId) {
         console.error("User ID not found.");
         return;
       }
 
       // Subscribe the user and update payment status
       await subscribeUser({
-        user_id: user_id,
+        userId: userId,
         plan: plan.id,
         price: parseFloat(plan.amount),
         attempts: plan.attempts,
       });
-      await updateUserField(user_id, "payment_completed", true);
+      await updateUserField(userId, "payment_completed", true);
 
       console.log("Payment completed successfully. Order ID:", orderId);
      
@@ -78,7 +79,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
   const initiatePayment = useCallback(async () => {
     const userId = getUserId();
 
-    // Case 1: If user_id not in sessionStorage
+    // Case 1: If userId not in sessionStorage
     if (!userId) {
       window.location.href = "/"; // Redirect to landing
       return;
@@ -90,7 +91,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       const paymentCompleted = await readUserField(userId, "payment_completed");
 
       if (!userExists) {
-        // Case 1: user_id not in table
+        // Case 1: userId not in table
         window.location.href = "/";
         return;
       }
@@ -107,22 +108,27 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       }
 
       setIsProcessing(true);
+      console.log("Initiating payment for user ID:", userId);
 
       const userName = await readUserField(userId, "name");
       const userEmail = await readUserField(userId, "email");
+
+      
+
 
       const paymentDetails = {
         order_id: `ORDER-${Date.now()}`,
         amount: plan.amount,
         currency: "USD",
-        name: userName || "User",
+        first_name: userName ? userName.split(" ")[0] : "User",
+        last_name: userName ? userName.split(" ")[1] || "User" : "User",
         email: userEmail || "test@example.com",
         phone: "",
         address: "",
         city: "",
         country: "Sri Lanka",
-        custom_1: "interview_prep",
-        custom_2: "user_id",
+        custom_1: plan.id,
+        custom_2: userId,
       };
 
       const API_URL = process.env.REACT_APP_PAYMENTS_SERVER_URL || "http://localhost:4001";
@@ -146,8 +152,8 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         amount: paymentDetails.amount,
         currency: paymentDetails.currency,
         hash: hash,
-        first_name: paymentDetails.name,
-        last_name: "",
+        first_name: paymentDetails.first_name,
+        last_name: paymentDetails.last_name,
         email: paymentDetails.email,
         phone: paymentDetails.phone,
         address: paymentDetails.address,
@@ -158,6 +164,8 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
         authorization: 1 // This enables authorization mode
       };
+
+      console.log("Payment details:", payment);
 
       // Set up PayHere event handlers
       window.payhere.onCompleted = handlePaymentComplete;

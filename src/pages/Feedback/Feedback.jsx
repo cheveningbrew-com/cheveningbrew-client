@@ -89,8 +89,8 @@ useEffect(() => {
           return;
         }
 
-        const user_id = getUserId();
-        if (!user_id) {
+        const userId = getUserId();
+        if (!userId) {
           setError("User not authenticated");
           setFeedbackLoading(false);
           return;

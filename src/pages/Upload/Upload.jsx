@@ -5,7 +5,7 @@ import Uploader from "../../components/Uploader/Uploader";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
 import { readUserField, getUserId, getUserSubscription, interviewReadUserField } from "../../services/api";
-import Price from "../../components/Price_Popup/Price";
+import Price from "../../components/PricePopUp/Price";
 import SignOutPopup from "../../components/SignoutPopup/SignoutPopup";
 import { handleSignOut } from "../../components/SignOut/SignOutHelper";
 import { useAuth } from "../../context/AuthContext";
@@ -25,18 +25,18 @@ const Upload = () => {
 
   useEffect(() => {
     const checkUserStatus = async () => {
-      const user_id = getUserId();
-      if (!user_id) {
+      const userId = getUserId();
+      if (!userId) {
         navigate("/");
         return;
       }
   
       try {
         // Check payment status
-        const dbPaymentStatus = await readUserField(user_id, "payment_completed");
+        const dbPaymentStatus = await readUserField(userId, "payment_completed");
         // Check interview status and attempts
-        const interviewDone = await interviewReadUserField(user_id, "is_completed");
-        const subscription = await getUserSubscription({ user_id, field: "attempts" });
+        const interviewDone = await interviewReadUserField(userId, "is_completed");
+        const subscription = await getUserSubscription({ userId, field: "attempts" });
 
         setInterviewDone(interviewDone === true);
         setAttemptsLeft(subscription.attempts);
@@ -87,15 +87,15 @@ const Upload = () => {
 
   const handlePaymentComplete = async () => {
     try {
-      const user_id = getUserId();
-      if (!user_id) return;
+      const userId = getUserId();
+      if (!userId) return;
 
       let attempts = 0;
       let dbPaymentStatus = false;
 
       // Retry mechanism: Check payment status up to 5 times with a 1-second delay
       while (attempts < 5) {
-        dbPaymentStatus = await readUserField(user_id, "payment_completed");
+        dbPaymentStatus = await readUserField(userId, "payment_completed");
         if (dbPaymentStatus) break;
         await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
         attempts++;
@@ -125,7 +125,7 @@ const Upload = () => {
 
   const handleSignOutConfirm = () => {
     setShowSignOutPopup(false);
-    handleSignOut(logout, navigate, user?.user_id);
+    handleSignOut(logout, navigate, user?.userId);
   };
   
   const handleSignOutCancel = () => {

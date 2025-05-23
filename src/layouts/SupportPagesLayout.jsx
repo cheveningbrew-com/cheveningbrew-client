@@ -11,9 +11,9 @@ const SupportPagesLayout = ({ children }) => {
 
   useEffect(() => {
     const fetchUserName = async () => {
-      const user_id = getUserId()
-      if (user_id) {
-        const storedName = await readUserField(user_id, 'name');
+      const userId = getUserId()
+      if (userId) {
+        const storedName = await readUserField(userId, 'name');
         if (storedName) {
           setUserName(storedName);
         }

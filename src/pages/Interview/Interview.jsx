@@ -50,17 +50,17 @@ function Page(props) {
   useEffect(() => {
     const checkInterviewStatus = async () => {
       try {
-        const user_id = getUserId();
-        if (!user_id) {
+        const userId = getUserId();
+        if (!userId) {
           console.error("No user ID found");
           return;
         }
     
         // Fetch all data in parallel
         const [interviewDoneRaw, paymentCompletedRaw, subscription] = await Promise.all([
-          interviewReadUserField(user_id, "is_completed"),
-          readUserField(user_id, "payment_completed"),
-          getUserSubscription({ user_id, field: "attempts" }).catch(() => ({ attempts: 0 })), // Handle 404 error
+          interviewReadUserField(userId, "is_completed"),
+          readUserField(userId, "payment_completed"),
+          getUserSubscription({ userId, field: "attempts" }).catch(() => ({ attempts: 0 })), // Handle 404 error
         ]);
     
         console.log("Payment status from DB:", paymentCompletedRaw);
@@ -180,10 +180,10 @@ function Page(props) {
   const onConnectButtonClicked = useCallback(async () => {
     
     try {
-      const user_id = getUserId();
+      const userId = getUserId();
 
       // ✅ Check if document is uploaded
-    // const documentUploaded = await readUserField(user_id, "document_uploaded");
+    // const documentUploaded = await readUserField(userId, "document_uploaded");
     const documentUploaded = sessionStorage.getItem('upload_completed');
     if (!documentUploaded) {
       setPopupMessage("Please upload your PDF before starting the interview.");
@@ -196,7 +196,7 @@ function Page(props) {
   
 
       // Fetch user name and questions from the backend API
-      const userName = await readUserField(user_id, "name");
+      const userName = await readUserField(userId, "name");
       const userQuestions = await sessionStorage.getItem("interview_questions");      
       // using userName and time, generate a unique file path for saving chat history
       // no space allowed in file name. No special characters allowed in file name except underscore
@@ -237,10 +237,10 @@ function Page(props) {
       sessionStorage.setItem("interview_Id", response.data.roomName); // Store the interview ID in session storage // Update the connection details with the API response
       createInterview(
        response.data.roomName,
-        user_id,
+        userId,
         userQuestions
       );
-      console.log("Interview created:", response.data.roomName, user_id, userQuestions);
+      console.log("Interview created:", response.data.roomName, userId, userQuestions);
 
       // Start the timer when connection is established
       setTimerActive(true);
@@ -253,7 +253,7 @@ function Page(props) {
   const handleSignOutConfirm = () => {
     setShowSignOutPopup(false);
     // navigate("/feedback");
-    handleSignOut(logout, navigate, user?.user_id);
+    handleSignOut(logout, navigate, user?.userId);
   };
   
   const handleSignOutCancel = () => {
@@ -389,14 +389,14 @@ function ControlBar(props) {
   
     useEffect(() => {
       const fetchAttempts = async () => {
-        const user_id = getUserId();
-        if (!user_id) {
+        const userId = getUserId();
+        if (!userId) {
           console.error("No user email found.");
           return;
         }
   
         try {
-          const result = await getUserSubscription({ user_id, field: "attempts" });
+          const result = await getUserSubscription({ userId, field: "attempts" });
           setAttemptsLeft(result?.attempts ?? 0); // default to 0 if missing
         } catch (error) {
           console.error("Error fetching attempts:", error);

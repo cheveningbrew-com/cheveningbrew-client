@@ -1,6 +1,6 @@
 export const STORAGE_KEYS = {
   AUTH_TOKEN: 'authToken',
-  USER_ID: 'user_id',
+  userId: 'userId',
   USER_NAME: 'userName',
   USER_EMAIL: 'userEmail',
   UPLOAD_COMPLETED: 'upload_completed',
