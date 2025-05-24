@@ -59,7 +59,7 @@ export const AuthProvider = ({ children }) => {
       if (!id) {
         throw new Error("Invalid user ID");
       }
-
+      console.log("Setting auth data to sessionStorage");
       sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       sessionStorage.setItem(STORAGE_KEYS.USER_ID, id);
       if (name) {

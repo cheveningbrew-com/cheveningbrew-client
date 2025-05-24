@@ -1,5 +1,7 @@
+import { STORAGE_KEYS } from '../constants/storage';
+
 const API_BASE_URL = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || 'https://www.cheveningbrew.com/'; 
-const DB_SERVER_URL = DB_SERVER_URL || 'https://www.livekit.cheveningbrew.com/api/db'; // Ensure this is in your .env
+const DB_SERVER_URL = process.env.REACT_APP_DB_SERVER_URL || 'https://www.livekit.cheveningbrew.com/api/db'; // Ensure this is in your .env
 
 export const uploadEssay = async (file) => {
     const formData = new FormData();
@@ -60,8 +62,8 @@ export const createUser = async (email, name, id, picture, auth_token) => {
     }
   };
 
-// Get user Email from session storage
-export const getUserId = () => sessionStorage.getItem("user_id");
+// Get user ID from session storage
+export const getUserId = () => sessionStorage.getItem(STORAGE_KEYS.USER_ID);
 
 // Get user details from database
 export const readUserField = async (user_id, field) => {
