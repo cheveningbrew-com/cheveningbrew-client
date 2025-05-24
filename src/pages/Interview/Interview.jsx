@@ -8,12 +8,15 @@ import styles from "./Interview.module.css";
 import SignOutPopup from "../../components/SignoutPopup/SignoutPopup";
 import { handleSignOut } from "../../components/SignOut/SignOutHelper";
 import {
+  AgentState,
   BarVisualizer,
   DisconnectButton,
   LiveKitRoom,
   RoomAudioRenderer,
   VoiceAssistantControlBar,
   useVoiceAssistant,
+  useParticipant,
+  useRoom,
 } from "@livekit/components-react";
 import "@livekit/components-styles";
 import { useKrispNoiseFilter } from "@livekit/components-react/krisp";
