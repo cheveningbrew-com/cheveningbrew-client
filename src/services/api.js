@@ -1,7 +1,7 @@
 import { STORAGE_KEYS } from '../constants/storage';
 
 const API_BASE_URL = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || 'https://www.cheveningbrew.com/'; 
-const DB_SERVER_URL = process.env.REACT_APP_DB_SERVER_URL || 'https://www.livekit.cheveningbrew.com/api/db'; // Ensure this is in your .env
+const DB_SERVER_URL = process.env.REACT_APP_DB_SERVER_URL || 'https://www.cheveningbrew.com/api/db'; // Ensure this is in your .env
 
 export const uploadEssay = async (file) => {
     const formData = new FormData();

@@ -14,18 +14,13 @@ const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [_, setError] = useState(null);
   const [authSuccess, setAuthSuccess] = useState(false);
-  const { login: authLogin } = useAuth(); // Renamed to authLogin
+  const { login: authLogin, isAuthenticated } = useAuth(); // Get authentication state
   console.log(
     "login request root",
     process.env.REACT_APP_CHEVENINGBREW_SERVER_URL
   );
 
-  useEffect(() => {
-    if (authSuccess) {
-      console.log("Auth success detected, navigating to /upload");
-      navigate("/upload", { replace: true });
-    }
-  }, [authSuccess, navigate]);
+  // We'll navigate in the login process completion instead of using authSuccess state
 
   const googleLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
@@ -48,14 +43,7 @@ const LandingPage = () => {
         if (data.authenticated) {
           console.log("Authentication successful:", data);
   
-          // Step 2: Call auth context login
-          if (data.user && data.user.name && data.user.id) {
-            authLogin(data.authToken, data.user.name, data.user.id);
-          } else {
-            authLogin(data.authToken);
-          }
-  
-          // Step 3: Save user in the database
+          // Step 2: Save user in the database first
           const savedUser = await createUser(
             data.user.email, 
             data.user.name, 
@@ -63,10 +51,19 @@ const LandingPage = () => {
             data.user.picture, 
             data.authToken // Pass token if needed
           );
-  
+
           console.log("User saved in DB:", savedUser);
-  
-          setAuthSuccess(true);
+
+          // Step 3: Call auth context login and wait for it to complete
+          if (data.user && data.user.name && data.user.id) {
+            await authLogin(data.authToken, data.user.name, data.user.id);
+          } else {
+            await authLogin(data.authToken);
+          }
+          
+          // Step 4: Now navigate to the upload page
+          console.log("Auth process completed, navigating to /upload");
+          navigate("/upload", { replace: true });
         } else {
           setError("Authentication failed");
         }
