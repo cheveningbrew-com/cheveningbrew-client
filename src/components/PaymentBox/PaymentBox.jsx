@@ -156,6 +156,9 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         custom_2: paymentDetails.custom_2,
       };
 
+      // log payment details
+      console.log("Payment details:", payment);
+
       // Set up PayHere event handlers
       window.payhere.onCompleted = handlePaymentComplete;
       window.payhere.onDismissed = handlePaymentDismissed;

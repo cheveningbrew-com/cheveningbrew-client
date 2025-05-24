@@ -5,7 +5,7 @@ import Uploader from "../../components/Uploader/Uploader";
 import styles from "./Upload.module.css";
 import { useNavigate } from "react-router-dom";
 import { readUserField, getUserId, getUserSubscription, interviewReadUserField } from "../../services/api";
-import Price from "../../components/Price_Popup/Price";
+import Price from "../../components/PricePopUp/Price";
 import SignOutPopup from "../../components/SignoutPopup/SignoutPopup";
 import { handleSignOut } from "../../components/SignOut/SignOutHelper";
 import { useAuth } from "../../context/AuthContext";
@@ -13,7 +13,7 @@ import { useAuth } from "../../context/AuthContext";
 const Upload = () => {
   const [_, setFilePath] = useState(null);
   const [showPaymentPopup, setShowPaymentPopup] = useState(false);
-  const [payment_completed, setpayment_completed] = useState(false);
+  const [payment_completed, setPaymentCompleted] = useState(false);
   const [showRulesPopup, setShowRulesPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
@@ -44,7 +44,7 @@ const Upload = () => {
         if (!dbPaymentStatus) {
           setShowPaymentPopup(true);
         } else {
-          setpayment_completed(true);
+          setPaymentCompleted(true);
         }
 
         // Show sign out popup if no attempts left and interview is done
@@ -102,7 +102,7 @@ const Upload = () => {
       }
 
       if (dbPaymentStatus) {
-        setpayment_completed(true);
+        setPaymentCompleted(true);
         setShowPaymentPopup(false); // Hide the popup
       } else {
         console.warn("Payment not yet marked complete in DB after retries.");
