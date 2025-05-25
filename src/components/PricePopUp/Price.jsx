@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './Price.module.css';
 import PaymentBox from '../PaymentBox/PaymentBox';
-import { updateUserField, getUserId } from '../../services/api';
+import { getUserId } from '../../services/api';
 
 const handlePaymentComplete = async (orderId) => {
   try {
@@ -11,8 +11,8 @@ const handlePaymentComplete = async (orderId) => {
       console.error("User ID not found.");
       return;
     }
-    await updateUserField(user_id, "payment_completed", true);
-    console.log("User payment status updated successfully.");
+    //await updateUserField(user_id, "payment_completed", true);
+    // console.log("User payment status updated successfully.");
   } catch (error) {
     console.error("Error updating user payment status:", error);
   }

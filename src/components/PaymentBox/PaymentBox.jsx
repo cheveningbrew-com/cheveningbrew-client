@@ -39,13 +39,13 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       }
 
       // Subscribe the user and update payment status
-      await subscribeUser({
-        user_id: user_id,
-        plan: plan.id,
-        price: parseFloat(plan.amount),
-        attempts: plan.attempts,
-      });
-      await updateUserField(user_id, "payment_completed", true);
+      // await subscribeUser({
+      //   user_id: user_id,
+      //   plan: plan.id,
+      //   price: parseFloat(plan.amount),
+      //   attempts: plan.attempts,
+      // });
+      // await updateUserField(user_id, "payment_completed", true);
 
       console.log("Payment completed successfully. Order ID:", orderId);
 
@@ -110,18 +110,27 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       const userName = await readUserField(userId, "name");
       const userEmail = await readUserField(userId, "email");
 
+      // Validate that user information is available before proceeding
+      if (!userName || !userEmail) {
+        setIsProcessing(false);
+        alert("Missing user information. Please update your profile with your name and email before making a payment.");
+        return;
+      }
+
       const paymentDetails = {
         order_id: `ORDER-${Date.now()}`,
         amount: plan.amount,
+        attempts: plan.attempts,
+        plan_id: plan.id,
         currency: "USD",
-        name: userName || "User",
-        email: userEmail || "test@example.com",
+        name: userName,
+        email: userEmail,
         phone: "",
         address: "",
         city: "",
         country: "Sri Lanka",
-        custom_1: "interview_prep",
-        custom_2: "one_time",
+        plan_id: plan.id,  
+        user_id: userId,
       };
 
       const API_URL = process.env.REACT_APP_PAYMENTS_SERVER_URL || "http://localhost:4001";
@@ -141,19 +150,19 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         cancel_url: process.env.REACT_APP_CANCEL_URL || window.location.href,
         notify_url: process.env.REACT_APP_NOTIFY_URL || `${API_URL}/payment/notify`,
         order_id: paymentDetails.order_id,
-        items: "Chevening Interview Prep - One-time Access",
+        items: paymentDetails.plan_id,
         amount: paymentDetails.amount,
         currency: paymentDetails.currency,
         hash: hash,
-        first_name: paymentDetails.name,
-        last_name: "",
+        first_name: paymentDetails.name.split(" ")[0],
+        last_name: paymentDetails.name.split(" ").slice(1).join(" "),
         email: paymentDetails.email,
         phone: paymentDetails.phone,
         address: paymentDetails.address,
         city: paymentDetails.city,
         country: paymentDetails.country,
-        custom_1: paymentDetails.custom_1,
-        custom_2: paymentDetails.custom_2,
+        custom_1: paymentDetails.attempts,
+        custom_2: paymentDetails.user_id,
       };
 
       // log payment details
@@ -200,4 +209,3 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 };
 
 export default PaymentBox;
-
