@@ -5,9 +5,10 @@ import styles from "./Tabs.module.css";
 const Tabs = () => {
   const location = useLocation();
 
+  // Remove Interview tab
   const tabs = [
     { path: "/upload", label: "Upload" },
-    { path: "/interview", label: "Interview" },
+    // Remove interview tab
     { path: "/feedback", label: "Feedback" },
   ];
 
