@@ -2,7 +2,10 @@ import React from "react";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
+// import axios from "axios";
+// import { completeInterview, getUserId, readUserField, getUserInterviews } from "../../services/api";
 import ReactMarkdown from "react-markdown";
+// import { downloadFeedbackPDFs } from "../../utils/downloadFeedback";
 
 const Feedback = () => {
   // Static demo feedback
@@ -45,7 +48,7 @@ Based on this mock interview, you have shown good potential as a Chevening candi
                 </button>
               </div>
             </div>
-            <button className={styles.downloadButton}>
+            <button className={styles.downloadButton} onClick={() => alert("Download feature disabled in demo mode")}>
               Download Sample Feedback (PDF)
             </button>
           </div>

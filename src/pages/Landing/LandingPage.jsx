@@ -1,23 +1,87 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styles from "./LandingPage.module.css";
 import Logo from "../../components/Logo/Logo";
 import Footer from "../../components/Footer/Footer";
-// Comment out Google imports
 // import g from "../../assets/images/G.webp";
 // import { useGoogleLogin } from "@react-oauth/google";
 // import {useAuth} from '../../context/AuthContext';
-// import { createUser } from "../../services/api";
+// import { createUser } from "../../services/api"; 
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  // Comment out auth-related state
   // const [isLoading, setIsLoading] = useState(false);
   // const [_, setError] = useState(null);
   // const [authSuccess, setAuthSuccess] = useState(false);
-  // const { login: authLogin, isAuthenticated } = useAuth();
+  // const { login: authLogin, isAuthenticated } = useAuth(); // Get authentication state
   
-  // Replace Google login with direct navigation
+  // const googleLogin = useGoogleLogin({
+  //   onSuccess: async (tokenResponse) => {
+  //     try {
+  //       setIsLoading(true);
+  
+  //       // Step 1: Send Google auth code to backend
+  //       const response = await fetch(`${process.env.REACT_APP_USER_AUTH_SERVER}/api/auth/google`, {
+  //         method: "POST",
+  //         headers: { "Content-Type": "application/json" },
+  //         body: JSON.stringify({ code: tokenResponse.code }),
+  //       });
+  
+  //       if (!response.ok) {
+  //         throw new Error("Google authentication failed");
+  //       }
+  
+  //       const data = await response.json();
+  
+  //       if (data.authenticated) {
+  //         console.log("Authentication successful:", data);
+  
+  //         // Step 2: Save user in the database first
+  //         const savedUser = await createUser(
+  //           data.user.email, 
+  //           data.user.name, 
+  //           data.user.id, 
+  //           data.user.picture, 
+  //           data.authToken // Pass token if needed
+  //         );
+
+  //         console.log("User saved in DB:", savedUser);
+
+  //         // Step 3: Call auth context login and wait for it to complete
+  //         if (data.user && data.user.name && data.user.id) {
+  //           await authLogin(data.authToken, data.user.name, data.user.id);
+  //         } else {
+  //           await authLogin(data.authToken);
+  //         }
+          
+  //         // Step 4: Now navigate to the upload page
+  //         console.log("Auth process completed, navigating to /upload");
+  //         navigate("/upload", { replace: true });
+  //       } else {
+  //         setError("Authentication failed");
+  //       }
+  //     } catch (error) {
+  //       console.error("Authentication error:", error);
+  //       setError("Authentication failed");
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   },
+  
+  //   onError: (error) => {
+  //     console.error("Google Authentication error:", error);
+  //     setIsLoading(false);
+  //     setError("Authentication failed");
+  //   },
+  
+  //   flow: "auth-code",
+  // });
+
+  // const handleGoogleSignIn = () => {
+  //   setIsLoading(true);
+  //   googleLogin(); // Updated to use the renamed function
+  // };
+
   const handleGetStarted = () => {
     // Simply navigate to upload page
     navigate("/upload");
@@ -66,12 +130,19 @@ const LandingPage = () => {
               </div>
             </div>
 
-            {/* Modify button to skip auth */}
+            {/* Start button using CSS Module class */}
             <button
               className={styles.landingPageButton}
               onClick={handleGetStarted}
             >
               Get Started
+              {/* {isLoading ? (
+                "Signing in..."
+              ) : (
+                <>
+                  <img src={g} alt="logo" width="30" /> Sign in with Google
+                </>
+              )} */}
             </button>
           </div>
           <Footer className={styles.landingPageFooter} />
