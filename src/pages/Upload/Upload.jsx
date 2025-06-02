@@ -1,56 +1,155 @@
 import React, { useState } from "react";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
-import Uploader from "../../components/Uploader/Uploader";
 import styles from "./Upload.module.css";
-import { useNavigate } from "react-router-dom";
-// Remove auth-related imports
-import Price from "../../components/PricePopUp/Price";
+import { uploadEssayFile, getWritingStyleAnalysis } from "../../services/essay_api";
 
 const Upload = () => {
-  const [_, setFilePath] = useState(null);
-  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
-  const [payment_completed, setPaymentCompleted] = useState(true); // Set to true to bypass payment
-  const [showRulesPopup, setShowRulesPopup] = useState(false);
-  const navigate = useNavigate();
-  const [fileUploaded, setFileUploaded] = useState(false);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [links, setLinks] = useState(null);
+  const [error, setError] = useState(null);
 
-  // Simplified upload success handler
-  const handleUploadSuccess = (path) => {
-    setFilePath(path);
-    console.log("File path:", path);
-    
-    // Mark upload as completed
-    sessionStorage.setItem("upload_completed", "true");
-    setFileUploaded(true);
-    
-    // Navigate directly to feedback (skip interview)
-    navigate("/feedback");
+  // Handle file selection
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Please upload a PDF file.");
+        return;
+      }
+      
+      setSelectedFile(file);
+      setError(null);
+    }
   };
 
-  // Simplified payment handler
-  const handlePaymentComplete = async () => {
-    setPaymentCompleted(true);
-    setShowPaymentPopup(false);
+  // Handle file upload and get links
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setError("Please select a file first.");
+      return;
+    }
+
+    try {
+      setIsLoading(true);
+      setError(null);
+      
+      // Step 1: Upload the file
+      const uploadResult = await uploadEssayFile(selectedFile);
+      
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.message || "Upload failed");
+      }
+      
+      // Step 2: Extract directory name from path
+      const extractedTextPath = uploadResult.extracted_text_path;
+      const pathParts = extractedTextPath.split('/');
+      const dirName = pathParts[1]; // Format: "text_outs/dirName/extracted_text.txt"
+      
+      // Step 3: Get the analysis with links
+      const analysisResult = await getWritingStyleAnalysis(dirName);
+      
+      // Step 4: Set the links
+      setLinks({
+        googleDrive: analysisResult.google_drive_link,
+        googleDocs: analysisResult.google_docs_link,
+        download: analysisResult.download_link
+      });
+      
+    } catch (err) {
+      setError(`Error: ${err.message || "Unknown error occurred"}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Reset everything
+  const handleReset = () => {
+    setSelectedFile(null);
+    setLinks(null);
+    setError(null);
+    
+    // Reset file input
+    const fileInput = document.getElementById("file-upload");
+    if (fileInput) fileInput.value = "";
   };
 
   return (
     <MainLayout>
       <ActionBox>
-        <div className={`${styles.uploadContainer} customScroll`}>
-          <div>
-            <h1 className={styles.title}>
-              Download your Chevening Application as a PDF file and upload it here before start interview.
-            </h1>
-
-            <Uploader onUploadSuccess={handleUploadSuccess} />
-
-            {!payment_completed && showPaymentPopup && (
-              <Price
-                onPaymentComplete={handlePaymentComplete}
-                onPaymentError={() => {}}
-                onPaymentDismissed={() => setShowPaymentPopup(false)}
-              />
+        <div className={styles.uploadContainer}>
+          <h1 className={styles.title}>
+            Upload your Chevening Application Essays
+          </h1>
+          
+          <div className={styles.uploadSection}>
+            {!links ? (
+              <>
+                <div className={styles.fileInputContainer}>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    disabled={isLoading}
+                    className={styles.fileInput}
+                  />
+                  <label htmlFor="file-upload" className={styles.fileInputLabel}>
+                    {selectedFile ? selectedFile.name : "Choose PDF file"}
+                  </label>
+                </div>
+                
+                {error && <div className={styles.errorMessage}>{error}</div>}
+                
+                <button
+                  className={styles.uploadButton}
+                  onClick={handleUpload}
+                  disabled={!selectedFile || isLoading}
+                >
+                  {isLoading ? "Processing..." : "Upload & Analyze"}
+                </button>
+              </>
+            ) : (
+              <div className={styles.linksContainer}>
+                <h2 className={styles.linksTitle}>Your Analysis is Ready!</h2>
+                
+                <div className={styles.linkButtons}>
+                  <a 
+                    href={links.googleDrive} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${styles.linkButton} ${styles.driveButton}`}
+                  >
+                    View in Google Drive
+                  </a>
+                  
+                  <a 
+                    href={links.googleDocs} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${styles.linkButton} ${styles.docsButton}`}
+                  >
+                    Open in Google Docs
+                  </a>
+                  
+                  <a 
+                    href={links.download} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${styles.linkButton} ${styles.downloadButton}`}
+                  >
+                    Download DOCX
+                  </a>
+                </div>
+                
+                <button 
+                  className={styles.resetButton} 
+                  onClick={handleReset}
+                >
+                  Upload Another Document
+                </button>
+              </div>
             )}
           </div>
         </div>
