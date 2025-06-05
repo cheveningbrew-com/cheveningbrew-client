@@ -15,23 +15,40 @@ const Privacy = () => {
     }));
   };
 
-  // Split the privacy policy text into sections
-  const sections = privacyPolicyText.split('##').filter(Boolean);
+  // Split the markdown content into sections based on h2 headers
+  const sections = privacyPolicyText.split(/(?=## )/).filter(Boolean);
+  
+  // Parse the first section (introduction)
+  const introContent = sections[0];
+  
+  // Create an array of section objects similar to termsContentSections in Terms.jsx
+  const privacyContentSections = sections.slice(1).map((section) => {
+    // Extract title from the first line
+    const title = section.split('\n')[0].replace('## ', '');
+    // Remove the title line from the content to prevent duplication
+    const contentWithoutTitle = section.split('\n').slice(1).join('\n').trim();
+    
+    return {
+      title: title,
+      content: contentWithoutTitle
+    };
+  });
 
   return (
     <SupportPagesLayout>
       <ActionBox>
         <div className={`${styles.supportContent} customScroll`}>
-          <h1 className={styles.pageTitle}>Privacy Policy</h1>
+          <h1 className={styles.pageTitle}>Privacy policy</h1>
           <div className={styles.description}>
             {/* First section is always visible */}
-            <div className={styles.termsContent}>
-              <ReactMarkdown>{sections[0]}</ReactMarkdown>
+            <div className={`${styles.termsContent} ${styles.noLeftPadding}`}>
+              <div className={styles.customMarkdown}>
+                <ReactMarkdown>{introContent}</ReactMarkdown>
+              </div>
             </div>
 
-            {/* Rest of the sections are collapsible */}
-            {sections.slice(1).map((section, index) => {
-              const [title, ...content] = section.split('\n');
+            {/* Rest of the sections are collapsible - styled like in Terms.jsx */}
+            {privacyContentSections.map((section, index) => {
               const sectionId = `section-${index + 1}`;
               const isOpen = openSections[sectionId];
 
@@ -41,28 +58,30 @@ const Privacy = () => {
                     className={`${styles.termsHeader} ${isOpen ? styles.open : ''}`}
                     onClick={() => toggleSection(sectionId)}
                   >
-                    <span>{title.trim()}</span>
+                    <span>{section.title}</span>
                     <span className={styles.arrow}>{isOpen ? '▼' : '▶'}</span>
                   </button>
                   <div className={`${styles.termsContent} ${isOpen ? styles.open : ''}`}>
-                    <ReactMarkdown
-                      components={{
-                        p: ({ node, ...props }) => (
-                          <p className={styles.privacyParagraph} {...props} />
-                        ),
-                        ul: ({ node, ...props }) => (
-                          <ul className={styles.privacyList} {...props} />
-                        ),
-                        li: ({ node, ...props }) => (
-                          <li className={styles.privacyListItem} {...props} />
-                        ),
-                        strong: ({ node, ...props }) => (
-                          <strong className={styles.privacyHighlight} {...props} />
-                        ),
-                      }}
-                    >
-                      {content.join('\n')}
-                    </ReactMarkdown>
+                    <div className={styles.customMarkdown}>
+                      <ReactMarkdown
+                        components={{
+                          p: ({ node, ...props }) => (
+                            <p className={styles.privacyParagraph} {...props} />
+                          ),
+                          ul: ({ node, ...props }) => (
+                            <ul className={styles.privacyList} {...props} />
+                          ),
+                          li: ({ node, ...props }) => (
+                            <li className={styles.privacyListItem} {...props} />
+                          ),
+                          strong: ({ node, ...props }) => (
+                            <strong className={styles.privacyHighlight} {...props} />
+                          )
+                        }}
+                      >
+                        {section.content}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 </div>
               );

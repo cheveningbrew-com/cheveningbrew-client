@@ -1,6 +1,10 @@
 /* Base styles */
 .priceSection {
   width: 100%;
+  height: 100%; /* Use full height available */
+  display: flex;
+  align-items: center; /* Vertical centering */
+  justify-content: center; /* Horizontal centering */
 }
 
 .priceContainerBox {
@@ -8,7 +12,8 @@
   border-radius: 10px;
   padding: 30px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.352);
-  margin: 20px 0;
+  margin: 0; /* Remove vertical margins that can interfere with centering */
+  width: 100%; /* Ensure it takes up full width */
 }
 
 .priceGrid {

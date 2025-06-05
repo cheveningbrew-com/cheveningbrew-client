@@ -434,7 +434,7 @@ function ControlBar(props) {
             className="startButton"
             onClick={props.onConnectButtonClicked}
           >
-            Start your interview({attemptsLeft} left)
+            Start your interview ({attemptsLeft} left)
           </motion.button>
         )}
       </AnimatePresence>

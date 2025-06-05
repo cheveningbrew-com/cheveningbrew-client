@@ -181,3 +181,17 @@
 .agreeButton:hover {
   background-color: #45a049;
 }
+
+.paymentWithTitle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  width: 100%;
+  max-width: 800px;
+  margin: 0 auto;
+  height: 100%; /* Take up full height available */
+}
+
+.paymentWithTitle .title {
+  margin-bottom: 1.5rem;
+}

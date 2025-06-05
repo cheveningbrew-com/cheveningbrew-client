@@ -99,13 +99,26 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         return;
       }
 
+      setIsProcessing(true);
+
+      // DEVELOPMENT MODE: Skip actual payment flow
+      console.log("DEV MODE: Bypassing payment process and simulating successful payment");
+      
+      // Generate a mock order ID for development
+      const orderId = `DEV-ORDER-${Date.now()}`;
+      
+      // Wait a short time to simulate processing
+      setTimeout(() => {
+        // Simulate successful payment completion
+        handlePaymentComplete(orderId);
+      }, 1000);
+
+      /* COMMENTED OUT FOR DEVELOPMENT - REAL PAYMENT FLOW
       // Case 2: user exists and payment_completed === false → proceed to payment
       if (!window.payhere || isProcessing) {
         alert("Payment system not loaded. Please refresh the page and try again.");
         return;
       }
-
-      setIsProcessing(true);
 
       const userName = await readUserField(userId, "name");
       const userEmail = await readUserField(userId, "email");
@@ -175,6 +188,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
       // Start payment
       window.payhere.startPayment(payment);
+      */
 
     } catch (error) {
       console.error("Payment initialization error:", error);
@@ -193,7 +207,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         {isProcessing ? (
           <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
         ) : (
-          <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
+          <span>Pay ${plan.amount}</span>
         )}
       </button>
       {!payHereLoaded && <p className={styles.loadingMessage}>Loading payment system...</p>}

@@ -143,18 +143,27 @@ const Upload = () => {
         />
         <div className={`${styles.uploadContainer} customScroll`}>
           <div>
-            <h1 className={styles.title}>
-              Download your Chevening Application as a PDF file and upload it here before start interview.
-            </h1>
-
-            {payment_completed && <Uploader onUploadSuccess={handleUploadSuccess} />}
+            {payment_completed && (
+              <>
+                <h1 className={styles.title}>
+                  Upload your Chevening application PDF here. 
+                </h1>
+                <Uploader onUploadSuccess={handleUploadSuccess} />
+              </>
+            )}
 
             {!payment_completed && showPaymentPopup && (
-              <Price
-                onPaymentComplete={handlePaymentComplete}
-                onPaymentError={handlePaymentError}
-                onPaymentDismissed={handlePaymentDismissed}
-              />
+              <div className={styles.paymentWithTitle}>
+                <h1 className={styles.title}>
+                  Upload your Chevening application PDF here. 
+                </h1>
+                <Price
+                  onPaymentComplete={handlePaymentComplete}
+                  onPaymentError={handlePaymentError}
+                  onPaymentDismissed={handlePaymentDismissed}
+                  showUploadTitle={false} /* Not needed as we've added the title above */
+                />
+              </div>
             )}
 
             {showRulesPopup && (

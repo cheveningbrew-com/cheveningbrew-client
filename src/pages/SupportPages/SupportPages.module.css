@@ -165,6 +165,40 @@
   overflow-y: auto; */
 }
 
+/* Custom Markdown Styling */
+.customMarkdown p,
+.customMarkdown li,
+.customMarkdown strong,
+.customMarkdown em,
+.customMarkdown u,
+.customMarkdown span,
+.customMarkdown div {
+  color: #ffffff;
+  line-height: 1.6;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+}
+
+.customMarkdown strong {
+  font-weight: 700;
+}
+
+.customMarkdown ul,
+.customMarkdown ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Reduce padding for customMarkdown elements inside termsContent */
+.termsContent .customMarkdown ul,
+.termsContent .customMarkdown ol {
+  padding-left: 1rem;
+}
+
+.customMarkdown li {
+  margin-bottom: 0.5rem;
+}
+
 /* Styles for markdown content */
 .markdownContent {
   /* Base text styling */
@@ -600,17 +634,20 @@
   padding: 0 1rem;
 }
 
+.noLeftPadding {
+  padding-left: 0 !important;
+}
+
 /* Style for the first section that's always visible */
 .description > .termsContent:first-child {
   max-height: none;
   padding: 1rem;
   margin-bottom: 2rem;
-  border-bottom: 1px solid #e0e0e0;
 }
 
 .termsContent.open {
   max-height: none; /* Changed from fixed height to allow content to expand */
-  padding: 1rem;
+  padding: 1rem 1rem 1rem 0.5rem; /* Reduced left padding from 1rem to 0.5rem */
 }
 
 .arrow {

@@ -15,15 +15,15 @@ const Help = () => {
 
   const faqSections = [
     {
-      title: "Interview Retake",
-      content: "Simply, sign out and sign in again to retake the interview."
+      title: "I have run out of attempts but want to retake the interview",
+      content: "Simply, sign out and sign in again. You can choose a new plan."
     },
     {
-      title: "Refund Process",
-      content: "Please email us at help@cheveningbrew.com with the topic \"REFUND REQUEST\" and we will get back to you."
+      title: "I am unhappy with my purchase, I want a refund",
+      content: "Please email us at help@cheveningbrew.com with the topic \"REFUND REQUEST\", indicate the payment ID you received from us at the time of purchase in the email. We will get back to you in 3-5 working days."
     },
     {
-      title: "Contact Support",
+      title: "Other queries",
       content: (
         <>
           If you need any other assistance, please contact us at{" "}
@@ -46,11 +46,11 @@ const Help = () => {
           <h1 className={styles.pageTitle}>FAQs and further help</h1>
           <div className={styles.description}>
             {/* Introduction section always visible */}
-            <div className={styles.termsContent}>
-              <p>
+            {/* <div className={styles.termsContent}>
+              <p className={styles.privacyParagraph}>
                 Welcome to our help center. Below you'll find answers to frequently asked questions and information about our services.
               </p>
-            </div>
+            </div> */}
 
             {/* FAQ sections as collapsible items */}
             {faqSections.map((section, index) => {

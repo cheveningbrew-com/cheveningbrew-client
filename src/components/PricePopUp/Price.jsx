@@ -34,21 +34,21 @@ const plans = [
     name: 'Basic',
     amount: '5.00',
     attempts: 1,
-    description: '1 attempt\n20 minutes\nquick practice!',
+    description: '1 interview\n20 minutes\nQuick practice',
   },
   {
     id: 'standard',
     name: 'Standard',
     amount: '10.00',
     attempts: 3,
-    description: '3 attempts\n60 minutes\nrefining answers!',
+    description: '3 interviews\n60 minutes\nAlmost there',
   },
   {
     id: 'premium',
     name: 'Premium',
     amount: '15.00',
     attempts: 5,
-    description: '5 attempts\n100 minutes\nserious prep!',
+    description: '5 interviews\n100 minutes\nInterview ready',
   },
 ];
 
