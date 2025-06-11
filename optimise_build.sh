@@ -1,38 +1,37 @@
 #!/bin/bash
 
-# Print memory status before cleanup
-echo "Initial memory status:"
-free -h
+echo "Building Essay Frontend ..."
 
-# Clear page cache, dentries, and inodes
-echo "Clearing system cache..."
-sync
-sudo sh -c 'echo 3 > /proc/sys/vm/drop_caches'
+# Navigate to essay prep directory
+cd ~/essay-prep/cheveningbrew-client
 
-# Clear npm cache
-echo "Clearing npm cache..."
+# Clear cache and build
 npm cache clean --force
-
-# Run garbage collection on Node.js
-echo "Running Node.js garbage collection..."
-node --expose-gc -e "global.gc()"
-
-# Clear any temporary files in /tmp older than 2 days
-echo "Cleaning temporary files..."
-sudo find /tmp -type f -atime +2 -delete
-
-# Print memory status after cleanup
-echo "Memory status after cleanup:"
-free -h
-
-# Run the build process
-echo "Starting build process..."
 npm run build
 
-# Copy the build files to the server
-echo "Copying build files to server..."
+
+# Copy build files
 sudo cp -r build/ /usr/local/openresty/nginx/html/
 
-# restart openresty
-echo "Restarting openresty..."
-sudo systemctl restart openresty
+# Set proper permissions
+# sudo chown -R nginx:nginx /usr/local/openresty/nginx/html/build
+# sudo chmod -R 755 /usr/local/openresty/nginx/html/build
+
+echo "Essay build files copied to build directory"
+
+# Copy updated nginx config
+sudo cp ~/interview-prep/cheveningbrew-client/cheveningbrew-app-dev.conf /usr/local/openresty/nginx/conf/conf.d/
+
+# Test nginx configuration
+echo "Testing nginx configuration..."
+sudo nginx -t
+
+if [ $? -eq 0 ]; then
+    echo "Nginx config is valid. Reloading OpenResty..."
+    sudo systemctl reload openresty
+    echo "✅ Essay frontend deployed successfully!"
+    echo "🌐 Access at: https://www.cheveningbrew.com"
+else
+    echo "❌ Nginx config has errors. Please check the configuration."
+    exit 1
+fi
