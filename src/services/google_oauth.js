@@ -3,7 +3,7 @@ import axios from "axios";
 export class GoogleOAuthService {
   constructor() {
     this.clientId = process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID;
-    this.apiUrl = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || "http://localhost:3000";
+    this.apiUrl = process.env.REACT_APP_CHEVENINGBREW_SERVER_URL || "http://localhost:8001";
   }
 
   /**

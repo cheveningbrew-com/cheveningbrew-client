@@ -1,193 +1,192 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
-import Uploader from "../../components/Uploader/Uploader";
 import styles from "./Upload.module.css";
-import { useNavigate } from "react-router-dom";
-import { readUserField, getUserId, getUserSubscription, interviewReadUserField } from "../../services/api";
-import Price from "../../components/PricePopUp/Price";
-import SignOutPopup from "../../components/SignoutPopup/SignoutPopup";
-import { handleSignOut } from "../../components/SignOut/SignOutHelper";
+import { uploadEssayFile, getWritingStyleAnalysis } from "../../services/essay_api";
+import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const Upload = () => {
-  const [_, setFilePath] = useState(null);
-  const [showPaymentPopup, setShowPaymentPopup] = useState(false);
-  const [payment_completed, setPaymentCompleted] = useState(false);
-  const [showRulesPopup, setShowRulesPopup] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [links, setLinks] = useState(null);
+  const [error, setError] = useState(null);
+  const { userName, logout } = useAuth();
   const navigate = useNavigate();
-  const [fileUploaded, setFileUploaded] = useState(false);
-  const [showSignOutPopup, setShowSignOutPopup] = useState(false);
-  const [attemptsLeft, setAttemptsLeft] = useState(0);
-  const [interviewDone, setInterviewDone] = useState(false);
-  const { logout, user } = useAuth();
 
+  // Check if user is authenticated
   useEffect(() => {
-    const checkUserStatus = async () => {
-      const user_id = getUserId();
-      if (!user_id) {
-        navigate("/");
+    if (!userName) {
+      navigate("/");
+    }
+  }, [userName, navigate]);
+
+  // Handle file selection
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      if (file.type !== "application/pdf") {
+        setError("Please upload a PDF file.");
         return;
       }
-  
-      try {
-        // Check payment status
-        const dbPaymentStatus = await readUserField(user_id, "payment_completed");
-        // Check interview status and attempts
-        const interviewDone = await interviewReadUserField(user_id, "is_completed");
-        const subscription = await getUserSubscription({ user_id, field: "attempts" });
-
-        setInterviewDone(interviewDone === true);
-        setAttemptsLeft(subscription.attempts);
-        
-        if (!dbPaymentStatus) {
-          setShowPaymentPopup(true);
-        } else {
-          setPaymentCompleted(true);
-        }
-
-        // Show sign out popup if no attempts left and interview is done
-        if (interviewDone && subscription.attempts === 0) {
-          setShowSignOutPopup(true);
-        }
-      } catch (error) {
-        console.error("Error checking user status:", error);
-        setShowPaymentPopup(true); // fallback: show popup if unsure
-      } finally {
-        setIsLoading(false);
-      }
-    };
-  
-    checkUserStatus();
-  }, [navigate]);
-
-  useEffect(() => {
-    const uploadStatus = sessionStorage.getItem("upload_completed");
-    if (uploadStatus === "true") {
-      setFileUploaded(true);
+      
+      setSelectedFile(file);
+      setError(null);
     }
-  }, []);
-
-  const handleUploadSuccess = (path) => {
-    setFilePath(path);
-    console.log("File path:", path);
-
-    // Mark upload as completed
-    sessionStorage.setItem("upload_completed", "true");
-    setFileUploaded(true);
-
-    setShowRulesPopup(true);
   };
 
-  const handleRulesAgreed = () => {
-    setShowRulesPopup(false);
-    navigate("/interview");
-  };
+  // Handle file upload and get links
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setError("Please select a file first.");
+      return;
+    }
 
-  const handlePaymentComplete = async () => {
+    if (!userName) {
+      setError("You must be logged in to upload files.");
+      return;
+    }
+
     try {
-      const user_id = getUserId();
-      if (!user_id) return;
-
-      let attempts = 0;
-      let dbPaymentStatus = false;
-
-      // Retry mechanism: Check payment status up to 5 times with a 1-second delay
-      while (attempts < 5) {
-        dbPaymentStatus = await readUserField(user_id, "payment_completed");
-        if (dbPaymentStatus) break;
-        await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second
-        attempts++;
+      setIsLoading(true);
+      setError(null);
+      
+      const userId = getUserId();
+      
+      // Step 1: Upload the file
+      const uploadResult = await uploadEssayFile(selectedFile);
+      
+      if (!uploadResult.success) {
+        throw new Error(uploadResult.message || "Upload failed");
       }
-
-      if (dbPaymentStatus) {
-        setPaymentCompleted(true);
-        setShowPaymentPopup(false); // Hide the popup
-      } else {
-        console.warn("Payment not yet marked complete in DB after retries.");
-        alert("Payment may take a few seconds to complete. Please refresh the page if needed.");
+      
+      // Step 2: Extract directory name from path
+      const extractedTextPath = uploadResult.extracted_text_path;
+      const pathParts = extractedTextPath.split('/');
+      const dirName = pathParts[1]; // Format: "text_outs/dirName/extracted_text.txt"
+      
+      // Step 3: Get the analysis with links
+      const analysisResult = await getWritingStyleAnalysis(dirName);
+      
+      // Step 4: Store the upload details in the user's profile if needed
+      // if (userId) {
+      //   await updateUserField(userId, "last_upload", {
+      //     filename: selectedFile.name,
+      //     timestamp: new Date().toISOString(),
+      //     dirName: dirName
+      //   });
+      // }
+      
+      // Step 5: Set the links
+      setLinks({
+        googleDrive: analysisResult.google_drive_link,
+        googleDocs: analysisResult.google_docs_link,
+        download: analysisResult.download_link
+      });
+      
+    } catch (err) {
+      setError(`Error: ${err.message || "Unknown error occurred"}`);
+      
+      // If the error is due to authentication issues, redirect to login
+      if (err.message?.includes("unauthorized") || err.message?.includes("not authenticated")) {
+        logout();
+        navigate("/");
       }
-    } catch (error) {
-      console.error("Error verifying payment after completion:", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handlePaymentError = (error) => {
-    console.error("Payment failed:", error);
-    alert("Payment failed. Please try again.");
+  // Reset everything
+  const handleReset = () => {
+    setSelectedFile(null);
+    setLinks(null);
+    setError(null);
+    
+    // Reset file input
+    const fileInput = document.getElementById("file-upload");
+    if (fileInput) fileInput.value = "";
   };
 
-  const handlePaymentDismissed = () => {
-    console.log("User dismissed the payment popup.");
-    setShowPaymentPopup(false);
-  };
-
-  const handleSignOutConfirm = () => {
-    setShowSignOutPopup(false);
-    handleSignOut(logout, navigate, user?.user_id);
-  };
-  
-  const handleSignOutCancel = () => {
-    setShowSignOutPopup(false);
-    navigate("/feedback");
-  };
+  // If not authenticated, this could show a loading state
+  // The useEffect will handle redirecting
+ 
 
   return (
     <MainLayout>
       <ActionBox>
-        <SignOutPopup
-          isOpen={showSignOutPopup}
-          onConfirm={handleSignOutConfirm}
-          onCancel={handleSignOutCancel}
-        />
-        <div className={`${styles.uploadContainer} customScroll`}>
-          <div>
-            <h1 className={styles.title}>
-              Download your Chevening Application as a PDF file and upload it here before start interview.
-            </h1>
-
-            {payment_completed && <Uploader onUploadSuccess={handleUploadSuccess} />}
-
-            {!payment_completed && showPaymentPopup && (
-              <Price
-                onPaymentComplete={handlePaymentComplete}
-                onPaymentError={handlePaymentError}
-                onPaymentDismissed={handlePaymentDismissed}
-              />
-            )}
-
-            {showRulesPopup && (
-              <div className={styles.paymentPopupOverlay}>
-                <div className={styles.paymentPopup}>
-                  <div className={styles.paymentPopupHeader}>
-                    <h2 className={styles.h2}>Important: Interview Rules</h2>
-                  </div>
-                  <div className={`${styles.rulesContent} customScroll`}>
-                    <ol className={styles.rulesList}>
-                      <li>
-                        * If you quit the interview before time is up, you'll be graded up to that point.
-                      </li>
-                      <li>
-                        * This is a real-time voice AI platform. Press "Start Conversation" when you're ready.
-                      </li>
-                      <li>
-                        * It may take up to ~10 secs to connect the AI interviewer.
-                      </li>
-                      <li>
-                        * Wait patiently if the interviewer takes a few seconds to respond — that's normal.
-                      </li>
-                      <li>
-                        * You can change the default audio device via the dropdown next to the mic.
-                      </li>
-                    </ol>
-                    <div className={styles.rulesActions}>
-                      <button className={styles.agreeButton} onClick={handleRulesAgreed}>
-                        Agree and continue
-                      </button>
-                    </div>
-                  </div>
+        <div className={styles.uploadContainer}>
+          <h1 className={styles.title}>
+            Upload your Chevening Application Essays
+          </h1>
+          
+          <div className={styles.uploadSection}>
+            {!links ? (
+              <>
+                <div className={styles.fileInputContainer}>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    disabled={isLoading}
+                    className={styles.fileInput}
+                  />
+                  <label htmlFor="file-upload" className={styles.fileInputLabel}>
+                    {selectedFile ? selectedFile.name : "Choose PDF file"}
+                  </label>
                 </div>
+                
+                {error && <div className={styles.errorMessage}>{error}</div>}
+                
+                <button
+                  className={styles.uploadButton}
+                  onClick={handleUpload}
+                  disabled={!selectedFile || isLoading}
+                >
+                  {isLoading ? "Processing..." : "Upload & Analyze"}
+                </button>
+              </>
+            ) : (
+              <div className={styles.linksContainer}>
+                <h2 className={styles.linksTitle}>Your Analysis is Ready!</h2>
+                
+                <div className={styles.linkButtons}>
+                  <a 
+                    href={links.googleDrive} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${styles.linkButton} ${styles.driveButton}`}
+                  >
+                    View in Google Drive
+                  </a>
+                  
+                  <a 
+                    href={links.googleDocs} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${styles.linkButton} ${styles.docsButton}`}
+                  >
+                    Open in Google Docs
+                  </a>
+                  
+                  <a 
+                    href={links.download} 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className={`${styles.linkButton} ${styles.downloadButton}`}
+                  >
+                    Download DOCX
+                  </a>
+                </div>
+                
+                <button 
+                  className={styles.resetButton} 
+                  onClick={handleReset}
+                >
+                  Upload Another Document
+                </button>
               </div>
             )}
           </div>
@@ -198,4 +197,3 @@ const Upload = () => {
 };
 
 export default Upload;
-
