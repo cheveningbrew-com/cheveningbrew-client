@@ -10,13 +10,12 @@ const MetaTags = () => {
     ? process.env.PUBLIC_URL || ''
     : serverUrl;
 
-    const localUrl =  'http://localhost:3001';
   return (
     <Helmet>
       {/* Links for static assets */}
-      <link rel="apple-touch-icon" href={`${localUrl}/logo192.png`} />
-      <link rel="manifest" href={`${localUrl}/manifest.json`} />
-      <link rel="icon" href={`${localUrl}/favicon.ico`} />
+      <link rel="apple-touch-icon" href={`${staticAssetsUrl}/logo192.png`} />
+      <link rel="manifest" href={`${staticAssetsUrl}/manifest.json`} />
+      <link rel="icon" href={`${staticAssetsUrl}/favicon.ico`} />
 
       {/* Open Graph */}
       <meta property="og:type" content="website" />
