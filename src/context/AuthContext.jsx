@@ -27,10 +27,12 @@ export const AuthProvider = ({ children }) => {
       }
 
       // Fetch both user fields in a single Promise.all
-      const [token, name] = await Promise.all([
+      const [token, name, email] = await Promise.all([
         readUserField(user_id, "auth_token"),
         readUserField(user_id, "name")
+        , readUserField(user_id, "email")
       ]);
+      console.log(`shamil: ${email}` );
 
       console.log("Token exists:", !!token);
 
@@ -54,7 +56,7 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (token, name, id) => {
+  const login = async (token, name, id, email) => {
     try {
       if (!id) {
         throw new Error("Invalid user ID");
@@ -62,6 +64,7 @@ export const AuthProvider = ({ children }) => {
       console.log("Setting auth data to sessionStorage");
       sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       sessionStorage.setItem(STORAGE_KEYS.USER_ID, id);
+      sessionStorage.setItem(STORAGE_KEYS.USER_EMAIL, email );
       if (name) {
         sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
       }

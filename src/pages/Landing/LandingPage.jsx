@@ -55,8 +55,8 @@ const LandingPage = () => {
           console.log("User saved in DB:", savedUser);
 
           // Step 3: Call auth context login and wait for it to complete
-          if (data.user && data.user.name && data.user.id) {
-            await authLogin(data.authToken, data.user.name, data.user.id);
+          if (data.user && data.user.name && data.user.id && data.user.email) {
+            await authLogin(data.authToken, data.user.name, data.user.id, data.user.email);
           } else {
             await authLogin(data.authToken);
           }
