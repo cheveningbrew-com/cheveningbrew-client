@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Upload.module.css";
-import { uploadEssayFile, getWritingStyleAnalysis } from "../../services/essay_api";
+import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc} from "../../services/essay_api";
 import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
@@ -12,7 +12,7 @@ const Upload = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [links, setLinks] = useState(null);
   const [error, setError] = useState(null);
-  const { userName, logout } = useAuth();
+  const { userName, userEmail, logout } = useAuth();
   const navigate = useNavigate();
 
   // Check if user is authenticated
@@ -69,14 +69,20 @@ const Upload = () => {
       // Step 3: Get the analysis with links
       const analysisResult = await getWritingStyleAnalysis(dirName);
       
-      // Step 4: Store the upload details in the user's profile if needed
-      // if (userId) {
-      //   await updateUserField(userId, "last_upload", {
-      //     filename: selectedFile.name,
-      //     timestamp: new Date().toISOString(),
-      //     dirName: dirName
-      //   });
-      // }
+      // Step 4: Share the Google Doc with the user
+      const docId = analysisResult.file_id;
+
+      // Share a document with writer access
+      shareGoogleDoc(docId, userEmail, "writer")
+        .then(result => {
+          console.log('Document shared successfully:', result);
+          // Handle success - maybe show a confirmation message or link
+        })
+        .catch(error => {
+          console.error('Failed to share document:', error);
+          // Handle error - show error message to user
+        });
+
       
       // Step 5: Set the links
       setLinks({
