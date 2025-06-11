@@ -10,7 +10,7 @@ export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userName, setUserName] = useState(null);
   const [loading, setLoading] = useState(true);
-
+  const [userEmail, setUserEmail] = useState(null);
   // Check authentication status on mount
   useEffect(() => {
     checkAuthStatus();
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
         readUserField(user_id, "name")
         , readUserField(user_id, "email")
       ]);
-      console.log(`shamil: ${email}` );
+      
 
       console.log("Token exists:", !!token);
 
@@ -40,17 +40,20 @@ export const AuthProvider = ({ children }) => {
         console.log("Token is valid, setting authenticated");
         setIsAuthenticated(true);
         setUserName(name);
+        setUserEmail(email);
       } else {
         console.log("Token is invalid or missing");
         clearAuthData();
         setIsAuthenticated(false);
         setUserName(null);
+        setUserEmail(null);
       }
     } catch (error) {
       console.error("Error checking auth status:", error);
       clearAuthData();
       setIsAuthenticated(false);
       setUserName(null);
+      setUserEmail(null);
     } finally {
       setLoading(false);
     }
@@ -87,6 +90,7 @@ export const AuthProvider = ({ children }) => {
     // Reset authentication state
     setIsAuthenticated(false);
     setUserName(null);
+    setUserEmail(null);
   };
 
   return (
@@ -94,6 +98,7 @@ export const AuthProvider = ({ children }) => {
       value={{
         isAuthenticated,
         userName,
+        userEmail,
         loading,
         checkAuthStatus,
         login,
