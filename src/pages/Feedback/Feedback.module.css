@@ -15,8 +15,8 @@
   color: white;
   border-radius: 12px;
   margin-bottom: 20px;
-  max-height: 400px; /* Restrict height to enable scrolling */
-  min-height: 300px; /* Ensure a minimum height */
+  max-height: 500px; /* Increased height for essay analysis */
+  min-height: 350px; /* Ensure a minimum height */
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */
   display: flex;
@@ -61,79 +61,30 @@
   color: white;
 }
 
-/* Bottom container styles */
-.bottomContainer {
-  width: 100%;
-  background-color: rgba(109, 36, 147, 0.9);
-  color: white;
-  border-radius: 12px;
-  padding: 20px;
-  display: flex;
-  flex-direction: column; /* Default to vertical stacking */
-  gap: 20px;
-  box-sizing: border-box;
-}
-
-/* Attempt group styles */
-.attemptGroup {
-  display: flex;
-  flex-direction: column; /* Default to vertical stacking */
-  gap: 10px;
-}
-.attemptTitle {
-  font-size: 1rem;
-  font-weight: bold;
-  color: white;
-}
-.attemptButtons {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-.attemptButton {
-  width: 40px;
-  height: 40px;
-  border-radius: 20%;
-  background-color: #333;
-  color: white;
-  font-weight: bold;
-  border: 2px solid #888;
-  cursor: pointer;
-  transition: background-color 0.2s ease, transform 0.2s ease;
-}
-.attemptButton:hover {
-  background-color: #555;
-  transform: scale(1.05);
-}
-.attemptButton.active {
-  background-color: #dd0c7e;
-  border-color: #ca1582;
-}
-
-/* Download button styles */
-.downloadButton {
-  padding: 12px 20px;
-  background-color: #dd0c7e;
-  color: white;
-  border: none;
-  font-weight: bold;
-  cursor: pointer;
+/* Upload prompt styles */
+.uploadPrompt {
+  margin-top: 2rem;
+  padding: 1.5rem;
+  background: rgba(255, 229, 133, 0.1);
+  border: 1px solid rgba(255, 229, 133, 0.3);
   border-radius: 8px;
-  transition: background-color 0.2s ease;
-  width: 100%;
-}
-.downloadButton:hover {
-  background-color: #ca1582;
+  text-align: left;
 }
 
-.noAttemptsMessage {
-  text-align: center;
+.uploadPrompt h3 {
   color: #ffe585;
-  font-size: 1.1rem;
-  padding: 1rem;
-  background: rgba(109, 36, 147, 0.3);
-  border-radius: 8px;
-  margin: 0;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.uploadPrompt ol {
+  color: #ffffff;
+  padding-left: 1.5rem;
+}
+
+.uploadPrompt li {
+  margin-bottom: 0.5rem;
+  line-height: 1.5;
 }
 
 .retryButton {
@@ -176,77 +127,16 @@
     font-size: 14px;
   }
   .feedbackContent {
-    min-height: 260px;
+    min-height: 300px;
     padding: 15px;
   }
 
-  /* Bottom container styles */
-  .bottomContainer {
-    width: 100%;
-    background-color: rgba(109, 36, 147, 0.9);
-    color: white;
-    border-radius: 12px;
-    padding: 10px; /* Reduced padding */
-    display: flex;
-    flex-direction: column; /* Default to vertical stacking */
-    gap: 10px;
-    box-sizing: border-box;
-    height: 100px; /* Allow dynamic height based on content */
+  .uploadPrompt {
+    padding: 1rem;
   }
 
-  /* Attempt group styles */
-  .attemptGroup {
-    display: flex;
-    flex-direction: row; /* Align title and buttons horizontally */
-    align-items: center; /* Vertically align items */
-    gap: 10px; /* Add spacing between title and buttons */
-  }
-  .attemptTitle {
-    font-size: 15px;
-    font-weight: bold;
-    color: white;
-  }
-  .attemptButtons {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-  }
-  .attemptButton {
-    width: 20px;
-    height: 20px;
-    border-radius: 20%;
-    background-color: #333;
-    color: white;
-    font-weight: bold;
-    border: 2px solid #888;
-    cursor: pointer;
-    transition: background-color 0.2s ease, transform 0.2s ease;
-  }
-  .attemptButton:hover {
-    background-color: #555;
-    transform: scale(1.05);
-  }
-  .attemptButton.active {
-    background-color: #dd0c7e;
-    border-color: #ca1582;
-  }
-
-  /* Download button styles */
-  .downloadButton {
-    padding: 8px 8px;
-    background-color: #dd0c7e;
-    color: white;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-    border-radius: 8px;
-    transition: background-color 0.2s ease;
-    width: 100%;
-    padding-bottom: 5px;
-    font-size: 12PX;
-  }
-  .downloadButton:hover {
-    background-color: #ca1582;
+  .uploadPrompt h3 {
+    font-size: 1.1rem;
   }
 }
 
@@ -259,22 +149,15 @@
     font-size: 14px;
   }
   .feedbackContent {
-    min-height: 300px;
+    min-height: 320px;
     padding: 15px;
-  }
-  .attemptButton {
-    width: 36px;
-    height: 36px;
   }
 }
 
 /* ========== Compact Height Devices (height <= 740px) ========== */
 @media (max-height: 740px)  {
   .feedbackContent {
-    max-height: 300px;
-  }
-  .bottomContainer {
-    padding: 12px;
+    max-height: 350px;
   }
   .title {
     font-size: 18px;
@@ -284,49 +167,21 @@
   }
 }
 
-
 /* ========== Narrow Tablet Landscape (e.g., 1024x600) ========== */
 @media (min-width: 900px) and (max-width: 1024px) and (max-height: 600px) {
   .feedbackContent {
     height: auto;
-    max-height: 280px;
+    max-height: 320px;
     padding: 16px;
-  }
-  .bottomContainer {
-    flex-direction: column;
-    gap: 16px;
   }
 }
 
 /* Horizontal layout for large screens */
 @media (min-width: 1024px) {
-
   .feedbackContent {
-    padding: 15px; /* Reduce padding for smaller screens */
+    padding: 25px;
     margin-bottom: 20px;
-    max-height: 450px; /* Adjust height for smaller screens */
-    overflow-y: auto; /* Ensure scrolling is enabled */
-  }
-
-  .bottomContainer {
-    flex-direction: row; /* Switch to horizontal layout */
-    justify-content: space-between; /* Space between the two sections */
-    align-items: center; /* Align items vertically in the row */
-    gap: 0; /* Remove vertical gap */
-  }
-
-  .attemptGroup {
-    flex-direction: row; /* Display attempts horizontally */
-    align-items: center;
-    gap: 20px; /* Add spacing between title and buttons */
-  }
-
-  .downloadButton {
-    width: auto; /* Adjust width to fit content */
+    max-height: 550px;
+    overflow-y: auto;
   }
 }
-
-
-
-
-

@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { toast } from "react-toastify";
 import styles from "./Uploader.module.css";
-import {createInterview,getUserId } from "../../services/api"; // Assuming you have this function to update user fields
+import { getUserId } from "../../services/api";
 
 const Uploader = ({ onUploadSuccess }) => {
   const [uploadedFile, setUploadedFile] = useState(null);
@@ -60,15 +60,11 @@ const Uploader = ({ onUploadSuccess }) => {
       setUploadProgress("success");
       toast.success("File uploaded successfully!");
 
-      // Call the callback with the file path if provided
+      // Call the callback for upload success
       if (onUploadSuccess) {
-    onUploadSuccess(result.interview_questions);
-    // createInterview(getUserId(), JSON.stringify(result.interview_questions));
-    sessionStorage.setItem("interview_questions", JSON.stringify(result.interview_questions));
+        onUploadSuccess();
+        sessionStorage.setItem("upload_completed", "true");
       }
-
-      // // Update user field in session storage
-      // updateUserField("interview_questions", result.interview_questions)
 
     } catch (error) {
       console.error("Upload error:", error);

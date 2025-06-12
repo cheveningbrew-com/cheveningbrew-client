@@ -83,8 +83,10 @@ const Upload = () => {
           // Handle error - show error message to user
         });
 
+      // Step 5: Store the analysis feedback for the feedback page
+      await updateUserField(userId, "essay_feedback", analysisResult.analysis_feedback);
       
-      // Step 5: Set the links
+      // Step 6: Set the links
       setLinks({
         googleDrive: analysisResult.google_drive_link,
         googleDocs: analysisResult.google_docs_link,
@@ -114,10 +116,6 @@ const Upload = () => {
     const fileInput = document.getElementById("file-upload");
     if (fileInput) fileInput.value = "";
   };
-
-  // If not authenticated, this could show a loading state
-  // The useEffect will handle redirecting
- 
 
   return (
     <MainLayout>
@@ -193,6 +191,16 @@ const Upload = () => {
                 >
                   Upload Another Document
                 </button>
+
+                <div className={styles.nextStep}>
+                  <p>Your analysis is also available in the <strong>Feedback</strong> section.</p>
+                  <button 
+                    className={styles.feedbackButton}
+                    onClick={() => navigate("/feedback")}
+                  >
+                    View Analysis Results
+                  </button>
+                </div>
               </div>
             )}
           </div>

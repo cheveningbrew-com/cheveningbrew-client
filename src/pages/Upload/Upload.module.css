@@ -156,11 +156,44 @@
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
-  margin-top: 1rem;
+  margin-bottom: 1.5rem;
 }
 
 .resetButton:hover {
   background: rgba(255, 255, 255, 0.2);
+}
+
+/* Next step section */
+.nextStep {
+  width: 100%;
+  padding: 1.5rem;
+  background: rgba(255, 229, 133, 0.1);
+  border: 1px solid rgba(255, 229, 133, 0.3);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.nextStep p {
+  margin-bottom: 1rem;
+  color: #ffe585;
+  font-size: 1rem;
+}
+
+.feedbackButton {
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
+  color: #4b0082;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.feedbackButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsive styles */
@@ -201,5 +234,13 @@
   .uploadButton {
     font-size: 1rem;
     padding: 0.7rem 1.2rem;
+  }
+
+  .nextStep {
+    padding: 1rem;
+  }
+
+  .nextStep p {
+    font-size: 0.9rem;
   }
 }

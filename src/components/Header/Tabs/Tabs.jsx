@@ -7,7 +7,6 @@ const Tabs = () => {
 
   const tabs = [
     { path: "/upload", label: "Upload" },
-    { path: "/interview", label: "Interview" },
     { path: "/feedback", label: "Feedback" },
   ];
 

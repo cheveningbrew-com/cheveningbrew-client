@@ -6,7 +6,6 @@ import MetaTags from "./components/MetaTags/MetaTags";
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LandingPage from "./pages/Landing/LandingPage";
 import Upload from "./pages/Upload/Upload";
-import Interview from "./pages/Interview/Interview";
 import Feedback from "./pages/Feedback/Feedback";
 import Help from "./pages/SupportPages/Help/Help";
 import About from "./pages/SupportPages/About/About";
@@ -33,9 +32,7 @@ const App = () => {
             {/* Protected Routes */}
             <Route element={<ProtectedRoute />}>
               <Route path="/upload" element={<Upload />} />
-              <Route path="/interview" element={<Interview />} />
               <Route path="/feedback" element={<Feedback />} />
-              
             </Route>
           </Routes>
         </AuthProvider>
