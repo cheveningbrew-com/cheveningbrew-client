@@ -83,10 +83,7 @@ const Upload = () => {
           // Handle error - show error message to user
         });
 
-      // Step 5: Store the analysis feedback for the feedback page
-      await updateUserField(userId, "essay_feedback", analysisResult.analysis_feedback);
-      
-      // Step 6: Set the links
+      // Step 5: Set the links
       setLinks({
         googleDrive: analysisResult.google_drive_link,
         googleDocs: analysisResult.google_docs_link,
