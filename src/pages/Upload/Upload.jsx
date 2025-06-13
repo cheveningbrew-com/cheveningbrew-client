@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Upload.module.css";
-import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc} from "../../services/essay_api";
+import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc, createGoogleDoc, getEssayFeedback} from "../../services/essay_api";
 import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 

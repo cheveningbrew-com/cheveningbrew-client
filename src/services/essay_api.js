@@ -53,6 +53,59 @@ export const getWritingStyleAnalysis = async (dirName) => {
 };
 
 /**
+ * Get essay feedback for Chevening essays
+ * @param {string} dirName - Directory name containing the extraction
+ * @returns {Promise<Object>} Feedback results with essay analysis
+ */
+export const getEssayFeedback = async (dirName) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/essay_feedback/${dirName}`);
+    
+    if (!response.ok) {
+      throw new Error(`Failed to get essay feedback for ${dirName}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Essay feedback error for ${dirName}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * Create a new Google Doc with optional content and sharing
+ * @param {string} title - Title for the new document
+ * @param {string} content - Optional content to add to the document
+ * @param {string} shareWith - Optional email address to share the document with
+ * @returns {Promise<Object>} Creation result with document ID and links
+ */
+export const createGoogleDoc = async (title, content = null, shareWith = null) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/google_docs/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        title: title,
+        content: content,
+        share_with: shareWith
+      }),
+    });
+    
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.detail || `Failed to create Google Doc: ${title}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Google Doc creation error for ${title}:`, error);
+    throw error;
+  }
+};
+
+/**
  * Share a Google Doc with a specific email address
  * @param {string} docId - The Google Document ID to share
  * @param {string} email - Email address to share the document with
@@ -85,9 +138,11 @@ export const shareGoogleDoc = async (docId, email, role = "writer") => {
   }
 };
 
-// Update the default export to include the new function
+// Export all functions as default
 export default {
   uploadEssayFile,
   getWritingStyleAnalysis,
+  getEssayFeedback,
+  createGoogleDoc,
   shareGoogleDoc
 };
