@@ -6,7 +6,7 @@ import styles from "./Upload.module.css";
 import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc, createGoogleDoc, getEssayFeedback} from "../../services/essay_api";
 import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-
+import { STORAGE_KEYS } from '../../constants/storage';
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -17,8 +17,12 @@ const Upload = () => {
 
   // Check if user is authenticated
   useEffect(() => {
+
+    sessionStorage.setItem(STORAGE_KEYS.USER_EMAIL, "shamilkaleel81@gmail.com" );
+
     if (!userName) {
-      navigate("/");
+      {/* #AUTH_REMOVED */}
+      // navigate("/");
     }
   }, [userName, navigate]);
 
@@ -42,11 +46,11 @@ const Upload = () => {
       setError("Please select a file first.");
       return;
     }
-
-    if (!userName) {
-      setError("You must be logged in to upload files.");
-      return;
-    }
+{/* #AUTH_REMOVED */}
+    // if (!userName) {
+    //   setError("You must be logged in to upload files.");
+    //   return;
+    // }
 
     try {
       setIsLoading(true);
@@ -62,32 +66,39 @@ const Upload = () => {
       }
       
       // Step 2: Extract directory name from path
-      const extractedTextPath = uploadResult.extracted_text_path;
+      const extractedTextPath = uploadResult.extracted_text_dir;
       const pathParts = extractedTextPath.split('/');
       const dirName = pathParts[1]; // Format: "text_outs/dirName/extracted_text.txt"
       
-      // Step 3: Get the analysis with links
+      // Step 3: Get essay feedback
+      const feedbackResult = await getEssayFeedback(dirName);
+
+      // Step 4: Create the Google Doc with the feedback
+      const docCreationResult = await createGoogleDoc(
+        `Essay Feedback - ${userName}`, 
+        feedbackResult.feedback, 
+        "shamilkaleel81@gmail.com"
+      );
+
+      // Step 5: Get the analysis with links (for writing style analysis)
       const analysisResult = await getWritingStyleAnalysis(dirName);
       
-      // Step 4: Share the Google Doc with the user
+      // Step 6: Share the writing style analysis document with the user
       const docId = analysisResult.file_id;
 
-      // Share a document with writer access
-      shareGoogleDoc(docId, userEmail, "writer")
+      // Share writing style analysis document with writer access
+      shareGoogleDoc(docId, "shamilkaleel81@gmail.com", "writer")
         .then(result => {
-          console.log('Document shared successfully:', result);
-          // Handle success - maybe show a confirmation message or link
+          console.log('Writing style document shared successfully:', result);
         })
         .catch(error => {
-          console.error('Failed to share document:', error);
-          // Handle error - show error message to user
+          console.error('Failed to share writing style document:', error);
         });
 
-      // Step 5: Set the links
+      // Step 7: Set the links (only showing Google Docs and Essay Feedback)
       setLinks({
-        googleDrive: analysisResult.google_drive_link,
-        googleDocs: analysisResult.google_docs_link,
-        download: analysisResult.download_link
+        googleDocs: analysisResult.google_docs_link, // Writing style analysis
+        essayFeedback: docCreationResult.view_link,   // Essay feedback document
       });
       
     } catch (err) {
@@ -155,12 +166,12 @@ const Upload = () => {
                 
                 <div className={styles.linkButtons}>
                   <a 
-                    href={links.googleDrive} 
+                    href={links.essayFeedback} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className={`${styles.linkButton} ${styles.driveButton}`}
+                    className={`${styles.linkButton} ${styles.feedbackButton}`}
                   >
-                    View in Google Drive
+                    📝 View Essay Feedback
                   </a>
                   
                   <a 
@@ -169,16 +180,7 @@ const Upload = () => {
                     rel="noopener noreferrer"
                     className={`${styles.linkButton} ${styles.docsButton}`}
                   >
-                    Open in Google Docs
-                  </a>
-                  
-                  <a 
-                    href={links.download} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={`${styles.linkButton} ${styles.downloadButton}`}
-                  >
-                    Download DOCX
+                    ✏️ Writing Style Analysis
                   </a>
                 </div>
                 
@@ -190,12 +192,12 @@ const Upload = () => {
                 </button>
 
                 <div className={styles.nextStep}>
-                  <p>Your analysis is also available in the <strong>Feedback</strong> section.</p>
+                  <p>Your analysis results are also available in the <strong>Feedback</strong> section.</p>
                   <button 
-                    className={styles.feedbackButton}
+                    className={styles.nextStepButton}
                     onClick={() => navigate("/feedback")}
                   >
-                    View Analysis Results
+                    Go to Feedback Section
                   </button>
                 </div>
               </div>

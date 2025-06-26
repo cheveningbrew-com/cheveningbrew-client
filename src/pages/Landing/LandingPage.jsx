@@ -26,7 +26,7 @@ const LandingPage = () => {
     onSuccess: async (tokenResponse) => {
       try {
         setIsLoading(true);
-  
+        console.log("Google auth starte");
         // Step 1: Send Google auth code to backend
         const response = await fetch(`${process.env.REACT_APP_USER_AUTH_SERVER}/api/auth/google`, {
           method: "POST",
@@ -138,7 +138,10 @@ const LandingPage = () => {
               className={`${styles.landingPageButton} ${
                 isLoading ? styles.loading : ""
               }`}
-              onClick={handleGoogleSignIn}
+              // #AUTH_REMOVED 
+              // onClick={handleGoogleSignIn}
+              onClick={() => {navigate("/upload")}}
+            
             >
               {isLoading ? (
                 "Signing in..."

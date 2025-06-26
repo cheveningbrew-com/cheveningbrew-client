@@ -22,3 +22,5 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 ### `set PORT=3001 && npm start`
 
 
+useed this comment to remove the auth
+{/* #AUTH_REMOVED */}

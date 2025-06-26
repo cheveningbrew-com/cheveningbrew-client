@@ -72,6 +72,8 @@ export const getEssayFeedback = async (dirName) => {
   }
 };
 
+
+
 /**
  * Create a new Google Doc with optional content and sharing
  * @param {string} title - Title for the new document
@@ -143,6 +145,7 @@ export default {
   uploadEssayFile,
   getWritingStyleAnalysis,
   getEssayFeedback,
+  getCombinedGrammarHemingwayAnalysis,
   createGoogleDoc,
   shareGoogleDoc
 };

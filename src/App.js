@@ -30,10 +30,11 @@ const App = () => {
             <Route path="/terms" element={<Terms />} />
 
             {/* Protected Routes */}
-            <Route element={<ProtectedRoute />}>
+            {/* #AUTH_REMOVED */}
+            {/* <Route element={<ProtectedRoute />}> */}
               <Route path="/upload" element={<Upload />} />
               <Route path="/feedback" element={<Feedback />} />
-            </Route>
+            {/* </Route> */}
           </Routes>
         </AuthProvider>
       </BrowserRouter>
