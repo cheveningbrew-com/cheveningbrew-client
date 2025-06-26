@@ -31,10 +31,10 @@ const App = () => {
 
             {/* Protected Routes */}
             {/* #AUTH_REMOVED */}
-            {/* <Route element={<ProtectedRoute />}> */}
+            <Route element={<ProtectedRoute />}>
               <Route path="/upload" element={<Upload />} />
               <Route path="/feedback" element={<Feedback />} />
-            {/* </Route> */}
+            </Route>
           </Routes>
         </AuthProvider>
       </BrowserRouter>

@@ -139,8 +139,8 @@ const LandingPage = () => {
                 isLoading ? styles.loading : ""
               }`}
               // #AUTH_REMOVED 
-              // onClick={handleGoogleSignIn}
-              onClick={() => {navigate("/upload")}}
+              onClick={handleGoogleSignIn}
+              // onClick={() => {navigate("/upload")}}
             
             >
               {isLoading ? (

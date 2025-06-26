@@ -20,7 +20,7 @@ const Upload = () => {
     
     if (!userName) {
       {/* #AUTH_REMOVED */}
-      // navigate("/");
+      navigate("/");
     }
   }, [userName, navigate]);
 
@@ -45,10 +45,10 @@ const Upload = () => {
       return;
     }
     {/* #AUTH_REMOVED */}
-    // if (!userName) {
-    //   setError("You must be logged in to upload files.");
-    //   return;
-    // }
+    if (!userName) {
+      setError("You must be logged in to upload files.");
+      return;
+    }
 
     try {
       setIsLoading(true);
