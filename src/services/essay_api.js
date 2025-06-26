@@ -72,7 +72,31 @@ export const getEssayFeedback = async (dirName) => {
   }
 };
 
+/**
+ * Get combined grammar and Hemingway analysis
+ * @param {string} dirName - Directory name containing the extraction
+ * @param {string} email - Optional email address to share the document with
+ * @returns {Promise<Object>} Combined analysis results with Google Drive links
+ */
+export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null) => {
+  try {
+    const url = new URL(`${API_BASE_URL}/combined_analysis/grammar_hemingway/${dirName}`);
+    if (email) {
+      url.searchParams.append('email', email);
+    }
 
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      throw new Error(`Failed to get combined analysis for ${dirName}`);
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Combined grammar + Hemingway analysis error for ${dirName}:`, error);
+    throw error;
+  }
+};
 
 /**
  * Create a new Google Doc with optional content and sharing

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Upload.module.css";
-import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc, createGoogleDoc, getEssayFeedback} from "../../services/essay_api";
+import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc, createGoogleDoc, getEssayFeedback, getCombinedGrammarHemingwayAnalysis} from "../../services/essay_api";
 import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { STORAGE_KEYS } from '../../constants/storage';
@@ -81,20 +81,11 @@ const Upload = () => {
       );
 
       // Step 5: Get the analysis with links (for writing style analysis)
-      const analysisResult = await getWritingStyleAnalysis(dirName);
+      const analysisResult = await getCombinedGrammarHemingwayAnalysis(dirName,  "shamilkaleel81@gmail.com");
       
-      // Step 6: Share the writing style analysis document with the user
-      const docId = analysisResult.file_id;
+      
 
-      // Share writing style analysis document with writer access
-      shareGoogleDoc(docId, "shamilkaleel81@gmail.com", "writer")
-        .then(result => {
-          console.log('Writing style document shared successfully:', result);
-        })
-        .catch(error => {
-          console.error('Failed to share writing style document:', error);
-        });
-
+      
       // Step 7: Set the links (only showing Google Docs and Essay Feedback)
       setLinks({
         googleDocs: analysisResult.google_docs_link, // Writing style analysis
@@ -180,7 +171,7 @@ const Upload = () => {
                     rel="noopener noreferrer"
                     className={`${styles.linkButton} ${styles.docsButton}`}
                   >
-                    ✏️ Writing Style Analysis
+                    ✏️ Hemingway Analysis
                   </a>
                 </div>
                 
