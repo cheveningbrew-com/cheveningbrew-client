@@ -7,19 +7,17 @@ import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc, createGoogleD
 import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { STORAGE_KEYS } from '../../constants/storage';
+
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [links, setLinks] = useState(null);
   const [error, setError] = useState(null);
   const { userName, userEmail, logout } = useAuth();
   const navigate = useNavigate();
 
   // Check if user is authenticated
   useEffect(() => {
-
-    sessionStorage.setItem(STORAGE_KEYS.USER_EMAIL, "shamilkaleel81@gmail.com" );
-
+    
     if (!userName) {
       {/* #AUTH_REMOVED */}
       // navigate("/");
@@ -40,13 +38,13 @@ const Upload = () => {
     }
   };
 
-  // Handle file upload and get links
+  // Handle file upload and redirect to feedback
   const handleUpload = async () => {
     if (!selectedFile) {
       setError("Please select a file first.");
       return;
     }
-{/* #AUTH_REMOVED */}
+    {/* #AUTH_REMOVED */}
     // if (!userName) {
     //   setError("You must be logged in to upload files.");
     //   return;
@@ -77,20 +75,28 @@ const Upload = () => {
       const docCreationResult = await createGoogleDoc(
         `Essay Feedback - ${userName}`, 
         feedbackResult.feedback, 
-        "shamilkaleel81@gmail.com"
+        userEmail
       );
 
-      // Step 5: Get the analysis with links (for writing style analysis)
-      const analysisResult = await getCombinedGrammarHemingwayAnalysis(dirName,  "shamilkaleel81@gmail.com");
+      // Step 5: Get the analysis with links (using combined analysis)
+      const analysisResult = await getCombinedGrammarHemingwayAnalysis(dirName, userEmail);
       
+      // Step 6: Store the analysis results for the feedback section
+      const analysisData = {
+        googleDocs: analysisResult.google_docs_link,
+        essayFeedback: docCreationResult.view_link,
+        timestamp: new Date().toISOString(),
+        fileName: selectedFile.name
+      };
+
+      // Store in sessionStorage for immediate access
+      sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
+      
+      // Store in user data for persistence (optional, if you want to keep it cached)
       
 
-      
-      // Step 7: Set the links (only showing Google Docs and Essay Feedback)
-      setLinks({
-        googleDocs: analysisResult.google_docs_link, // Writing style analysis
-        essayFeedback: docCreationResult.view_link,   // Essay feedback document
-      });
+      // Step 7: Redirect to feedback section
+      navigate("/feedback");
       
     } catch (err) {
       setError(`Error: ${err.message || "Unknown error occurred"}`);
@@ -108,7 +114,6 @@ const Upload = () => {
   // Reset everything
   const handleReset = () => {
     setSelectedFile(null);
-    setLinks(null);
     setError(null);
     
     // Reset file input
@@ -125,74 +130,38 @@ const Upload = () => {
           </h1>
           
           <div className={styles.uploadSection}>
-            {!links ? (
-              <>
-                <div className={styles.fileInputContainer}>
-                  <input
-                    type="file"
-                    id="file-upload"
-                    accept=".pdf"
-                    onChange={handleFileChange}
-                    disabled={isLoading}
-                    className={styles.fileInput}
-                  />
-                  <label htmlFor="file-upload" className={styles.fileInputLabel}>
-                    {selectedFile ? selectedFile.name : "Choose PDF file"}
-                  </label>
-                </div>
-                
-                {error && <div className={styles.errorMessage}>{error}</div>}
-                
-                <button
-                  className={styles.uploadButton}
-                  onClick={handleUpload}
-                  disabled={!selectedFile || isLoading}
-                >
-                  {isLoading ? "Processing..." : "Upload & Analyze"}
-                </button>
-              </>
-            ) : (
-              <div className={styles.linksContainer}>
-                <h2 className={styles.linksTitle}>Your Analysis is Ready!</h2>
-                
-                <div className={styles.linkButtons}>
-                  <a 
-                    href={links.essayFeedback} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={`${styles.linkButton} ${styles.feedbackButton}`}
-                  >
-                    📝 View Essay Feedback
-                  </a>
-                  
-                  <a 
-                    href={links.googleDocs} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={`${styles.linkButton} ${styles.docsButton}`}
-                  >
-                    ✏️ Hemingway Analysis
-                  </a>
-                </div>
-                
-                <button 
-                  className={styles.resetButton} 
-                  onClick={handleReset}
-                >
-                  Upload Another Document
-                </button>
-
-                <div className={styles.nextStep}>
-                  <p>Your analysis results are also available in the <strong>Feedback</strong> section.</p>
-                  <button 
-                    className={styles.nextStepButton}
-                    onClick={() => navigate("/feedback")}
-                  >
-                    Go to Feedback Section
-                  </button>
-                </div>
+            <>
+              <div className={styles.fileInputContainer}>
+                <input
+                  type="file"
+                  id="file-upload"
+                  accept=".pdf"
+                  onChange={handleFileChange}
+                  disabled={isLoading}
+                  className={styles.fileInput}
+                />
+                <label htmlFor="file-upload" className={styles.fileInputLabel}>
+                  {selectedFile ? selectedFile.name : "Choose PDF file"}
+                </label>
               </div>
-            )}
+              
+              {error && <div className={styles.errorMessage}>{error}</div>}
+              
+              <button
+                className={styles.uploadButton}
+                onClick={handleUpload}
+                disabled={!selectedFile || isLoading}
+              >
+                {isLoading ? "Processing..." : "Upload & Analyze"}
+              </button>
+
+              {isLoading && (
+                <div className={styles.loadingContainer}>
+                  <div className={styles.spinner}></div>
+                  <p>Analyzing your essays...</p>
+                </div>
+              )}
+            </>
           </div>
         </div>
       </ActionBox>

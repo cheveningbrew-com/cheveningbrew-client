@@ -1,32 +1,30 @@
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
+import uploadStyles from "../Upload/Upload.module.css"; // Import upload styles
 import { getUserId, readUserField } from "../../services/api";
 import ReactMarkdown from "react-markdown";
 
 const Feedback = () => {
   const [feedback, setFeedback] = useState(null);
+  const [analysisResults, setAnalysisResults] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   // Fetch essay analysis feedback
   useEffect(() => {
     const fetchFeedback = async () => {
       try {
-        const userId = getUserId();
-        if (!userId) {
-          setError("User session not found. Please log in again.");
+        // First, check for fresh analysis results from recent upload
+        const freshResults = sessionStorage.getItem('latestAnalysisResults');
+        if (freshResults) {
+          const parsedResults = JSON.parse(freshResults);
+          setAnalysisResults(parsedResults);
           setLoading(false);
-          return;
-        }
-
-        // Check for cached essay analysis feedback
-        const cachedFeedback = await readUserField(userId, "essay_feedback");
-        if (cachedFeedback) {
-          console.log("Using cached essay feedback");
-          setFeedback(cachedFeedback);
-          setLoading(false);
+          
           return;
         }
 
@@ -47,6 +45,10 @@ const Feedback = () => {
 
     fetchFeedback();
   }, []);
+
+  const handleUploadAnother = () => {
+    navigate("/upload");
+  };
 
   if (loading) {
     return (
@@ -86,11 +88,52 @@ const Feedback = () => {
         <ActionBox>
           <div className={`${styles.feedbackContent} customScroll`}>
             <div className={styles.title}>Essay Analysis Results</div>
-            {feedback ? (
+            
+            {/* Show analysis results with upload styling */}
+            {analysisResults ? (
+              <div className={uploadStyles.uploadSection}>
+                <div className={uploadStyles.linksContainer}>
+                  <h2 className={uploadStyles.linksTitle}>Your Analysis is Ready!</h2>
+                  
+                  <div className={uploadStyles.linkButtons}>
+                    <a 
+                      href={analysisResults.essayFeedback} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
+                    >
+                      📝 View Essay Feedback
+                    </a>
+                    
+                    <a 
+                      href={analysisResults.googleDocs} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
+                    >
+                      ✏️ Hemingway Analysis
+                    </a>
+                  </div>
+                  
+                  <button 
+                    className={uploadStyles.resetButton} 
+                    onClick={handleUploadAnother}
+                  >
+                    Upload Another Document
+                  </button>
+
+                  <div className={uploadStyles.nextStep}>
+                    <p>Your analysis documents are available anytime through the links above.</p>
+                  </div>
+                </div>
+              </div>
+            ) : feedback ? (
+              /* Fall back to old feedback display */
               <div className={styles.markdownContent}>
                 <ReactMarkdown>{feedback}</ReactMarkdown>
               </div>
             ) : (
+              /* No analysis available */
               <div className={styles.feedbackSections}>
                 <p>No essay analysis available. Please upload your Chevening essays to receive detailed feedback and analysis.</p>
                 <div className={styles.uploadPrompt}>
@@ -100,6 +143,12 @@ const Feedback = () => {
                     <li>Upload your Chevening application essays (PDF format)</li>
                     <li>Receive detailed writing style analysis and feedback</li>
                   </ol>
+                  <button 
+                    className={styles.uploadButton}
+                    onClick={handleUploadAnother}
+                  >
+                    Go to Upload
+                  </button>
                 </div>
               </div>
             )}

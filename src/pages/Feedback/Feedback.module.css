@@ -185,3 +185,81 @@
     overflow-y: auto;
   }
 }
+
+
+/* ========================================
+   ADD THESE STYLES TO YOUR EXISTING Feedback.module.css
+   ======================================== */
+
+/* Analysis info section */
+.analysisInfo {
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.analysisInfo p {
+  margin: 0.5rem 0;
+  color: #374151;
+  font-size: 0.9rem;
+}
+
+.analysisInfo strong {
+  color: var(--primary, #1d4f91);
+}
+
+/* Upload button for the prompt section */
+.uploadButton {
+  background-color: var(--primary, #1d4f91);
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 1rem;
+}
+
+.uploadButton:hover {
+  background-color: #1e40af;
+  transform: translateY(-1px);
+}
+
+/* Loading spinner (if you don't have it already) */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #f3f4f6;
+  border-top: 4px solid var(--primary, #1d4f91);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Ensure compatibility with uploaded styles */
+.feedbackContent .uploadSection {
+  background: transparent;
+  padding: 0;
+  box-shadow: none;
+}
+
+/* Mobile responsiveness for analysis info */
+@media (max-width: 768px) {
+  .analysisInfo {
+    padding: 0.75rem;
+  }
+  
+  .analysisInfo p {
+    font-size: 0.85rem;
+  }
+}
