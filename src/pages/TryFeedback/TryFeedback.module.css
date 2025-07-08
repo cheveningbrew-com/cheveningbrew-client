@@ -1,0 +1,549 @@
+/* Ensure smooth scrolling */
+.tryFeedbackContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem;
+  text-align: center;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
+.title {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  color: #fff;
+}
+
+.feedbackSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  max-width: 600px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  min-height: fit-content;
+}
+
+/* Custom scrollbar for the main container */
+.tryFeedbackContainer::-webkit-scrollbar {
+  width: 8px;
+}
+
+.tryFeedbackContainer::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.tryFeedbackContainer::-webkit-scrollbar-thumb {
+  background: rgba(255, 140, 0, 0.5);
+  border-radius: 4px;
+}
+
+.tryFeedbackContainer::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 140, 0, 0.7);
+}
+
+/* Auto analysis container */
+.autoAnalysisContainer {
+  width: 100%;
+  text-align: center;
+}
+
+.autoAnalysisTitle {
+  font-size: 1.5rem;
+  color: #ff8c00;
+  margin-bottom: 2rem;
+}
+
+.analysisInfo {
+  background: rgba(255, 140, 0, 0.1);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.analysisInfo p {
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 0.8rem;
+}
+
+.analysisInfo code {
+  background: rgba(0, 0, 0, 0.4);
+  padding: 0.2rem 0.4rem;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+  color: #ffe585;
+}
+
+/* Waiting container */
+.waitingContainer {
+  width: 100%;
+  text-align: center;
+}
+
+.waitingTitle {
+  font-size: 1.5rem;
+  color: #ff8c00;
+  margin-bottom: 2rem;
+}
+
+/* Error container */
+.errorContainer {
+  width: 100%;
+  text-align: center;
+}
+
+.errorTitle {
+  font-size: 1.5rem;
+  color: #ff5252;
+  margin-bottom: 2rem;
+}
+
+/* Info box styles */
+.infoBox {
+  width: 100%;
+  background: rgba(255, 140, 0, 0.1);
+  border: 1px solid rgba(255, 140, 0, 0.3);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.infoTitle {
+  color: #ff8c00;
+  font-size: 1.1rem;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.infoContent {
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.infoContent p {
+  margin-bottom: 0.8rem;
+}
+
+.featureList {
+  list-style: none;
+  padding: 0;
+  margin: 1rem 0;
+}
+
+.featureList li {
+  margin-bottom: 0.5rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.autoFilled {
+  background: rgba(0, 255, 127, 0.1);
+  border: 1px solid rgba(0, 255, 127, 0.3);
+  border-radius: 4px;
+  padding: 0.8rem;
+  color: #00ff7f !important;
+  font-weight: 500;
+}
+
+.uploadPrompt {
+  background: rgba(255, 229, 133, 0.1);
+  border: 1px solid rgba(255, 229, 133, 0.3);
+  border-radius: 4px;
+  padding: 0.8rem;
+  color: #ffe585 !important;
+  font-weight: 500;
+}
+
+.analyzeForm {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.inputContainer {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  width: 100%;
+}
+
+.inputLabel {
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.textInput {
+  width: 100%;
+  padding: 0.8rem 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.textInput:focus {
+  outline: none;
+  border-color: #ff8c00;
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.textInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.textInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.inputHint {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+  font-style: italic;
+}
+
+.errorMessage {
+  color: #ff5252;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+  text-align: center;
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-radius: 6px;
+}
+
+.buttonGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.analyzeButton {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(90deg, #ff8c00 0%, #ff7f50 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.analyzeButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.analyzeButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.secondaryButtons {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+}
+
+.resetButton {
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.resetButton:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.resetButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.uploadNavButton {
+  flex: 1;
+  padding: 0.8rem 1.5rem;
+  background: rgba(100, 149, 237, 0.2);
+  color: #6495ed;
+  border: 1px solid rgba(100, 149, 237, 0.5);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.uploadNavButton:hover:not(:disabled) {
+  background: rgba(100, 149, 237, 0.3);
+  color: white;
+}
+
+.uploadNavButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 140, 0, 0.3);
+  border-top: 4px solid #ff8c00;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Results section */
+.resultsContainer {
+  width: 100%;
+  text-align: center;
+}
+
+.resultsTitle {
+  font-size: 1.5rem;
+  color: #ff8c00;
+  margin-bottom: 2rem;
+}
+
+.resultInfo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.infoItem {
+  margin-bottom: 0.8rem;
+  color: #fff;
+  font-size: 0.95rem;
+}
+
+.infoItem strong {
+  color: #ff8c00;
+  margin-right: 0.5rem;
+}
+
+.linkButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.linkButton {
+  padding: 1rem;
+  border-radius: 8px;
+  font-weight: 500;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+}
+
+.linkButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.docsButton {
+  background-color: #0f9d58;
+  color: white;
+}
+
+.driveButton {
+  background-color: #4285f4;
+  color: white;
+}
+
+.downloadButton {
+  background-color: #dd0c7e;
+  color: white;
+}
+
+.summarySection {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.summarySection h3 {
+  color: #ff8c00;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.summaryContent {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.85rem;
+  overflow-x: auto;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.summaryContent pre {
+  white-space: pre-wrap;
+  margin: 0;
+  font-family: 'Courier New', monospace;
+}
+
+.actionButtons {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  width: 100%;
+}
+
+.newAnalysisButton {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  background: linear-gradient(90deg, #ff8c00 0%, #ff7f50 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.newAnalysisButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Responsive styles */
+@media screen and (max-width: 768px) {
+  .tryFeedbackContainer {
+    padding: 1rem;
+    height: calc(100vh - 200px); /* Ensure proper height on mobile */
+  }
+ 
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+ 
+  .feedbackSection {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+
+  .secondaryButtons {
+    flex-direction: column;
+  }
+
+  .linkButtons {
+    gap: 0.8rem;
+  }
+
+  .linkButton {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .tryFeedbackContainer {
+    padding: 0.8rem;
+    padding-bottom: 3rem; /* Extra bottom padding for mobile */
+    height: calc(100vh - 180px); /* Ensure proper height on small mobile */
+  }
+ 
+  .title {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+ 
+  .feedbackSection {
+    padding: 1.2rem;
+    margin-bottom: 3rem; /* Extra margin at bottom */
+  }
+ 
+  .textInput {
+    padding: 0.7rem 0.8rem;
+    font-size: 0.9rem;
+  }
+ 
+  .analyzeButton, .resetButton, .uploadNavButton, .newAnalysisButton {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem;
+  }
+
+  .infoBox {
+    padding: 1rem;
+  }
+
+  .resultInfo {
+    padding: 1rem;
+  }
+
+  .infoItem {
+    font-size: 0.85rem;
+    margin-bottom: 0.6rem;
+  }
+
+  .summaryContent {
+    font-size: 0.8rem;
+    max-height: 150px;
+  }
+
+  .summarySection {
+    padding: 1rem;
+    margin-bottom: 2rem; /* Extra margin before action buttons */
+  }
+
+  .actionButtons {
+    margin-top: 1.5rem; /* Extra space before final buttons */
+  }
+}

@@ -7,6 +7,8 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LandingPage from "./pages/Landing/LandingPage";
 import Upload from "./pages/Upload/Upload";
 import Feedback from "./pages/Feedback/Feedback";
+import TryUpload from "./pages/TryUpload/TryUpload";
+import TryFeedback from "./pages/TryFeedback/TryFeedback";
 import Help from "./pages/SupportPages/Help/Help";
 import About from "./pages/SupportPages/About/About";
 import Pricing from "./pages/SupportPages/Pricing/Pricing";
@@ -34,6 +36,8 @@ const App = () => {
             <Route element={<ProtectedRoute />}>
               <Route path="/upload" element={<Upload />} />
               <Route path="/feedback" element={<Feedback />} />
+              <Route path="/try-upload" element={<TryUpload />} />
+              <Route path="/try-feedback" element={<TryFeedback />} />
             </Route>
           </Routes>
         </AuthProvider>
