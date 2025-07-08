@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Upload.module.css";
-import { uploadEssayFile, getWritingStyleAnalysis, shareGoogleDoc, createGoogleDoc, getEssayFeedback, getCombinedGrammarHemingwayAnalysis} from "../../services/essay_api";
+import { uploadEssayFile, getEssayFeedback, getCombinedGrammarHemingwayAnalysis} from "../../services/essay_api";
 import { getUserId, updateUserField } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { STORAGE_KEYS } from '../../constants/storage';
@@ -69,22 +69,15 @@ const Upload = () => {
       const dirName = pathParts[1]; // Format: "text_outs/dirName/extracted_text.txt"
       
       // Step 3: Get essay feedback
-      const feedbackResult = await getEssayFeedback(dirName);
+      const feedbackResult = await getEssayFeedback(dirName, userEmail);
 
-      // Step 4: Create the Google Doc with the feedback
-      const docCreationResult = await createGoogleDoc(
-        `Essay Feedback - ${userName}`, 
-        feedbackResult.feedback, 
-        userEmail
-      );
-
-      // Step 5: Get the analysis with links (using combined analysis)
+      // Step 4: Get the analysis with links (using combined analysis)
       const analysisResult = await getCombinedGrammarHemingwayAnalysis(dirName, userEmail);
       
-      // Step 6: Store the analysis results for the feedback section
+      // Step 5: Store the analysis results for the feedback section
       const analysisData = {
         googleDocs: analysisResult.google_docs_link,
-        essayFeedback: docCreationResult.view_link,
+        essayFeedback: feedbackResult.google_docs_link,
         timestamp: new Date().toISOString(),
         fileName: selectedFile.name
       };
