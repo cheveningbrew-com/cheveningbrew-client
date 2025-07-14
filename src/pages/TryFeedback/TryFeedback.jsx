@@ -3,377 +3,333 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./TryFeedback.module.css";
-import { analyzeLeadershipGrammar, getTaskStatus, getQueueStatus } from "../../services/essay_api";
+import uploadStyles from "../Upload/Upload.module.css";
+import { getTaskStatus } from "../../services/essay_api";
 import { useAuth } from "../../context/AuthContext";
 
 const TryFeedback = () => {
-  const [dirName, setDirName] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [analysisResults, setAnalysisResults] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [result, setResult] = useState(null);
-  const [analysisProgress, setAnalysisProgress] = useState(null);
-  const [currentTask, setCurrentTask] = useState(null);
-  const [queueStatus, setQueueStatus] = useState(null);
-  const { userName, userEmail, logout } = useAuth();
+  const [taskStatus, setTaskStatus] = useState(null);
+  const [pollingActive, setPollingActive] = useState(false);
+  const { userName, logout } = useAuth();
   const navigate = useNavigate();
 
-  // Check if user is authenticated and auto-analyze if coming from Try Upload
+  // Check if user is authenticated and load analysis results
   useEffect(() => {
     if (!userName) {
       navigate("/");
       return;
     }
 
-    // Check queue status
-    checkQueueStatus();
+    const fetchAnalysisResults = async () => {
+      try {
+        setLoading(true);
+        
+        // Check for fresh analysis results from recent upload
+        const freshResults = sessionStorage.getItem('tryAnalysisResults');
+        if (freshResults) {
+          const parsedResults = JSON.parse(freshResults);
+          setAnalysisResults(parsedResults);
+          
+          // Check if there's a pending task
+          if (parsedResults.taskId) {
+            await checkPendingTask(parsedResults.taskId);
+          } else {
+            setLoading(false);
+          }
+          return;
+        }
 
-    // Check if we should auto-analyze from Try Upload
-    const shouldAutoAnalyze = sessionStorage.getItem('autoAnalyze');
-    const tryDirName = sessionStorage.getItem('tryDirectoryName');
-    
-    if (shouldAutoAnalyze === 'true' && tryDirName) {
-      console.log("Auto-analyzing from Try Upload with directory:", tryDirName);
-      setDirName(tryDirName);
-      
-      // Clear the auto-analyze flag
-      sessionStorage.removeItem('autoAnalyze');
-      
-      // Start automatic analysis
-      performAutomaticAnalysis(tryDirName);
-    } else if (tryDirName) {
-      // Just set the directory name without auto-analyzing
-      setDirName(tryDirName);
-    }
+        // If no analysis results available, show message
+        setError("No analysis found. Please upload a PDF first in the Try Upload section.");
+        setLoading(false);
+
+      } catch (err) {
+        console.error("Error loading analysis results:", err);
+        setError("Failed to load analysis results. Please try again.");
+        setLoading(false);
+      }
+    };
+
+    fetchAnalysisResults();
   }, [userName, navigate]);
 
-  const checkQueueStatus = async () => {
+  // Check status of pending background task
+  const checkPendingTask = async (taskId) => {
     try {
-      const status = await getQueueStatus();
-      setQueueStatus(status);
+      setPollingActive(true);
+      
+      // Check initial status
+      const status = await getTaskStatus(taskId);
+      setTaskStatus(status);
+
+      // Check if task is completed
+      if (['COMPLETED', 'ERROR', 'FAILED'].includes(status.status)) {
+        setPollingActive(false);
+        setLoading(false);
+        
+        if (status.status === 'COMPLETED' && status.result) {
+          // Update analysis results with completed task data
+          updateAnalysisWithTaskResult(status.result);
+        }
+        return;
+      }
+
+      // Start polling for incomplete task
+      const pollInterval = setInterval(async () => {
+        try {
+          const updatedStatus = await getTaskStatus(taskId);
+          setTaskStatus(updatedStatus);
+
+          if (['COMPLETED', 'ERROR', 'FAILED'].includes(updatedStatus.status)) {
+            clearInterval(pollInterval);
+            setPollingActive(false);
+            setLoading(false);
+            
+            if (updatedStatus.status === 'COMPLETED' && updatedStatus.result) {
+              updateAnalysisWithTaskResult(updatedStatus.result);
+            }
+          }
+        } catch (error) {
+          console.error("Error polling task status:", error);
+          clearInterval(pollInterval);
+          setPollingActive(false);
+          setLoading(false);
+        }
+      }, 3000);
+
+      // Cleanup interval on component unmount
+      return () => {
+        clearInterval(pollInterval);
+        setPollingActive(false);
+      };
+
     } catch (error) {
-      console.error("Failed to get queue status:", error);
+      console.error("Error checking pending task:", error);
+      setPollingActive(false);
+      setLoading(false);
     }
   };
 
-  // Progress callback for background tasks
-  const handleProgress = (progress) => {
-    setAnalysisProgress({
-      step: progress.step || '',
-      message: progress.message || 'Processing...',
-      progress: progress.progress || 0,
-      status: progress.status || 'PROCESSING'
+  // Update analysis results with completed task data
+  const updateAnalysisWithTaskResult = (taskResult) => {
+    setAnalysisResults(prevResults => {
+      const updatedResults = { ...prevResults };
+      
+      // Update with new Google Drive links if available
+      if (taskResult.google_docs_link) {
+        updatedResults.googleDocs = taskResult.google_docs_link;
+      }
+      if (taskResult.google_drive_link) {
+        updatedResults.googleDrive = taskResult.google_drive_link;
+      }
+      if (taskResult.download_link) {
+        updatedResults.downloadLink = taskResult.download_link;
+      }
+      if (taskResult.analysis_summary) {
+        updatedResults.analysisSummary = taskResult.analysis_summary;
+      }
+      
+      // Update sessionStorage with new results
+      sessionStorage.setItem('tryAnalysisResults', JSON.stringify(updatedResults));
+      
+      return updatedResults;
     });
   };
 
-  // Status change callback
-  const handleStatusChange = (statusData) => {
-    console.log("Task status updated:", statusData);
-    setCurrentTask(statusData);
-  };
-
-  // Automatic analysis function
-  const performAutomaticAnalysis = async (directoryName) => {
-    try {
-      setIsLoading(true);
-      setError(null);
-      setResult(null);
-      setAnalysisProgress(null);
-      setCurrentTask(null);
-      
-      console.log("Starting automatic leadership grammar analysis for:", directoryName);
-      
-      setAnalysisProgress({
-        step: "1/4",
-        message: "Initializing grammar analysis...",
-        progress: 10,
-        status: "INITIALIZING"
-      });
-
-      // Call the leadership grammar analysis API with background processing
-      const analysisResult = await analyzeLeadershipGrammar(directoryName, userEmail, {
-        useBackground: true,
-        onProgress: (progress) => {
-          handleProgress({
-            ...progress,
-            step: progress.step || "3/4",
-            message: `Grammar Analysis: ${progress.message || 'Analyzing leadership essay...'}`,
-            progress: 25 + (progress.progress || 0) * 0.7 // 25-95%
-          });
-        },
-        onStatusChange: handleStatusChange,
-        pollingInterval: 2000 // Poll every 2 seconds for demo
-      });
-      
-      setResult(analysisResult);
-      
-      setAnalysisProgress({
-        step: "4/4",
-        message: "Analysis complete!",
-        progress: 100,
-        status: "COMPLETED"
-      });
-      
-      console.log("Automatic leadership grammar analysis completed successfully:", analysisResult);
-      
-    } catch (err) {
-      console.error("Analysis error:", err);
-      
-      // Handle specific queue full error
-      if (err.message?.includes("queue is full")) {
-        setError("Analysis queue is currently full. Please try again in a few minutes.");
-        await checkQueueStatus(); // Update queue status
-      } else {
-        setError(`Analysis failed: ${err.message || "Unknown error occurred"}`);
-      }
-      
-      // If the error is due to authentication issues, redirect to login
-      if (err.message?.includes("unauthorized") || err.message?.includes("not authenticated")) {
-        logout();
-        navigate("/");
-      }
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Manual analysis function
-  const handleManualAnalysis = async () => {
-    if (!dirName.trim()) {
-      setError("Please enter a directory name.");
-      return;
-    }
-
-    await performAutomaticAnalysis(dirName.trim());
-  };
-
-  // Navigate to Try Upload
-  const goToTryUpload = () => {
-    // Clear any existing flags
-    sessionStorage.removeItem('autoAnalyze');
+  const handleUploadAnother = () => {
+    // Clear current analysis data
+    sessionStorage.removeItem('tryAnalysisResults');
     navigate("/try-upload");
   };
 
-  // Reset function
-  const handleReset = () => {
-    setDirName("");
-    setError(null);
-    setResult(null);
-    setAnalysisProgress(null);
-    setCurrentTask(null);
-    sessionStorage.removeItem('tryDirectoryName');
+  const getTaskStatusDisplay = (status) => {
+    const statusMap = {
+      'PENDING': { emoji: '⏳', text: 'Waiting in queue' },
+      'PROCESSING': { emoji: '🔄', text: 'Processing' },
+      'ANALYZING': { emoji: '🧠', text: 'AI Analysis in progress' },
+      'GENERATING': { emoji: '📝', text: 'Creating document' },
+      'FINALIZING': { emoji: '☁️', text: 'Uploading to Google Drive' },
+      'COMPLETED': { emoji: '✅', text: 'Completed' },
+      'FAILED': { emoji: '❌', text: 'Failed' },
+      'ERROR': { emoji: '⚠️', text: 'Error' }
+    };
+    
+    return statusMap[status] || { emoji: '📋', text: status };
   };
 
-  return (
-    <MainLayout>
-      <ActionBox>
-        <div className={`${styles.tryFeedbackContainer} customScroll`}>
-          <h1 className={styles.title}>
-            Try Feedback - Demo Grammar Analysis
-          </h1>
-          
-          <div className={styles.feedbackSection}>
-            {/* Queue Status Display */}
-            {queueStatus && queueStatus.status === "busy" && (
-              <div className={styles.queueWarning}>
-                ⚠️ Analysis queue is busy ({queueStatus.queue_length}/{queueStatus.max_queue_length} tasks). 
-                Your analysis may take longer than usual.
-              </div>
-            )}
-
-            {isLoading ? (
-              // Show loading state during automatic analysis
-              <div className={styles.autoAnalysisContainer}>
-                <h2 className={styles.autoAnalysisTitle}>🔍 Analyzing Leadership Essay</h2>
-
-                {analysisProgress && (
-                  <div className={styles.progressContainer}>
-                    <div className={styles.progressHeader}>
-                      <p>{analysisProgress.step}</p>
-                    </div>
-                    
-                    <div className={styles.progressBar}>
-                      <div 
-                        className={styles.progressFill}
-                        style={{ width: `${analysisProgress.progress}%` }}
-                      ></div>
-                    </div>
-                    
-                    <div className={styles.progressInfo}>
-                      <div className={styles.spinner}></div>
-                      <div className={styles.progressText}>
-                        <p className={styles.progressMessage}>{analysisProgress.message}</p>
-                        <small className={styles.progressPercent}>
-                          {analysisProgress.progress}% complete
-                        </small>
-                      </div>
-                    </div>
-
-                    {/* Task Information */}
-                    {currentTask && (
-                      <div className={styles.taskInfo}>
-                        <small>Task ID: {currentTask.task_id}</small>
-                        <small>Status: {currentTask.status}</small>
-                        {currentTask.meta?.status && (
-                          <small>Details: {currentTask.meta.status}</small>
-                        )}
-                      </div>
-                    )}
-
-                    <div className={styles.estimatedTime}>
-                      <small>⏱️ Estimated time: 5-8 minutes for grammar analysis</small>
-                    </div>
-                  </div>
-                )}
-              </div>
-            ) : result ? (
-              // Show results after analysis
-              <div className={styles.resultsContainer}>
-                <h2 className={styles.resultsTitle}>✅ Leadership Grammar Analysis Complete!</h2>
-                
-
-                <div className={styles.linkButtons}>
-                  <a 
-                    href={result.google_docs_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={`${styles.linkButton} ${styles.docsButton}`}
-                  >
-                    ✏️ Edit in Google Docs
-                  </a>
-                  
-                  <a 
-                    href={result.google_drive_link} 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className={`${styles.linkButton} ${styles.driveButton}`}
-                  >
-                    📁 View in Google Drive
-                  </a>
-                  
-                  {result.download_link && (
-                    <a 
-                      href={result.download_link} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={`${styles.linkButton} ${styles.downloadButton}`}
-                    >
-                      ⬇️ Download DOCX
-                    </a>
-                  )}
-                </div>
-
-                {/* Analysis Summary */}
-                {result.analysis_summary && (
-                  <div className={styles.summarySection}>
-                    <h3>📊 Analysis Summary</h3>
-                    <div className={styles.summaryContent}>
-                      <p><strong>Grammar Issues Found:</strong> {result.analysis_summary.total_grammar_issues || 0}</p>
-                      <p><strong>Essay Type:</strong> {result.essay_type || 'Leadership Essay'}</p>
-                      {result.analysis_summary.key_issues && (
-                        <p><strong>Key Areas:</strong> {result.analysis_summary.key_issues.join(', ')}</p>
+  if (loading) {
+    return (
+      <MainLayout>
+        <ActionBox>
+          <div className={`${styles.tryFeedbackContainer} customScroll`}>
+            <div className={styles.loadingContainer}>
+              <div className={styles.spinner}></div>
+              <h3>👑 Processing Leadership Grammar Analysis</h3>
+              
+              {pollingActive && taskStatus && (
+                <div className={styles.taskStatusContainer}>
+                  <h4>Analysis Status:</h4>
+                  <div className={styles.taskStatusItem}>
+                    <span className={styles.taskEmoji}>
+                      {getTaskStatusDisplay(taskStatus.status).emoji}
+                    </span>
+                    <div className={styles.taskDetails}>
+                      <p className={styles.taskStatus}>
+                        {getTaskStatusDisplay(taskStatus.status).text}
+                      </p>
+                      {taskStatus.meta?.status && (
+                        <small className={styles.taskMeta}>{taskStatus.meta.status}</small>
+                      )}
+                      {taskStatus.meta?.step && (
+                        <small className={styles.taskStep}>{taskStatus.meta.step}</small>
                       )}
                     </div>
                   </div>
-                )}
-
-                <div className={styles.actionButtons}>
-                  <button 
-                    className={styles.uploadNavButton} 
-                    onClick={goToTryUpload}
-                  >
-                    ← Try Another Upload
-                  </button>
-                  
-                  <button 
-                    className={styles.resetButton} 
-                    onClick={handleReset}
-                  >
-                    Reset Demo
-                  </button>
-                </div>
-              </div>
-            ) : error ? (
-              // Show error state
-              <div className={styles.errorContainer}>
-                <h2 className={styles.errorTitle}>❌ Analysis Failed</h2>
-                <div className={styles.errorMessage}>{error}</div>
-                <div className={styles.actionButtons}>
-                  <button 
-                    className={styles.uploadNavButton} 
-                    onClick={goToTryUpload}
-                  >
-                    ← Back to Try Upload
-                  </button>
-                  
-                  <button 
-                    className={styles.resetButton} 
-                    onClick={handleReset}
-                  >
-                    Reset Demo
-                  </button>
-                </div>
-              </div>
-            ) : (
-              // Show when no analysis is running (direct navigation or manual entry)
-              <div className={styles.waitingContainer}>
-                <h2 className={styles.waitingTitle}>📋 Ready for Analysis</h2>
-                
-                <div className={styles.infoBox}>
-                  <h3 className={styles.infoTitle}>🔍 Leadership Grammar Analysis Demo</h3>
-                  <div className={styles.infoContent}>
-                    <p>Upload a PDF in the <strong>Try Upload</strong> tab to automatically analyze your leadership essay for grammar and spelling issues.</p>
-                    <p>Or enter a directory name manually to test the analysis system:</p>
-                    <ul className={styles.featureList}>
-                      <li>✅ Extract text from your PDF</li>
-                      <li>✅ Analyze leadership essay grammar</li>
-                      <li>✅ Create DOCX with Word comments</li>
-                      <li>✅ Share via Google Drive & Docs</li>
-                    </ul>
+                  <div className={styles.estimatedTime}>
+                    <small>⏱️ This may take 5-8 minutes for grammar analysis</small>
                   </div>
                 </div>
+              )}
+              
+              {!pollingActive && (
+                <p>Loading your analysis results...</p>
+              )}
+            </div>
+          </div>
+        </ActionBox>
+      </MainLayout>
+    );
+  }
 
-                {/* Manual Directory Input */}
-                <div className={styles.manualInputSection}>
-                  <h3>🧪 Manual Testing</h3>
-                  <div className={styles.inputContainer}>
-                    <label className={styles.inputLabel}>Directory Name:</label>
-                    <input
-                      type="text"
-                      className={styles.textInput}
-                      value={dirName}
-                      onChange={(e) => setDirName(e.target.value)}
-                      placeholder="Enter directory name (e.g., extracted_1234567890)"
-                      disabled={isLoading}
-                    />
-                    <div className={styles.inputHint}>
-                      Enter the directory name from a previous extraction to test the analysis system.
-                    </div>
-                  </div>
+  if (error) {
+    return (
+      <MainLayout>
+        <ActionBox>
+          <div className={`${styles.tryFeedbackContainer} customScroll`}>
+            <div className={styles.errorContainer}>
+              <h2 className={styles.errorTitle}>❌ No Analysis Found</h2>
+              <div className={styles.errorMessage}>{error}</div>
+              <div className={styles.errorActions}>
+                <button
+                  className={styles.uploadButton}
+                  onClick={handleUploadAnother}
+                >
+                  Go to Try Upload
+                </button>
+              </div>
+            </div>
+          </div>
+        </ActionBox>
+      </MainLayout>
+    );
+  }
+
+  return (
+    <MainLayout>
+      <div className={styles.feedbackWrapper}>
+        <ActionBox>
+          <div className={`${styles.tryFeedbackContainer} customScroll`}>
+            <div className={styles.title}>Leadership Grammar Analysis Results</div>
+            
+            {/* Show analysis results */}
+            {analysisResults && (
+              <div className={uploadStyles.uploadSection}>
+                <div className={uploadStyles.linksContainer}>
+                  <h2 className={uploadStyles.linksTitle}>✅ Grammar Analysis Complete!</h2>
                   
-                  <div className={styles.buttonGroup}>
-                    <button 
-                      className={styles.analyzeButton}
-                      onClick={handleManualAnalysis}
-                      disabled={!dirName.trim() || isLoading}
+                  <div className={uploadStyles.linkButtons}>
+                    <a 
+                      href={analysisResults.googleDocs} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
                     >
-                      Analyze Grammar
-                    </button>
+                      ✏️ Edit in Google Docs
+                    </a>
+                    
+                    <a 
+                      href={analysisResults.googleDrive} 
+                      target="_blank" 
+                      rel="noopener noreferrer"
+                      className={`${uploadStyles.linkButton} ${uploadStyles.driveButton}`}
+                    >
+                      📁 View in Google Drive
+                    </a>
+                    
+                    {analysisResults.downloadLink && (
+                      <a 
+                        href={analysisResults.downloadLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
+                      >
+                        ⬇️ Download DOCX
+                      </a>
+                    )}
                   </div>
-                </div>
-
-                <div className={styles.actionButtons}>
+                  
                   <button 
-                    className={styles.uploadNavButton} 
-                    onClick={goToTryUpload}
+                    className={uploadStyles.resetButton} 
+                    onClick={handleUploadAnother}
                   >
-                    ← Go to Try Upload
+                    Try Another Upload
                   </button>
+
+                  <div className={uploadStyles.nextStep}>
+                    <p>Your grammar analysis is available through the links above.</p>
+                    {analysisResults.fileName && (
+                      <small>Original file: {analysisResults.fileName}</small>
+                    )}
+                    {analysisResults.timestamp && (
+                      <small>
+                        Analysis completed: {new Date(analysisResults.timestamp).toLocaleString()}
+                      </small>
+                    )}
+                  </div>
+
+                  {/* Analysis Summary */}
+                  {analysisResults.analysisSummary && (
+                    <div className={styles.summarySection}>
+                      <h3>📊 Analysis Summary</h3>
+                      <div className={styles.summaryContent}>
+                        <p><strong>Essay Type:</strong> {analysisResults.essayType || 'Leadership Essay'}</p>
+                        {analysisResults.analysisSummary.total_grammar_issues !== undefined && (
+                          <p><strong>Grammar Issues Found:</strong> {analysisResults.analysisSummary.total_grammar_issues}</p>
+                        )}
+                        {analysisResults.analysisSummary.word_count && (
+                          <p><strong>Word Count:</strong> {analysisResults.analysisSummary.word_count}</p>
+                        )}
+                        {analysisResults.analysisSummary.key_issues && (
+                          <div>
+                            <p><strong>Key Areas for Improvement:</strong></p>
+                            <ul className={styles.issuesList}>
+                              {analysisResults.analysisSummary.key_issues.map((issue, index) => (
+                                <li key={index}>{issue}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Task Information (if available) */}
+                  {analysisResults.taskId && (
+                    <div className={styles.taskInfo}>
+                      <h4>Background Processing Information:</h4>
+                      <p><strong>Task ID:</strong> {analysisResults.taskId}</p>
+                      <p><strong>Directory:</strong> {analysisResults.directoryName}</p>
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
-        </div>
-      </ActionBox>
+        </ActionBox>
+      </div>
     </MainLayout>
   );
 };

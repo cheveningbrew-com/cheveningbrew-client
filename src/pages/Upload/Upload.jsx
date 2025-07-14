@@ -218,7 +218,7 @@ const Upload = () => {
   return (
     <MainLayout>
       <ActionBox>
-        <div className={styles.uploadContainer}>
+        <div className={`${styles.uploadContainer} customScroll`}>
           <h1 className={styles.title}>
             Upload your Chevening Application Essays
           </h1>

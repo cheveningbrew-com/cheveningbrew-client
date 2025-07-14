@@ -3,16 +3,21 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./TryUpload.module.css";
-import { uploadEssayFile, getQueueStatus } from "../../services/essay_api";
+import { 
+  uploadEssayFile, 
+  analyzeLeadershipGrammar,
+  getQueueStatus 
+} from "../../services/essay_api";
 import { useAuth } from "../../context/AuthContext";
 
 const TryUpload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [uploadProgress, setUploadProgress] = useState(null);
+  const [analysisProgress, setAnalysisProgress] = useState(null);
+  const [currentTask, setCurrentTask] = useState(null);
   const [queueStatus, setQueueStatus] = useState(null);
-  const { userName, logout } = useAuth();
+  const { userName, userEmail, logout } = useAuth();
   const navigate = useNavigate();
 
   // Check if user is authenticated
@@ -50,7 +55,23 @@ const TryUpload = () => {
     }
   };
 
-  // Handle file upload
+  // Progress callback for background tasks
+  const handleProgress = (progress) => {
+    setAnalysisProgress({
+      step: progress.step || '',
+      message: progress.message || 'Processing...',
+      progress: progress.progress || 0,
+      status: progress.status || 'PROCESSING'
+    });
+  };
+
+  // Status change callback
+  const handleStatusChange = (statusData) => {
+    console.log("Task status updated:", statusData);
+    setCurrentTask(statusData);
+  };
+
+  // Handle file upload and analysis
   const handleUpload = async () => {
     if (!selectedFile) {
       setError("Please select a file first.");
@@ -65,28 +86,24 @@ const TryUpload = () => {
     try {
       setIsLoading(true);
       setError(null);
+      setAnalysisProgress(null);
+      setCurrentTask(null);
       
-      console.log("Starting upload for testing...");
+      console.log("Starting upload and analysis for testing...");
       
-      // Step 1: Show upload progress
-      setUploadProgress({
+      // Step 1: Upload the file
+      setAnalysisProgress({
         step: "1/3",
-        message: "Uploading PDF file...",
-        progress: 20
+        message: "Uploading PDF and extracting text...",
+        progress: 15,
+        status: "UPLOADING"
       });
-      
-      // Step 1: Upload the file using the same API
+
       const uploadResponse = await uploadEssayFile(selectedFile);
       
       if (!uploadResponse.success) {
         throw new Error(uploadResponse.message || "Upload failed");
       }
-      
-      setUploadProgress({
-        step: "2/3",
-        message: "Extracting text from PDF...",
-        progress: 60
-      });
       
       // Step 2: Extract directory name from path
       const extractedTextPath = uploadResponse.extracted_text_dir;
@@ -95,38 +112,66 @@ const TryUpload = () => {
       
       console.log("Extraction completed. Directory name:", dirName);
       
-      setUploadProgress({
-        step: "3/3",
-        message: "Preparing for analysis...",
-        progress: 90
+      setAnalysisProgress({
+        step: "2/3",
+        message: "Starting leadership grammar analysis...",
+        progress: 30,
+        status: "INITIALIZING"
+      });
+
+      // Step 3: Start background leadership grammar analysis
+      const analysisResult = await analyzeLeadershipGrammar(dirName, userEmail, {
+        useBackground: true,
+        onProgress: (progress) => {
+          handleProgress({
+            ...progress,
+            step: "3/3",
+            message: `Grammar Analysis: ${progress.message || 'Analyzing leadership essay...'}`,
+            progress: 30 + (progress.progress || 0) * 0.7 // 30-100%
+          });
+        },
+        onStatusChange: handleStatusChange
       });
       
-      // Store directory name for automatic analysis
-      sessionStorage.setItem('tryDirectoryName', dirName);
-      sessionStorage.setItem('autoAnalyze', 'true'); // Flag for automatic analysis
+      // Step 4: Store the analysis results for the feedback section
+      const analysisData = {
+        googleDocs: analysisResult.google_docs_link,
+        googleDrive: analysisResult.google_drive_link,
+        downloadLink: analysisResult.download_link,
+        timestamp: new Date().toISOString(),
+        fileName: selectedFile.name,
+        directoryName: dirName,
+        essayType: analysisResult.essay_type || 'leadership_essay',
+        taskId: analysisResult.task_info?.task_id,
+        analysisSummary: analysisResult.analysis_summary
+      };
+
+      // Store in sessionStorage for immediate access
+      sessionStorage.setItem('tryAnalysisResults', JSON.stringify(analysisData));
       
-      setUploadProgress({
+      setAnalysisProgress({
         step: "3/3",
-        message: "Upload complete! Redirecting...",
-        progress: 100
+        message: "Analysis complete! Redirecting to results...",
+        progress: 100,
+        status: "COMPLETED"
       });
+
+      console.log("Upload and analysis successful! Navigating to Try Feedback...");
       
-      console.log("Upload successful! Navigating to Try Feedback for automatic analysis...");
-      
-      // Small delay to show success, then auto-navigate
+      // Step 5: Redirect to try feedback section
       setTimeout(() => {
         navigate("/try-feedback");
       }, 1500);
       
     } catch (err) {
-      console.error("Upload error:", err);
+      console.error("Upload and analysis error:", err);
       
       // Handle specific queue full error
       if (err.message?.includes("queue is full")) {
-        setError("Upload queue is currently full. Please try again in a few minutes.");
+        setError("Analysis queue is currently full. Please try again in a few minutes.");
         await checkQueueStatus(); // Update queue status
       } else {
-        setError(`Upload failed: ${err.message || "Unknown error occurred"}`);
+        setError(`Error: ${err.message || "Unknown error occurred"}`);
       }
       
       // If the error is due to authentication issues, redirect to login
@@ -143,7 +188,8 @@ const TryUpload = () => {
   const handleReset = () => {
     setSelectedFile(null);
     setError(null);
-    setUploadProgress(null);
+    setAnalysisProgress(null);
+    setCurrentTask(null);
     
     // Reset file input
     const fileInput = document.getElementById("file-upload");
@@ -162,8 +208,8 @@ const TryUpload = () => {
             {/* Queue Status Display */}
             {queueStatus && queueStatus.status === "busy" && (
               <div className={styles.queueWarning}>
-                ⚠️ Processing queue is busy ({queueStatus.queue_length}/{queueStatus.max_queue_length} tasks). 
-                Your upload may take longer than usual.
+                ⚠️ Analysis queue is busy ({queueStatus.queue_length}/{queueStatus.max_queue_length} tasks). 
+                Your analysis may take longer than usual.
               </div>
             )}
 
@@ -171,13 +217,13 @@ const TryUpload = () => {
             <div className={styles.infoBox}>
               <h3 className={styles.infoTitle}>🎯 Try Our PDF Analysis</h3>
               <div className={styles.infoContent}>
-                <p>Upload a PDF containing Chevening essays to test our text extraction and analysis capabilities.</p>
+                <p>Upload a PDF containing Chevening essays to test our leadership essay grammar analysis.</p>
                 <p>This demo will:</p>
                 <ul className={styles.featureList}>
                   <li>✅ Extract text from your PDF</li>
-                  <li>✅ Prepare for grammar analysis</li>
-                  <li>✅ Show you the analysis workflow</li>
-                  <li>✅ Generate demo feedback document</li>
+                  <li>✅ Analyze leadership essay grammar and spelling</li>
+                  <li>✅ Create DOCX with Word comments</li>
+                  <li>✅ Share via Google Drive & Docs</li>
                 </ul>
               </div>
             </div>
@@ -203,36 +249,47 @@ const TryUpload = () => {
               onClick={handleUpload}
               disabled={!selectedFile || isLoading}
             >
-              {isLoading ? "Processing..." : "Upload & Auto-Analyze"}
+              {isLoading ? "Processing..." : "Upload & Analyze"}
             </button>
 
             {/* Enhanced Progress Display */}
-            {isLoading && uploadProgress && (
+            {isLoading && analysisProgress && (
               <div className={styles.loadingContainer}>
                 <div className={styles.progressHeader}>
-                  <h3>📤 Processing Upload</h3>
-                  <p>{uploadProgress.step}</p>
+                  <h3>👑 Analyzing Leadership Essay</h3>
+                  <p>{analysisProgress.step}</p>
                 </div>
                 
                 <div className={styles.progressBar}>
                   <div 
                     className={styles.progressFill}
-                    style={{ width: `${uploadProgress.progress}%` }}
+                    style={{ width: `${analysisProgress.progress}%` }}
                   ></div>
                 </div>
                 
                 <div className={styles.progressInfo}>
                   <div className={styles.spinner}></div>
                   <div className={styles.progressText}>
-                    <p className={styles.progressMessage}>{uploadProgress.message}</p>
+                    <p className={styles.progressMessage}>{analysisProgress.message}</p>
                     <small className={styles.progressPercent}>
-                      {uploadProgress.progress}% complete
+                      {analysisProgress.progress}% complete
                     </small>
                   </div>
                 </div>
 
+                {/* Task Information */}
+                {currentTask && (
+                  <div className={styles.taskInfo}>
+                    <small>Task ID: {currentTask.task_id}</small>
+                    <small>Status: {currentTask.status}</small>
+                    {currentTask.meta?.status && (
+                      <small>Details: {currentTask.meta.status}</small>
+                    )}
+                  </div>
+                )}
+
                 <div className={styles.estimatedTime}>
-                  <small>⏱️ Estimated time: 2-5 minutes for upload and extraction</small>
+                  <small>⏱️ Estimated time: 5-8 minutes for grammar analysis</small>
                 </div>
               </div>
             )}
