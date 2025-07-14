@@ -26,6 +26,18 @@
   margin-top: 1rem;
 }
 
+.queueWarning {
+  width: 100%;
+  padding: 1rem;
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid rgba(255, 193, 7, 0.5);
+  border-radius: 8px;
+  color: #ffc107;
+  font-size: 0.9rem;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
 .fileInputContainer {
   position: relative;
   width: 100%;
@@ -71,6 +83,10 @@
   font-size: 0.9rem;
   text-align: center;
   width: 100%;
+  padding: 0.8rem;
+  background: rgba(255, 82, 82, 0.1);
+  border: 1px solid rgba(255, 82, 82, 0.3);
+  border-radius: 6px;
 }
 
 .uploadButton {
@@ -97,7 +113,138 @@
   cursor: not-allowed;
 }
 
-/* Links section */
+.resetButton {
+  width: 100%;
+  padding: 0.8rem 1.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.resetButton:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* Enhanced Loading Container */
+.loadingContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 1.5rem;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.progressHeader {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.progressHeader h3 {
+  color: #ffe585;
+  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.progressHeader p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+/* Progress Bar */
+.progressBar {
+  width: 100%;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 1rem;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+/* Progress Info */
+.progressInfo {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+}
+
+.progressText {
+  flex: 1;
+  text-align: left;
+}
+
+.progressMessage {
+  color: #fff;
+  font-size: 1rem;
+  margin: 0 0 0.3rem 0;
+}
+
+.progressPercent {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid rgba(255, 229, 133, 0.3);
+  border-top: 3px solid #ffe585;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  flex-shrink: 0;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Task Info */
+.taskInfo {
+  width: 100%;
+  padding: 0.8rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 6px;
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.taskInfo small {
+  display: block;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.75rem;
+  margin-bottom: 0.2rem;
+}
+
+.estimatedTime {
+  text-align: center;
+  margin-top: 0.5rem;
+}
+
+.estimatedTime small {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 0.8rem;
+}
+
+/* Links section (keeping existing styles) */
 .linksContainer {
   width: 100%;
   text-align: center;
@@ -147,20 +294,9 @@
   color: white;
 }
 
-.resetButton {
-  padding: 0.8rem 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
+.feedbackButton {
+  background-color: #0f9d58;
   color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-bottom: 1.5rem;
-}
-
-.resetButton:hover {
-  background: rgba(255, 255, 255, 0.2);
 }
 
 /* Next step section */
@@ -179,23 +315,6 @@
   font-size: 1rem;
 }
 
-.feedbackButton {
-  padding: 0.8rem 1.5rem;
-  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
-  color: #4b0082;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-}
-
-.feedbackButton:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-
 /* Responsive styles */
 @media screen and (max-width: 768px) {
   .uploadContainer {
@@ -209,6 +328,17 @@
  
   .uploadSection {
     padding: 1.5rem;
+  }
+
+  .progressInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.8rem;
+  }
+
+  .progressText {
+    text-align: center;
   }
 }
 
@@ -231,9 +361,21 @@
     font-size: 0.9rem;
   }
  
-  .uploadButton {
+  .uploadButton, .resetButton {
     font-size: 1rem;
     padding: 0.7rem 1.2rem;
+  }
+
+  .loadingContainer {
+    padding: 1rem;
+  }
+
+  .progressHeader h3 {
+    font-size: 1.1rem;
+  }
+
+  .progressMessage {
+    font-size: 0.9rem;
   }
 
   .nextStep {
