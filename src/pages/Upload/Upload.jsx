@@ -121,7 +121,7 @@ const Upload = () => {
       });
 
       // Step 3: Start background essay feedback analysis
-      const feedbackResult = await getEssayFeedback(dirName, userEmail, {
+      const feedbackResult = await getEssayFeedback(dirName, userEmail, userName,  {
         useBackground: true,
         onProgress: (progress) => {
           handleProgress({

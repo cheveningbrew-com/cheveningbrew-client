@@ -162,7 +162,7 @@ export const pollTaskUntilComplete = async (
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Task information or direct result
  */
-export const getEssayFeedback = async (dirName, email = null, options = {}) => {
+export const getEssayFeedback = async (dirName, email = null,userName=null, options = {}) => {
   try {
     const {
       useBackground = true,
@@ -173,6 +173,9 @@ export const getEssayFeedback = async (dirName, email = null, options = {}) => {
     
     // Build URL with parameters
     const url = new URL(`${API_BASE_URL}/essay_feedback/${dirName}`);
+    if (userName) {
+      url.searchParams.append('user_name', userName);
+    }
     if (email) {
       url.searchParams.append('email', email);
     }
