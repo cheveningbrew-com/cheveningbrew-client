@@ -168,7 +168,7 @@ export const getEssayFeedback = async (dirName, email = null,userName=null, opti
       useBackground = true,
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 3000
+      pollingInterval = 10000
     } = options;
     
     // Build URL with parameters
@@ -225,7 +225,7 @@ export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null,
       useBackground = true,
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 3000
+      pollingInterval = 10000
     } = options;
     
     const url = new URL(`${API_BASE_URL}/combined_analysis/grammar_hemingway/${dirName}`);
@@ -277,7 +277,7 @@ export const analyzeLeadershipGrammar = async (dirName, email = null, options = 
       useBackground = true,
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 3000
+      pollingInterval = 10000
     } = options;
     
     // Build URL with optional email parameter
