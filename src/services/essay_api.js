@@ -160,9 +160,10 @@ export const pollTaskUntilComplete = async (
  * @param {string} dirName - Directory name containing the extraction
  * @param {string} email - Optional email address to share the assessment document with
  * @param {Object} options - Analysis options
+ * @param {string} userName - Optional user name for personalized feedback
  * @returns {Promise<Object>} Task information or direct result
  */
-export const getEssayFeedback = async (dirName, email = null,userName=null, options = {}) => {
+export const getEssayFeedback = async (dirName, email = null, userName = null, options = {}) => {
   try {
     const {
       useBackground = true,
@@ -219,7 +220,7 @@ export const getEssayFeedback = async (dirName, email = null,userName=null, opti
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Task information or direct result
  */
-export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null, options = {}) => {
+export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null, userName = null, options = {}) => {
   try {
     const {
       useBackground = true,
@@ -229,6 +230,9 @@ export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null,
     } = options;
     
     const url = new URL(`${API_BASE_URL}/combined_analysis/grammar_hemingway/${dirName}`);
+    if (userName) {
+      url.searchParams.append('user_name', userName);
+    }
     if (email) {
       url.searchParams.append('email', email);
     }

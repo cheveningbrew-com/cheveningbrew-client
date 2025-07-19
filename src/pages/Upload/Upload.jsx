@@ -142,7 +142,7 @@ const Upload = () => {
       });
 
       // Step 4: Start background combined analysis
-      const analysisResult = await getCombinedGrammarHemingwayAnalysis(dirName, userEmail, {
+      const analysisResult = await getCombinedGrammarHemingwayAnalysis(dirName, userEmail, userName,{
         useBackground: true,
         onProgress: (progress) => {
           handleProgress({
