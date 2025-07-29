@@ -161,7 +161,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         address: paymentDetails.address,
         city: paymentDetails.city,
         country: paymentDetails.country,
-        custom_1: paymentDetails.attempts,
+        custom_1: paymentDetails.plan_id,
         custom_2: paymentDetails.user_id,
       };
 

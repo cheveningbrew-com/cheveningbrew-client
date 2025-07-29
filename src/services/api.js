@@ -231,3 +231,28 @@ export const updateUserSubscription = async ({ field, value }) => {
 
     return response.json();
 };
+
+// Add this to services/api.js
+
+// Mark free attempt as used
+export const markFreeAttemptUsed = async (user_id) => {
+    try {
+        const response = await fetch(`${DB_SERVER_URL}/users/mark_free_attempt_used`, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ user_id }),
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || "Failed to mark free attempt as used");
+        }
+
+        return await response.json();
+    } catch (error) {
+        console.error("Error marking free attempt as used:", error);
+        throw error;
+    }
+};
