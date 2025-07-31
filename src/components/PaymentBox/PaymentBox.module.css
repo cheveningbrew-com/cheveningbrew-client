@@ -24,7 +24,6 @@
     cursor: not-allowed;
   }
 
-
   .paymentBox {
     display: flex;
     flex-direction: column;
@@ -57,6 +56,13 @@
     opacity: 0.7;
   }
 
+  /* Success state for payment button */
+  .paymentButton:disabled.success {
+    background-color: #2e7d32;
+    color: white;
+    opacity: 1;
+  }
+
   .loadingIcon {
     display: inline-block;
     width: 16px;
@@ -66,6 +72,17 @@
     border-radius: 50%;
     border-top-color: white;
     animation: spin 1s linear infinite;
+  }
+
+  .successIcon {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    margin-right: 8px;
+    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: contain;
   }
 
   .paymentIcon {
@@ -85,10 +102,78 @@
     font-style: italic;
   }
 
+  /* Success message styles */
+  .successMessage {
+    margin-top: 15px;
+    padding: 15px;
+    background-color: #d4edda;
+    border: 1px solid #c3e6cb;
+    border-radius: 8px;
+    color: #155724;
+    text-align: center;
+    animation: fadeIn 0.5s ease-in;
+  }
 
+  .successMessage p {
+    margin: 5px 0;
+  }
+
+  .successMessage p:first-child {
+    font-weight: bold;
+    font-size: 1.1em;
+  }
+
+  .successMessage p:last-child {
+    font-size: 0.9em;
+    opacity: 0.8;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 
   @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
   }
 
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .paymentButton {
+      min-width: 180px;
+      font-size: 14px;
+      padding: 10px 20px;
+    }
+
+    .successMessage {
+      margin-top: 10px;
+      padding: 12px;
+    }
+
+    .successMessage p:first-child {
+      font-size: 1em;
+    }
+
+    .successMessage p:last-child {
+      font-size: 0.85em;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .paymentButton {
+      min-width: 160px;
+      font-size: 13px;
+      padding: 8px 16px;
+    }
+
+    .successMessage {
+      padding: 10px;
+    }
+  }
