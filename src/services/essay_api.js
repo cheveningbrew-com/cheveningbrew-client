@@ -165,7 +165,7 @@ export const pollTaskUntilComplete = async (
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Comprehensive analysis result
  */
-export const getComprehensiveAnalysis = async (dirName, email = null, userName = null, userId = null, options = {}) => {
+export const getComprehensiveAnalysis = async (dirName, email = null, userName = null, userId, options = {}) => {
   try {
     if (!userId) {
       throw new Error("User ID is required for comprehensive analysis");
@@ -214,6 +214,69 @@ export const getComprehensiveAnalysis = async (dirName, email = null, userName =
     
   } catch (error) {
     console.error(`Comprehensive analysis error for ${dirName}:`, error);
+    throw error;
+  }
+};
+
+/**
+ * NEW: Leadership Essay Comprehensive Analysis with Database Integration
+ * For Try Upload - combines leadership assessment + grammar analysis
+ * @param {string} dirName - Directory name containing the extraction
+ * @param {string} email - Optional email address to share documents with
+ * @param {string} userName - User name for personalized feedback
+ * @param {string} userId - User ID for database operations (REQUIRED)
+ * @param {Object} options - Analysis options
+ * @returns {Promise<Object>} Leadership comprehensive analysis result
+ */
+export const getLeadershipComprehensiveAnalysis = async (dirName, email = null, userName = null, userId, options = {}) => {
+  try {
+    if (!userId) {
+      throw new Error("User ID is required for leadership comprehensive analysis");
+    }
+
+    const {
+      onProgress = null,
+      onStatusChange = null,
+      pollingInterval = 10000
+    } = options;
+    
+    // Build URL with required parameters
+    const url = new URL(`${API_BASE_URL}/leadership_reviver/${dirName}`);
+    url.searchParams.append('user_id', userId); // Required parameter
+    if (userName) {
+      url.searchParams.append('user_name', userName);
+    }
+    if (email) {
+      url.searchParams.append('email', email);
+    }
+    
+    const response = await fetch(url.toString());
+    
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(errorData.error || errorData.detail || `Failed to get leadership comprehensive analysis for ${dirName}`);
+    }
+    
+    const result = await response.json();
+    
+    // This endpoint always uses background processing
+    if (result.task_id) {
+      console.log(`👑 Started leadership comprehensive analysis task: ${result.task_id}`);
+      
+      // Poll until completion
+      return await pollTaskUntilComplete(
+        result.task_id,
+        onProgress,
+        onStatusChange,
+        pollingInterval
+      );
+    }
+    
+    // Return direct result if no task ID (shouldn't happen with this endpoint)
+    return result;
+    
+  } catch (error) {
+    console.error(`Leadership comprehensive analysis error for ${dirName}:`, error);
     throw error;
   }
 };
@@ -471,10 +534,11 @@ export default {
   getQueueStatus,
   getTaskStatus,
   pollTaskUntilComplete,
-  getComprehensiveAnalysis,  // NEW: Primary function to use
-  getEssayFeedback,         // LEGACY: Deprecated
-  getCombinedGrammarHemingwayAnalysis, // LEGACY: Deprecated
-  analyzeLeadershipGrammar,
+  getComprehensiveAnalysis,          // For paid subscription users
+  getLeadershipComprehensiveAnalysis, // For free trial users
+  getEssayFeedback,                 // Legacy
+  getCombinedGrammarHemingwayAnalysis, // Legacy
+  analyzeLeadershipGrammar,         // Legacy
   createTaskMonitor,
   getMultipleTaskStatuses,
   cancelTask

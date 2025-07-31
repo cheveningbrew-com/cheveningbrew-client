@@ -8,8 +8,6 @@ const Tabs = () => {
   const tabs = [
     { path: "/upload", label: "Upload" },
     { path: "/feedback", label: "Feedback" },
-    { path: "/try-upload", label: "Try Upload" },
-    { path: "/try-feedback", label: "Try Feedback" },
   ];
 
   return (

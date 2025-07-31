@@ -118,18 +118,26 @@ const TryFeedback = () => {
     setAnalysisResults(prevResults => {
       const updatedResults = { ...prevResults };
       
-      // Update with new Google Drive links if available
-      if (taskResult.google_docs_link) {
-        updatedResults.googleDocs = taskResult.google_docs_link;
-      }
-      if (taskResult.google_drive_link) {
-        updatedResults.googleDrive = taskResult.google_drive_link;
-      }
-      if (taskResult.download_link) {
-        updatedResults.downloadLink = taskResult.download_link;
-      }
-      if (taskResult.analysis_summary) {
-        updatedResults.analysisSummary = taskResult.analysis_summary;
+      // Handle comprehensive analysis result structure
+      if (taskResult.summary) {
+        // Update with new Google Drive links from comprehensive analysis
+        if (taskResult.summary.assessment_document?.google_docs_link) {
+          updatedResults.essayFeedback = taskResult.summary.assessment_document.google_docs_link;
+        }
+        if (taskResult.summary.grammar_style_document?.google_docs_link) {
+          updatedResults.googleDocs = taskResult.summary.grammar_style_document.google_docs_link;
+        }
+        if (taskResult.summary.grammar_style_document?.google_drive_link) {
+          updatedResults.googleDrive = taskResult.summary.grammar_style_document.google_drive_link;
+        }
+        if (taskResult.summary.grammar_style_document?.download_link) {
+          updatedResults.downloadLink = taskResult.summary.grammar_style_document.download_link;
+        }
+        
+        // Update analysis summary
+        updatedResults.analysisSummary = taskResult.summary;
+        updatedResults.totalDocuments = taskResult.summary.total_documents_created || 2;
+        updatedResults.databaseSaved = taskResult.summary.database_saved || false;
       }
       
       // Update sessionStorage with new results
@@ -150,7 +158,7 @@ const TryFeedback = () => {
       'PENDING': { emoji: '⏳', text: 'Waiting in queue' },
       'PROCESSING': { emoji: '🔄', text: 'Processing' },
       'ANALYZING': { emoji: '🧠', text: 'AI Analysis in progress' },
-      'GENERATING': { emoji: '📝', text: 'Creating document' },
+      'GENERATING': { emoji: '📝', text: 'Creating documents' },
       'FINALIZING': { emoji: '☁️', text: 'Uploading to Google Drive' },
       'COMPLETED': { emoji: '✅', text: 'Completed' },
       'FAILED': { emoji: '❌', text: 'Failed' },
@@ -167,7 +175,7 @@ const TryFeedback = () => {
           <div className={`${styles.tryFeedbackContainer} customScroll`}>
             <div className={styles.loadingContainer}>
               <div className={styles.spinner}></div>
-              <h3>👑 Processing Leadership Grammar Analysis</h3>
+              <h3>👑 Processing Comprehensive Leadership Analysis</h3>
               
               {pollingActive && taskStatus && (
                 <div className={styles.taskStatusContainer}>
@@ -189,13 +197,14 @@ const TryFeedback = () => {
                     </div>
                   </div>
                   <div className={styles.estimatedTime}>
-                    <small>⏱️ This may take 5-8 minutes for grammar analysis</small>
+                    <small>⏱️ This may take 12-15 minutes for comprehensive leadership analysis</small>
+                    <small>📊 Creating 2 documents: Assessment + Grammar Analysis</small>
                   </div>
                 </div>
               )}
               
               {!pollingActive && (
-                <p>Loading your analysis results...</p>
+                <p>Loading your comprehensive analysis results...</p>
               )}
             </div>
           </div>
@@ -232,32 +241,51 @@ const TryFeedback = () => {
       <div className={styles.feedbackWrapper}>
         <ActionBox>
           <div className={`${styles.tryFeedbackContainer} customScroll`}>
-            <div className={styles.title}>Leadership Grammar Analysis Results</div>
+            <div className={styles.title}>Comprehensive Leadership Analysis Results</div>
             
-            {/* Show analysis results */}
+            {/* Show comprehensive analysis results */}
             {analysisResults && (
               <div className={uploadStyles.uploadSection}>
                 <div className={uploadStyles.linksContainer}>
-                  <h2 className={uploadStyles.linksTitle}>✅ Grammar Analysis Complete!</h2>
+                  <h2 className={uploadStyles.linksTitle}>✅ Comprehensive Analysis Complete!</h2>
                   
+                  {/* Analysis Documents */}
                   <div className={uploadStyles.linkButtons}>
-                    <a 
-                      href={analysisResults.googleDocs} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
-                    >
-                      ✏️ Edit in Google Docs
-                    </a>
+                    {/* Essay Feedback Document */}
+                    {analysisResults.essayFeedback && (
+                      <a 
+                        href={analysisResults.essayFeedback} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
+                      >
+                        👑 Leadership Essay Assessment
+                      </a>
+                    )}
                     
-                    <a 
-                      href={analysisResults.googleDrive} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={`${uploadStyles.linkButton} ${uploadStyles.driveButton}`}
-                    >
-                      📁 View in Google Drive
-                    </a>
+                    {/* Grammar & Style Document */}
+                    {analysisResults.googleDocs && (
+                      <a 
+                        href={analysisResults.googleDocs} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
+                      >
+                        ✏️ Grammar & Style Analysis
+                      </a>
+                    )}
+                    
+                    {/* Additional Links */}
+                    {analysisResults.googleDrive && (
+                      <a 
+                        href={analysisResults.googleDrive} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.driveButton}`}
+                      >
+                        📁 View in Google Drive
+                      </a>
+                    )}
                     
                     {analysisResults.downloadLink && (
                       <a 
@@ -279,7 +307,12 @@ const TryFeedback = () => {
                   </button>
 
                   <div className={uploadStyles.nextStep}>
-                    <p>Your grammar analysis is available through the links above.</p>
+                    <p>Your comprehensive leadership analysis is available through the links above.</p>
+                    <p><strong>Two documents created:</strong></p>
+                    <ul>
+                      <li>🎯 <strong>Leadership Essay Assessment</strong> - Chevening criteria aligned feedback</li>
+                      <li>📝 <strong>Grammar & Style Analysis</strong> - DOCX with Word comments for improvements</li>
+                    </ul>
                     {analysisResults.fileName && (
                       <small>Original file: {analysisResults.fileName}</small>
                     )}
@@ -295,26 +328,48 @@ const TryFeedback = () => {
                     <div className={styles.summarySection}>
                       <h3>📊 Analysis Summary</h3>
                       <div className={styles.summaryContent}>
-                        <p><strong>Essay Type:</strong> {analysisResults.essayType || 'Leadership Essay'}</p>
-                        {analysisResults.analysisSummary.total_grammar_issues !== undefined && (
-                          <p><strong>Grammar Issues Found:</strong> {analysisResults.analysisSummary.total_grammar_issues}</p>
-                        )}
-                        {analysisResults.analysisSummary.word_count && (
-                          <p><strong>Word Count:</strong> {analysisResults.analysisSummary.word_count}</p>
-                        )}
-                        {analysisResults.analysisSummary.key_issues && (
+                        <p><strong>Analysis Type:</strong> {analysisResults.analysisType || 'Leadership Comprehensive Analysis'}</p>
+                        <p><strong>Documents Created:</strong> {analysisResults.totalDocuments || 2}</p>
+                        <p><strong>Database Saved:</strong> {analysisResults.databaseSaved ? 'Yes' : 'No'}</p>
+                        
+                        {/* Show specific analysis details if available */}
+                        {analysisResults.analysisSummary.assessment_summary && (
                           <div>
-                            <p><strong>Key Areas for Improvement:</strong></p>
-                            <ul className={styles.issuesList}>
-                              {analysisResults.analysisSummary.key_issues.map((issue, index) => (
-                                <li key={index}>{issue}</li>
+                            <p><strong>Assessment Summary:</strong></p>
+                            <div className={styles.issuesList}>
+                              {Object.entries(analysisResults.analysisSummary.assessment_summary).map(([key, value]) => (
+                                <p key={key}><strong>{key.replace(/_/g, ' ').toUpperCase()}:</strong> {value}</p>
                               ))}
-                            </ul>
+                            </div>
+                          </div>
+                        )}
+                        
+                        {analysisResults.analysisSummary.grammar_summary && (
+                          <div>
+                            <p><strong>Grammar Analysis Summary:</strong></p>
+                            <div className={styles.issuesList}>
+                              {Object.entries(analysisResults.analysisSummary.grammar_summary).map(([key, value]) => (
+                                <p key={key}><strong>{key.replace(/_/g, ' ').toUpperCase()}:</strong> {value}</p>
+                              ))}
+                            </div>
                           </div>
                         )}
                       </div>
                     </div>
                   )}
+
+                  {/* Free Trial Used Notice */}
+                  <div className={styles.freeTrialNotice}>
+                    <h4>🎯 Free Trial Complete!</h4>
+                    <p>You've successfully used your free comprehensive leadership analysis.</p>
+                    <p>To analyze all 4 Chevening essays with full features, please subscribe to one of our plans.</p>
+                    <button 
+                      className={styles.upgradeButton}
+                      onClick={() => navigate("/pricing")}
+                    >
+                      View Subscription Plans
+                    </button>
+                  </div>
 
                   {/* Task Information (if available) */}
                   {analysisResults.taskId && (
@@ -322,6 +377,7 @@ const TryFeedback = () => {
                       <h4>Background Processing Information:</h4>
                       <p><strong>Task ID:</strong> {analysisResults.taskId}</p>
                       <p><strong>Directory:</strong> {analysisResults.directoryName}</p>
+                      <p><strong>Analysis Type:</strong> Leadership Comprehensive Revival</p>
                     </div>
                   )}
                 </div>

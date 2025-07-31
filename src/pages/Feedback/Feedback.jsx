@@ -4,7 +4,7 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import uploadStyles from "../Upload/Upload.module.css";
-import { getUserId, readUserField } from "../../services/api";
+import { getUserId } from "../../services/api";
 import { getTaskStatus, getMultipleTaskStatuses } from "../../services/essay_api";
 import ReactMarkdown from "react-markdown";
 
@@ -23,15 +23,15 @@ const Feedback = () => {
       try {
         setLoading(true);
         
-        // First, check for fresh analysis results from recent upload
+        // Check for fresh analysis results from recent upload
         const freshResults = sessionStorage.getItem('latestAnalysisResults');
         if (freshResults) {
           const parsedResults = JSON.parse(freshResults);
           setAnalysisResults(parsedResults);
           
           // Check if there are pending tasks
-          const taskIds = parsedResults.taskIds;
-          if (taskIds && (taskIds.feedbackTaskId || taskIds.analysisTaskId)) {
+          const taskIds = parsedResults.taskIds || [parsedResults.taskId].filter(Boolean);
+          if (taskIds.length > 0) {
             await checkPendingTasks(taskIds);
           } else {
             setLoading(false);
@@ -74,15 +74,14 @@ const Feedback = () => {
   const checkPendingTasks = async (taskIds) => {
     try {
       setPollingActive(true);
-      const taskIdList = Object.values(taskIds).filter(Boolean);
       
-      if (taskIdList.length === 0) {
+      if (taskIds.length === 0) {
         setLoading(false);
         return;
       }
 
       // Check initial status
-      const statuses = await getMultipleTaskStatuses(taskIdList);
+      const statuses = await getMultipleTaskStatuses(taskIds);
       setTaskStatuses(statuses);
 
       // Check if all tasks are completed
@@ -99,7 +98,7 @@ const Feedback = () => {
       // Start polling for incomplete tasks
       const pollInterval = setInterval(async () => {
         try {
-          const updatedStatuses = await getMultipleTaskStatuses(taskIdList);
+          const updatedStatuses = await getMultipleTaskStatuses(taskIds);
           setTaskStatuses(updatedStatuses);
 
           const stillProcessing = updatedStatuses.some(status => 
@@ -153,6 +152,16 @@ const Feedback = () => {
                 updatedResults.googleDocs = task.result.google_docs_link;
               }
             }
+            
+            // Handle comprehensive result structure
+            if (task.result.summary) {
+              if (task.result.summary.assessment_document?.google_docs_link) {
+                updatedResults.essayFeedback = task.result.summary.assessment_document.google_docs_link;
+              }
+              if (task.result.summary.grammar_style_document?.google_docs_link) {
+                updatedResults.googleDocs = task.result.summary.grammar_style_document.google_docs_link;
+              }
+            }
           }
         });
         
@@ -180,6 +189,19 @@ const Feedback = () => {
     };
     
     return statusMap[status] || { emoji: '📋', text: status };
+  };
+
+  // Determine analysis type for display
+  const getAnalysisTypeDisplay = () => {
+    if (!analysisResults) return "Essay Analysis";
+    
+    if (analysisResults.analysisType === "leadership_comprehensive_revival") {
+      return "Leadership Essay Analysis (Free Trial)";
+    } else if (analysisResults.analysisType === "comprehensive_essay_revival") {
+      return "Comprehensive Essay Analysis";
+    } else {
+      return "Essay Analysis";
+    }
   };
 
   if (loading) {
@@ -212,7 +234,7 @@ const Feedback = () => {
                     );
                   })}
                   <div className={styles.estimatedTime}>
-                    <small>⏱️ This may take 15-25 minutes for comprehensive analysis</small>
+                    <small>⏱️ This may take 12-30 minutes depending on analysis type</small>
                   </div>
                 </div>
               )}
@@ -259,32 +281,67 @@ const Feedback = () => {
       <div className={styles.feedbackWrapper}>
         <ActionBox>
           <div className={`${styles.feedbackContent} customScroll`}>
-            <div className={styles.title}>Essay Analysis Results</div>
+            <div className={styles.title}>{getAnalysisTypeDisplay()}</div>
             
-            {/* Show analysis results with upload styling */}
+            {/* Show analysis results */}
             {analysisResults ? (
               <div className={uploadStyles.uploadSection}>
                 <div className={uploadStyles.linksContainer}>
-                  <h2 className={uploadStyles.linksTitle}>Your Analysis is Ready!</h2>
+                  <h2 className={uploadStyles.linksTitle}>
+                    {analysisResults.analysisType === "leadership_comprehensive_revival" 
+                      ? "🆓 Your Free Trial Analysis is Ready!" 
+                      : "✅ Your Analysis is Ready!"}
+                  </h2>
                   
                   <div className={uploadStyles.linkButtons}>
-                    <a 
-                      href={analysisResults.essayFeedback} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
-                    >
-                      📝 View Essay Feedback
-                    </a>
+                    {/* Essay Feedback Document */}
+                    {analysisResults.essayFeedback && (
+                      <a 
+                        href={analysisResults.essayFeedback} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
+                      >
+                        {analysisResults.analysisType === "leadership_comprehensive_revival" 
+                          ? "👑 Leadership Essay Assessment" 
+                          : "📝 Essay Feedback Assessment"}
+                      </a>
+                    )}
                     
-                    <a 
-                      href={analysisResults.googleDocs} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
-                    >
-                      ✏️ Grammar & Style Analysis
-                    </a>
+                    {/* Grammar & Style Document */}
+                    {analysisResults.googleDocs && (
+                      <a 
+                        href={analysisResults.googleDocs} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
+                      >
+                        ✏️ Grammar & Style Analysis
+                      </a>
+                    )}
+                    
+                    {/* Additional Links */}
+                    {analysisResults.googleDrive && (
+                      <a 
+                        href={analysisResults.googleDrive} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.driveButton}`}
+                      >
+                        📁 View in Google Drive
+                      </a>
+                    )}
+                    
+                    {analysisResults.downloadLink && (
+                      <a 
+                        href={analysisResults.downloadLink} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
+                      >
+                        ⬇️ Download DOCX
+                      </a>
+                    )}
                   </div>
                   
                   <button 
@@ -296,6 +353,23 @@ const Feedback = () => {
 
                   <div className={uploadStyles.nextStep}>
                     <p>Your analysis documents are available anytime through the links above.</p>
+                    
+                    {/* Analysis Type Specific Information */}
+                    {analysisResults.analysisType === "leadership_comprehensive_revival" ? (
+                      <div>
+                        <p><strong>Free Trial Complete!</strong> You analyzed your leadership essay.</p>
+                        <p>🎯 To analyze all 4 Chevening essays with full features, please subscribe to one of our plans.</p>
+                        <button 
+                          className={styles.upgradeButton}
+                          onClick={() => navigate("/pricing")}
+                        >
+                          View Subscription Plans
+                        </button>
+                      </div>
+                    ) : (
+                      <p><strong>Comprehensive Analysis Complete!</strong> All 4 essays analyzed with full features.</p>
+                    )}
+                    
                     {analysisResults.fileName && (
                       <small>Original file: {analysisResults.fileName}</small>
                     )}
@@ -306,16 +380,24 @@ const Feedback = () => {
                     )}
                   </div>
 
+                  {/* Analysis Summary */}
+                  {analysisResults.analysisSummary && (
+                    <div className={styles.summarySection}>
+                      <h3>📊 Analysis Summary</h3>
+                      <div className={styles.summaryContent}>
+                        <p><strong>Analysis Type:</strong> {analysisResults.analysisType}</p>
+                        <p><strong>Documents Created:</strong> {analysisResults.totalDocuments || 2}</p>
+                        <p><strong>Database Saved:</strong> {analysisResults.databaseSaved ? 'Yes' : 'No'}</p>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Task Information (if available) */}
-                  {analysisResults.taskIds && (
+                  {analysisResults.taskId && (
                     <div className={styles.taskInfo}>
                       <h4>Background Processing Information:</h4>
-                      {analysisResults.taskIds.feedbackTaskId && (
-                        <p><strong>Essay Feedback Task:</strong> {analysisResults.taskIds.feedbackTaskId}</p>
-                      )}
-                      {analysisResults.taskIds.analysisTaskId && (
-                        <p><strong>Grammar Analysis Task:</strong> {analysisResults.taskIds.analysisTaskId}</p>
-                      )}
+                      <p><strong>Task ID:</strong> {analysisResults.taskId}</p>
+                      <p><strong>Analysis Type:</strong> {analysisResults.analysisType}</p>
                     </div>
                   )}
                 </div>
@@ -334,7 +416,7 @@ const Feedback = () => {
                   <ol>
                     <li>Go to the Upload page</li>
                     <li>Upload your Chevening application essays (PDF format)</li>
-                    <li>Wait for background processing to complete (15-25 minutes)</li>
+                    <li>Wait for background processing to complete (12-30 minutes)</li>
                     <li>Receive detailed writing style analysis and feedback</li>
                   </ol>
                   <button 

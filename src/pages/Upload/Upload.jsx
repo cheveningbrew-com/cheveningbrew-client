@@ -5,9 +5,11 @@ import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Upload.module.css";
 import { 
   uploadEssayFile, 
-  getQueueStatus 
+  getQueueStatus,
+  getComprehensiveAnalysis,
+  getLeadershipComprehensiveAnalysis
 } from "../../services/essay_api";
-import { getUserId, readUserField, getUserSubscription } from "../../services/api";
+import { getUserId, checkSubscriptionStatus } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const Upload = () => {
@@ -17,12 +19,12 @@ const Upload = () => {
   const [analysisProgress, setAnalysisProgress] = useState(null);
   const [currentTask, setCurrentTask] = useState(null);
   const [queueStatus, setQueueStatus] = useState(null);
+  const [analysisType, setAnalysisType] = useState(null);  // Added this
+  const [estimatedTime, setEstimatedTime] = useState(null);  // Added this
   
-  // Access control states
-  const [hasAccess, setHasAccess] = useState(false);
-  const [accessLoading, setAccessLoading] = useState(true);
-  const [subscriptionInfo, setSubscriptionInfo] = useState(null);
-  const [accessMessage, setAccessMessage] = useState("");
+  // Unified subscription status
+  const [subscriptionStatus, setSubscriptionStatus] = useState(null);
+  const [statusLoading, setStatusLoading] = useState(true);
 
   const { userName, userEmail, logout } = useAuth();
   const navigate = useNavigate();
@@ -34,77 +36,39 @@ const Upload = () => {
     }
   }, [userName, navigate]);
 
-  // Check subscription access on component mount
+  // Check comprehensive subscription status on component mount
   useEffect(() => {
-    checkSubscriptionAccess();
+    checkUserStatus();
   }, []);
 
-  const checkSubscriptionAccess = async () => {
+  const checkUserStatus = async () => {
     try {
-      setAccessLoading(true);
+      setStatusLoading(true);
       const userId = getUserId();
       
       if (!userId) {
-        setHasAccess(false);
-        setAccessMessage("Authentication required");
+        navigate("/");
         return;
       }
 
-      // Check payment status
-      const paymentCompleted = await readUserField(userId, "payment_completed");
+      // Get comprehensive subscription status
+      const status = await checkSubscriptionStatus(userId);
+      setSubscriptionStatus(status);
       
-      if (!paymentCompleted) {
-        setHasAccess(false);
-        setAccessMessage("You need an active subscription to upload essays. Please subscribe to continue.");
-        return;
-      }
-
-      // Get subscription details
-      try {
-        const subscription = await getUserSubscription({ user_id: userId, field: "remaining_attempts" });
-        const plan = await getUserSubscription({ user_id: userId, field: "plan" });
-        const totalAttempts = await getUserSubscription({ user_id: userId, field: "total_attempts" });
-        
-        if (subscription.remaining_attempts <= 0) {
-          setHasAccess(false);
-          setAccessMessage(`Your ${plan.plan} subscription has no remaining attempts. Please upgrade or purchase a new subscription.`);
-          setSubscriptionInfo({
-            plan: plan.plan,
-            remaining: 0,
-            total: totalAttempts.total_attempts
-          });
-          return;
-        }
-
-        // User has access
-        setHasAccess(true);
-        setSubscriptionInfo({
-          plan: plan.plan,
-          remaining: subscription.remaining_attempts,
-          total: totalAttempts.total_attempts
-        });
-        
-      } catch (subscriptionError) {
-        console.error("Subscription check error:", subscriptionError);
-        setHasAccess(false);
-        setAccessMessage("No active subscription found. Please subscribe to upload essays.");
-      }
-
     } catch (error) {
-      console.error("Access check error:", error);
-      setHasAccess(false);
-      setAccessMessage("Unable to verify subscription status. Please try again.");
+      console.error("Error checking user status:", error);
+      setError("Unable to verify user status. Please try again.");
     } finally {
-      setAccessLoading(false);
+      setStatusLoading(false);
     }
   };
 
-  // Check queue status on component mount
+  // Check queue status when component loads
   useEffect(() => {
-    if (hasAccess) {
+    if (subscriptionStatus) {
       checkQueueStatus();
     }
-  }, [hasAccess]);
+  }, [subscriptionStatus]);
 
   const checkQueueStatus = async () => {
     try {
@@ -145,139 +109,7 @@ const Upload = () => {
     setCurrentTask(statusData);
   };
 
-  // NEW: Single comprehensive analysis function
-  const getComprehensiveAnalysis = async (dirName, email = null, userName = null, userId = null, options = {}) => {
-    try {
-      const {
-        onProgress = null,
-        onStatusChange = null,
-        pollingInterval = 10000
-      } = options;
-      
-      // Build URL with required parameters
-      const url = new URL(`${process.env.REACT_APP_ESSAY_API_URL || "http://localhost:8000"}/essay_reviver/${dirName}`);
-      url.searchParams.append('user_id', userId); // Required parameter
-      if (userName) {
-        url.searchParams.append('user_name', userName);
-      }
-      if (email) {
-        url.searchParams.append('email', email);
-      }
-      
-      const response = await fetch(url.toString());
-      
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error || errorData.detail || `Failed to get comprehensive analysis for ${dirName}`);
-      }
-      
-      const result = await response.json();
-      
-      // This endpoint always uses background processing
-      if (result.task_id) {
-        console.log(`🔄 Started comprehensive essay analysis task: ${result.task_id}`);
-        
-        // Poll until completion
-        return await pollTaskUntilComplete(
-          result.task_id,
-          onProgress,
-          onStatusChange,
-          pollingInterval
-        );
-      }
-      
-      // Return direct result if no task ID (shouldn't happen with this endpoint)
-      return result;
-      
-    } catch (error) {
-      console.error(`Comprehensive analysis error for ${dirName}:`, error);
-      throw error;
-    }
-  };
-
-  // Utility function to poll task status (moved from essay_api.js)
-  const pollTaskUntilComplete = async (
-    taskId, 
-    onProgress = null, 
-    onStatusChange = null,
-    pollingInterval = 3000,
-    maxAttempts = 200
-  ) => {
-    let attempts = 0;
-    
-    while (attempts < maxAttempts) {
-      try {
-        const response = await fetch(`${process.env.REACT_APP_ESSAY_API_URL || "http://localhost:8000"}/task-status/${taskId}`);
-        
-        if (!response.ok) {
-          throw new Error("Failed to get task status");
-        }
-        
-        const statusResponse = await response.json();
-        
-        // Call status change callback
-        if (onStatusChange) {
-          onStatusChange(statusResponse);
-        }
-        
-        // Handle different states
-        switch (statusResponse.status) {
-          case 'COMPLETED':
-            console.log("✅ Task completed successfully");
-            return statusResponse.result;
-            
-          case 'FAILED':
-            console.error("❌ Task failed:", statusResponse.error);
-            throw new Error(statusResponse.error || "Task failed");
-            
-          case 'PROCESSING':
-          case 'ANALYZING':
-          case 'GENERATING':
-          case 'FINALIZING':
-            // Call progress callback if available
-            if (onProgress && statusResponse.meta) {
-              onProgress({
-                status: statusResponse.status,
-                step: statusResponse.meta.step || '',
-                message: statusResponse.meta.status || '',
-                progress: statusResponse.meta.progress || 0,
-                current: statusResponse.meta.current || 0,
-                total: statusResponse.meta.total || 100
-              });
-            }
-            
-            console.log(`🔄 Task ${statusResponse.status.toLowerCase()}: ${statusResponse.meta?.status || 'Processing...'}`);
-            break;
-            
-          case 'PENDING':
-            console.log("⏳ Task is pending...");
-            break;
-            
-          default:
-            console.log(`📋 Task status: ${statusResponse.status}`);
-        }
-        
-        // Wait before next poll
-        await new Promise(resolve => setTimeout(resolve, pollingInterval));
-        attempts++;
-        
-      } catch (error) {
-        console.error(`Polling attempt ${attempts + 1} failed:`, error);
-        attempts++;
-        
-        if (attempts >= maxAttempts) {
-          throw new Error("Task polling timeout - maximum attempts reached");
-        }
-        
-        // Wait before retry
-        await new Promise(resolve => setTimeout(resolve, pollingInterval));
-      }
-    }
-    
-    throw new Error("Task polling timeout");
-  };
-
-  // Handle file upload and analysis
+  // Main upload and analysis handler with routing logic
   const handleUpload = async () => {
     if (!selectedFile) {
       setError("Please select a file first.");
@@ -289,19 +121,82 @@ const Upload = () => {
       return;
     }
 
+    if (!subscriptionStatus) {
+      setError("Unable to verify subscription status. Please refresh the page.");
+      return;
+    }
+
     try {
       setIsLoading(true);
       setError(null);
       setAnalysisProgress(null);
       setCurrentTask(null);
+      setAnalysisType(null);  
+      setEstimatedTime(null);
       
       const userId = getUserId();
+
+      // 🚦 STEP 1: CHECK SUBSCRIPTION STATUS FIRST (BEFORE UPLOAD)
+      let analysisEndpoint;
+      let analysisTypeToUse;
+      let estimatedTimeToUse;
       
-      // Step 1: Upload the file
+      // Condition 1: Free attempt available (no payment, no subscription, free attempt not used)
+      if (subscriptionStatus.is_free_attempt_used === false && 
+          subscriptionStatus.payment_completed === false && 
+          subscriptionStatus.has_active_subscription === false) {
+        
+        console.log("🆓 Will use free leadership analysis");
+        analysisEndpoint = "leadership";
+        analysisTypeToUse = "leadership_comprehensive";
+        estimatedTimeToUse = "12-15 minutes";
+        
+        setAnalysisProgress({
+          step: "1/3",
+          message: "🆓 Free Trial: Will analyze your leadership essay only",
+          progress: 5,
+          status: "PREPARING"
+        });
+        
+      } 
+      // Condition 2: Active subscription with remaining attempts
+      else if (subscriptionStatus.payment_completed === true && 
+               subscriptionStatus.has_active_subscription === true && 
+               subscriptionStatus.remaining_attempts > 0) {
+        
+        console.log("💰 Will use comprehensive subscription analysis");
+        analysisEndpoint = "comprehensive";
+        analysisTypeToUse = "comprehensive_essay_revival";
+        estimatedTimeToUse = "25-30 minutes";
+        
+        setAnalysisProgress({
+          step: "1/3",
+          message: "💰 Premium Analysis: Will analyze all 4 Chevening essays",
+          progress: 5,
+          status: "PREPARING"
+        });
+        
+      } 
+      // Condition 3: All other cases - redirect to pricing
+      else {
+        console.log("💳 Redirecting to pricing page");
+        setIsLoading(false);
+        navigate("/pricing");
+        return;
+      }
+
+      // Set the determined analysis type and time
+      setAnalysisType(analysisTypeToUse);
+      setEstimatedTime(estimatedTimeToUse);
+
+      // Brief pause to show user what analysis they'll get
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      // STEP 2: Upload the file
       setAnalysisProgress({
-        step: "1/2",
+        step: "2/3",
         message: "Uploading PDF and extracting text...",
-        progress: 10,
+        progress: 15,
         status: "UPLOADING"
       });
 
@@ -311,59 +206,93 @@ const Upload = () => {
         throw new Error(uploadResult.message || "Upload failed");
       }
       
-      // Step 2: Extract directory name from path
+      // Extract directory name from path
       const extractedTextPath = uploadResult.extracted_text_dir;
       const pathParts = extractedTextPath.split('/');
       const dirName = pathParts[1]; // Format: "text_outs/dirName"
       
       setAnalysisProgress({
-        step: "2/2",
-        message: "Starting comprehensive essay analysis...",
-        progress: 25,
+        step: "3/3",
+        message: `Starting ${analysisTypeToUse === "leadership_comprehensive" ? "leadership" : "comprehensive"} analysis...`,
+        progress: 30,
         status: "INITIALIZING"
       });
 
-      // Step 3: Start single comprehensive analysis (replaces both previous calls)
-      const comprehensiveResult = await getComprehensiveAnalysis(dirName, userEmail, userName, userId, {
-        onProgress: (progress) => {
-          handleProgress({
-            ...progress,
-            step: "2/2",
-            message: progress.message || 'Running comprehensive analysis...',
-            progress: 25 + (progress.progress || 0) * 0.75 // 25-100%
-          });
-        },
-        onStatusChange: handleStatusChange
-      });
+      // STEP 3: Run the predetermined analysis
+      let analysisResult;
 
-      // Step 4: Extract the analysis results
-      const analysisData = {
-        // The comprehensive endpoint returns both documents in the summary
-        googleDocs: comprehensiveResult.summary?.grammar_style_document?.google_docs_link,
-        essayFeedback: comprehensiveResult.summary?.assessment_document?.google_docs_link,
-        timestamp: new Date().toISOString(),
-        fileName: selectedFile.name,
-        taskId: comprehensiveResult.task_info?.task_id,
-        // Additional information from comprehensive analysis
-        totalDocuments: comprehensiveResult.summary?.total_documents_created || 2,
-        databaseSaved: comprehensiveResult.summary?.database_saved || false,
-        analysisType: "comprehensive_essay_revival"
-      };
+      if (analysisEndpoint === "leadership") {
+        // Free trial - Leadership analysis
+        analysisResult = await getLeadershipComprehensiveAnalysis(dirName, userEmail, userName, userId, {
+          onProgress: (progress) => {
+            handleProgress({
+              ...progress,
+              step: "3/3",
+              message: `Leadership Analysis: ${progress.message || 'Analyzing leadership essay...'}`,
+              progress: 30 + (progress.progress || 0) * 0.7 // 30-100%
+            });
+          },
+          onStatusChange: handleStatusChange
+        });
 
-      // Store in sessionStorage for immediate access
-      sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
-      
+        // Store results for free trial format
+        const analysisData = {
+          essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
+          googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
+          googleDrive: analysisResult.summary?.grammar_style_document?.google_drive_link,
+          downloadLink: analysisResult.summary?.grammar_style_document?.download_link,
+          timestamp: new Date().toISOString(),
+          fileName: selectedFile.name,
+          directoryName: dirName,
+          taskId: analysisResult.task_info?.task_id,
+          analysisSummary: analysisResult.summary,
+          totalDocuments: analysisResult.summary?.total_documents_created || 2,
+          databaseSaved: analysisResult.summary?.database_saved || false,
+          analysisType: "leadership_comprehensive_revival"
+        };
+
+        sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
+        
+      } else if (analysisEndpoint === "comprehensive") {
+        // Paid subscription - Comprehensive analysis
+        analysisResult = await getComprehensiveAnalysis(dirName, userEmail, userName, userId, {
+          onProgress: (progress) => {
+            handleProgress({
+              ...progress,
+              step: "3/3",
+              message: progress.message || 'Running comprehensive analysis...',
+              progress: 30 + (progress.progress || 0) * 0.7 // 30-100%
+            });
+          },
+          onStatusChange: handleStatusChange
+        });
+
+        // Store results for comprehensive format
+        const analysisData = {
+          googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
+          essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
+          timestamp: new Date().toISOString(),
+          fileName: selectedFile.name,
+          taskId: analysisResult.task_info?.task_id,
+          totalDocuments: analysisResult.summary?.total_documents_created || 2,
+          databaseSaved: analysisResult.summary?.database_saved || false,
+          analysisType: "comprehensive_essay_revival"
+        };
+
+        sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
+      }
+
       setAnalysisProgress({
-        step: "2/2",
-        message: "Analysis complete! Documents created and saved to database.",
+        step: "3/3",
+        message: "Analysis complete! Redirecting to results...",
         progress: 100,
         status: "COMPLETED"
       });
 
-      // Refresh subscription info after successful upload
-      await checkSubscriptionAccess();
+      // Refresh user status after successful analysis
+      await checkUserStatus();
 
-      // Step 5: Redirect to feedback section
+      // Redirect to feedback section
       setTimeout(() => {
         navigate("/feedback");
       }, 1500);
@@ -371,18 +300,21 @@ const Upload = () => {
     } catch (err) {
       console.error("Upload and analysis error:", err);
       
-      // Handle specific queue full error
+      // Handle specific errors
       if (err.message?.includes("queue is full")) {
         setError("Analysis queue is currently full. Please try again in a few minutes.");
-        await checkQueueStatus(); // Update queue status
+        await checkQueueStatus();
+      } else if (err.message?.includes("You've used your free leadership analysis")) {
+        setError("Free trial already used. Please subscribe for full analysis features.");
+        await checkUserStatus();
       } else if (err.message?.includes("No attempts remaining")) {
         setError("You have no remaining attempts. Please upgrade your subscription.");
-        await checkSubscriptionAccess(); // Refresh access status
+        await checkUserStatus();
       } else {
         setError(`Error: ${err.message || "Unknown error occurred"}`);
       }
       
-      // If the error is due to authentication issues, redirect to login
+      // If authentication issues, redirect to login
       if (err.message?.includes("unauthorized") || err.message?.includes("not authenticated")) {
         logout();
         navigate("/");
@@ -398,6 +330,8 @@ const Upload = () => {
     setError(null);
     setAnalysisProgress(null);
     setCurrentTask(null);
+    setAnalysisType(null);  
+    setEstimatedTime(null);  // Added this
     
     // Reset file input
     const fileInput = document.getElementById("file-upload");
@@ -408,82 +342,14 @@ const Upload = () => {
     navigate("/pricing");
   };
 
-  if (accessLoading) {
+  if (statusLoading) {
     return (
       <MainLayout>
         <ActionBox>
           <div className={`${styles.uploadContainer} customScroll`}>
             <div className={styles.loadingContainer}>
               <div className={styles.spinner}></div>
-              <p>Checking subscription status...</p>
-            </div>
-          </div>
-        </ActionBox>
-      </MainLayout>
-    );
-  }
-
-  if (!hasAccess) {
-    return (
-      <MainLayout>
-        <ActionBox>
-          <div className={`${styles.uploadContainer} customScroll`}>
-            <h1 className={styles.title}>
-              Upload your Chevening Application Essays
-            </h1>
-            
-            <div className={styles.accessDeniedSection}>
-              <div className={styles.accessDeniedMessage}>
-                <h2>🔒 Subscription Required</h2>
-                <p>{accessMessage}</p>
-                
-                {subscriptionInfo && (
-                  <div className={styles.subscriptionInfo}>
-                    <p><strong>Current Plan:</strong> {subscriptionInfo.plan}</p>
-                    <p><strong>Attempts Used:</strong> {subscriptionInfo.total - subscriptionInfo.remaining}/{subscriptionInfo.total}</p>
-                  </div>
-                )}
-              </div>
-              
-              {/* Inline Pricing Section */}
-              <div className={styles.inlinePricing}>
-                <h3>💳 Choose Your Plan</h3>
-                <div className={styles.pricingGrid}>
-                  <div className={styles.planCard}>
-                    <h4>Basic</h4>
-                    <div className={styles.price}>$5.00</div>
-                    <ul>
-                      <li>3 attempts</li>
-                      <li>20 minutes</li>
-                      <li>Quick practice!</li>
-                    </ul>
-                  </div>
-                  <div className={styles.planCard}>
-                    <h4>Standard</h4>
-                    <div className={styles.price}>$10.00</div>
-                    <ul>
-                      <li>10 attempts</li>
-                      <li>60 minutes</li>
-                      <li>Refining answers!</li>
-                    </ul>
-                  </div>
-                  <div className={styles.planCard}>
-                    <h4>Premium</h4>
-                    <div className={styles.price}>$15.00</div>
-                    <ul>
-                      <li>20 attempts</li>
-                      <li>100 minutes</li>
-                      <li>Serious prep!</li>
-                    </ul>
-                  </div>
-                </div>
-                <button 
-                  className={styles.pricingButton}
-                  onClick={handleGoToPricing}
-                >
-                  View Pricing & Subscribe
-                </button>
-              </div>
+              <p>Checking your account status...</p>
             </div>
           </div>
         </ActionBox>
@@ -499,9 +365,23 @@ const Upload = () => {
             Upload your Chevening Application Essays
           </h1>
           
-          {subscriptionInfo && (
-            <div className={styles.subscriptionStatus}>
-              <p><strong>Plan:</strong> {subscriptionInfo.plan} | <strong>Attempts Remaining:</strong> {subscriptionInfo.remaining}</p>
+          {/* Status Display */}
+          {subscriptionStatus && (
+            <div className={styles.statusDisplay}>
+              {subscriptionStatus.has_active_subscription ? (
+                <div className={styles.subscriptionStatus}>
+                  <p><strong>Plan:</strong> {subscriptionStatus.subscription_plan} | 
+                     <strong>Attempts Remaining:</strong> {subscriptionStatus.remaining_attempts}</p>
+                </div>
+              ) : !subscriptionStatus.is_free_attempt_used ? (
+                <div className={styles.freeTrialStatus}>
+                  <p>🆓 <strong>Free Trial Available:</strong> Leadership essay analysis</p>
+                </div>
+              ) : (
+                <div className={styles.upgradeStatus}>
+                  <p>💰 <strong>Subscription Required:</strong> Free trial used</p>
+                </div>
+              )}
             </div>
           )}
           
@@ -514,6 +394,7 @@ const Upload = () => {
               </div>
             )}
 
+            {/* File Input - Always Show */}
             <div className={styles.fileInputContainer}>
               <input
                 type="file"
@@ -530,19 +411,31 @@ const Upload = () => {
             
             {error && <div className={styles.errorMessage}>{error}</div>}
             
-            <button
-              className={styles.uploadButton}
-              onClick={handleUpload}
-              disabled={!selectedFile || isLoading}
-            >
-              {isLoading ? "Processing..." : "Upload & Analyze"}
-            </button>
+            {/* Dynamic Upload Button */}
+            {subscriptionStatus && (
+              <button
+                className={styles.uploadButton}
+                onClick={handleUpload}
+                disabled={!selectedFile || isLoading}
+              >
+                {isLoading ? "Processing..." : 
+                 !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed 
+                   ? "Use Free Trial - Leadership Analysis" 
+                   : subscriptionStatus.can_upload 
+                     ? "Upload & Analyze All Essays"
+                     : "Upload & Analyze"}
+              </button>
+            )}
 
             {/* Enhanced Progress Display */}
             {isLoading && analysisProgress && (
               <div className={styles.loadingContainer}>
                 <div className={styles.progressHeader}>
-                  <h3>🎓 Comprehensive Analysis in Progress</h3>
+                  <h3>
+                    {analysisProgress.status === "UPLOADING" ? "📤 Uploading..." :
+                     analysisType === "leadership_comprehensive" ? "👑 Leadership Analysis" :
+                     "🎓 Comprehensive Analysis"}
+                  </h3>
                   <p>{analysisProgress.step}</p>
                 </div>
                 
@@ -571,9 +464,9 @@ const Upload = () => {
                   </div>
                 )}
 
-                {/* Estimated Time */}
+                {/* Dynamic Estimated Time */}
                 <div className={styles.estimatedTime}>
-                  <small>⏱️ Estimated time: 25-30 minutes for comprehensive analysis + database integration</small>
+                  <small>⏱️ Estimated time: {estimatedTime || "Processing analysis..."}</small>
                 </div>
               </div>
             )}
@@ -586,6 +479,18 @@ const Upload = () => {
               >
                 Reset
               </button>
+            )}
+
+            {/* Pricing Information for Users Who Need It */}
+            {subscriptionStatus && subscriptionStatus.needs_payment && (
+              <div className={styles.inlinePricing}>
+                <button 
+                  className={styles.pricingButton}
+                  onClick={handleGoToPricing}
+                >
+                  View Pricing & Subscribe
+                </button>
+              </div>
             )}
           </div>
         </div>

@@ -5,10 +5,10 @@ import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./TryUpload.module.css";
 import { 
   uploadEssayFile, 
-  analyzeLeadershipGrammar,
+  getLeadershipComprehensiveAnalysis,
   getQueueStatus 
 } from "../../services/essay_api";
-import { getUserId, readUserField, markFreeAttemptUsed } from "../../services/api";
+import { getUserId, readUserField, } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
 const TryUpload = () => {
@@ -147,7 +147,7 @@ const TryUpload = () => {
       setCurrentTask(null);
       
       const userId = getUserId();
-      console.log("Starting upload and analysis for free trial...");
+      console.log("Starting upload and comprehensive leadership analysis for free trial...");
       
       // Step 1: Upload the file
       setAnalysisProgress({
@@ -172,19 +172,18 @@ const TryUpload = () => {
       
       setAnalysisProgress({
         step: "2/4",
-        message: "Starting leadership grammar analysis...",
+        message: "Starting comprehensive leadership analysis...",
         progress: 30,
         status: "INITIALIZING"
       });
 
-      // Step 3: Start background leadership grammar analysis
-      const analysisResult = await analyzeLeadershipGrammar(dirName, userEmail, {
-        useBackground: true,
+      // Step 3: Start comprehensive leadership analysis (NEW!)
+      const comprehensiveResult = await getLeadershipComprehensiveAnalysis(dirName, userEmail, userName, userId, {
         onProgress: (progress) => {
           handleProgress({
             ...progress,
             step: "3/4",
-            message: `Grammar Analysis: ${progress.message || 'Analyzing leadership essay...'}`,
+            message: `Leadership Analysis: ${progress.message || 'Analyzing leadership essay comprehensively...'}`,
             progress: 30 + (progress.progress || 0) * 0.5 // 30-80%
           });
         },
@@ -199,26 +198,28 @@ const TryUpload = () => {
         status: "FINALIZING"
       });
 
-      try {
-        await markFreeAttemptUsed(userId);
-        console.log("Free attempt marked as used successfully");
-      } catch (markError) {
-        console.error("Error marking free attempt as used:", markError);
-        // Don't fail the entire process if marking fails
-        // But log it for debugging
-      }
       
-      // Step 5: Store the analysis results for the feedback section
+      // Step 5: Store the comprehensive analysis results (NEW FORMAT!)
       const analysisData = {
-        googleDocs: analysisResult.google_docs_link,
-        googleDrive: analysisResult.google_drive_link,
-        downloadLink: analysisResult.download_link,
+        // Leadership Essay Assessment (Feedback)
+        essayFeedback: comprehensiveResult.summary?.assessment_document?.google_docs_link,
+        // Grammar & Style Analysis  
+        googleDocs: comprehensiveResult.summary?.grammar_style_document?.google_docs_link,
+        googleDrive: comprehensiveResult.summary?.grammar_style_document?.google_drive_link,
+        downloadLink: comprehensiveResult.summary?.grammar_style_document?.download_link,
+        
+        // Analysis metadata
         timestamp: new Date().toISOString(),
         fileName: selectedFile.name,
         directoryName: dirName,
-        essayType: analysisResult.essay_type || 'leadership_essay',
-        taskId: analysisResult.task_info?.task_id,
-        analysisSummary: analysisResult.analysis_summary
+        essayType: 'leadership_essay_comprehensive',
+        taskId: comprehensiveResult.task_info?.task_id,
+        
+        // Comprehensive analysis summary
+        analysisSummary: comprehensiveResult.summary,
+        totalDocuments: comprehensiveResult.summary?.total_documents_created || 2,
+        databaseSaved: comprehensiveResult.summary?.database_saved || false,
+        analysisType: "leadership_comprehensive_revival"
       };
 
       // Store in sessionStorage for immediate access
@@ -226,12 +227,12 @@ const TryUpload = () => {
       
       setAnalysisProgress({
         step: "4/4",
-        message: "Analysis complete! Free trial used. Redirecting to results...",
+        message: "Comprehensive analysis complete! Free trial used. Redirecting to results...",
         progress: 100,
         status: "COMPLETED"
       });
 
-      console.log("Upload and analysis successful! Navigating to Try Feedback...");
+      console.log("Upload and comprehensive analysis successful! Navigating to Try Feedback...");
       
       // Step 6: Redirect to try feedback section
       setTimeout(() => {
@@ -239,12 +240,15 @@ const TryUpload = () => {
       }, 2000); // Slightly longer delay to show completion message
       
     } catch (err) {
-      console.error("Upload and analysis error:", err);
+      console.error("Upload and comprehensive analysis error:", err);
       
       // Handle specific queue full error
       if (err.message?.includes("queue is full")) {
         setError("Analysis queue is currently full. Please try again in a few minutes.");
         await checkQueueStatus(); // Update queue status
+      } else if (err.message?.includes("You've used your free leadership analysis")) {
+        setError("Free trial already used. Please subscribe for full analysis features.");
+        await checkFreeTrialAccess(); // Refresh access status
       } else {
         setError(`Error: ${err.message || "Unknown error occurred"}`);
       }
@@ -300,7 +304,7 @@ const TryUpload = () => {
         <ActionBox>
           <div className={`${styles.tryUploadContainer} customScroll`}>
             <h1 className={styles.title}>
-              Try Upload - Demo PDF Analysis
+              Try Upload - Comprehensive Leadership Analysis
             </h1>
             
             <div className={styles.accessDeniedSection}>
@@ -324,11 +328,12 @@ const TryUpload = () => {
                     <div className={styles.freeTrialInfo}>
                       <h3>🎓 What you get with a subscription:</h3>
                       <ul>
-                        <li>✅ Complete essay feedback analysis</li>
-                        <li>✅ Grammar and style analysis</li>
+                        <li>✅ Complete essay feedback analysis (all 4 essays)</li>
+                        <li>✅ Grammar and style analysis (all 4 essays)</li>
                         <li>✅ Multiple attempts</li>
                         <li>✅ Personalized feedback</li>
                         <li>✅ Google Docs integration</li>
+                        <li>✅ Database tracking & attempt management</li>
                       </ul>
                     </div>
                     
@@ -386,7 +391,7 @@ const TryUpload = () => {
       <ActionBox>
         <div className={`${styles.tryUploadContainer} customScroll`}>
           <h1 className={styles.title}>
-            Try Upload - Demo PDF Analysis
+            Try Upload - Comprehensive Leadership Analysis
           </h1>
           
           <div className={styles.uploadSection}>
@@ -400,18 +405,18 @@ const TryUpload = () => {
 
             {/* Info Box */}
             <div className={styles.infoBox}>
-              <h3 className={styles.infoTitle}>🎯 Try Our PDF Analysis (Free Trial)</h3>
+              <h3 className={styles.infoTitle}>🎯 Try Our Comprehensive Leadership Analysis (Free Trial)</h3>
               <div className={styles.infoContent}>
                 <p><strong>This is your FREE trial attempt!</strong></p>
-                <p>Upload a PDF containing Chevening essays to test our leadership essay grammar analysis.</p>
-                <p>This demo will:</p>
+                <p>Upload a PDF containing your leadership essay to test our comprehensive analysis.</p>
+                <p>This demo will generate TWO documents:</p>
                 <ul className={styles.featureList}>
-                  <li>✅ Extract text from your PDF</li>
-                  <li>✅ Analyze leadership essay grammar and spelling</li>
-                  <li>✅ Create DOCX with Word comments</li>
-                  <li>✅ Share via Google Drive & Docs</li>
+                  <li>👑 <strong>Leadership Essay Assessment</strong> - Chevening criteria aligned feedback</li>
+                  <li>✏️ <strong>Grammar & Style Analysis</strong> - DOCX with Word comments</li>
+                  <li>☁️ Share via Google Drive & Docs</li>
+                  <li>💾 Database integration for attempt tracking</li>
                 </ul>
-                <p><strong>Note:</strong> After using your free trial, you'll need a subscription for full analysis features.</p>
+                <p><strong>Note:</strong> After using your free trial, you'll need a subscription for full analysis features (all 4 essays).</p>
               </div>
             </div>
             
@@ -436,14 +441,14 @@ const TryUpload = () => {
               onClick={handleUpload}
               disabled={!selectedFile || isLoading}
             >
-              {isLoading ? "Processing..." : "Use Free Trial"}
+              {isLoading ? "Processing..." : "Use Free Trial - Comprehensive Analysis"}
             </button>
 
             {/* Enhanced Progress Display */}
             {isLoading && analysisProgress && (
               <div className={styles.loadingContainer}>
                 <div className={styles.progressHeader}>
-                  <h3>👑 Analyzing Leadership Essay (Free Trial)</h3>
+                  <h3>👑 Comprehensive Leadership Analysis (Free Trial)</h3>
                   <p>{analysisProgress.step}</p>
                 </div>
                 
@@ -476,7 +481,8 @@ const TryUpload = () => {
                 )}
 
                 <div className={styles.estimatedTime}>
-                  <small>⏱️ Estimated time: 5-8 minutes for grammar analysis</small>
+                  <small>⏱️ Estimated time: 12-15 minutes for comprehensive leadership analysis</small>
+                  <small>📊 Creating 2 documents: Assessment + Grammar Analysis</small>
                 </div>
               </div>
             )}

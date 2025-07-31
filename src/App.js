@@ -7,8 +7,6 @@ import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LandingPage from "./pages/Landing/LandingPage";
 import Upload from "./pages/Upload/Upload";
 import Feedback from "./pages/Feedback/Feedback";
-import TryUpload from "./pages/TryUpload/TryUpload";
-import TryFeedback from "./pages/TryFeedback/TryFeedback";
 import Help from "./pages/SupportPages/Help/Help";
 import About from "./pages/SupportPages/About/About";
 import Pricing from "./pages/SupportPages/Pricing/Pricing";
@@ -19,30 +17,27 @@ const App = () => {
   return (
     <>
       <MetaTags />
-    <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<LandingPage />} />
-            <Route path="/help" element={<Help />} />
-            <Route path="/about" element={<About />} />
-            <Route path="/pricing" element={<Pricing />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/terms" element={<Terms />} />
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}>
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              {/* Public Routes */}
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/help" element={<Help />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/pricing" element={<Pricing />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/terms" element={<Terms />} />
 
-            {/* Protected Routes */}
-            {/* #AUTH_REMOVED */}
-            <Route element={<ProtectedRoute />}>
-              <Route path="/upload" element={<Upload />} />
-              <Route path="/feedback" element={<Feedback />} />
-              <Route path="/try-upload" element={<TryUpload />} />
-              <Route path="/try-feedback" element={<TryFeedback />} />
-            </Route>
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-    </GoogleOAuthProvider>
+              {/* Protected Routes - Simplified */}
+              <Route element={<ProtectedRoute />}>
+                <Route path="/upload" element={<Upload />} />
+                <Route path="/feedback" element={<Feedback />} />
+              </Route>
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </GoogleOAuthProvider>
     </>
   );
 };

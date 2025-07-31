@@ -232,27 +232,31 @@ export const updateUserSubscription = async ({ field, value }) => {
     return response.json();
 };
 
-// Add this to services/api.js
+// Check user's subscription and payment status
+export const checkSubscriptionStatus = async (user_id) => {
+    if (!user_id) {
+        throw new Error("User ID is required");
+    }
 
-// Mark free attempt as used
-export const markFreeAttemptUsed = async (user_id) => {
     try {
-        const response = await fetch(`${DB_SERVER_URL}/users/mark_free_attempt_used`, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
+        const response = await fetch(`${DB_SERVER_URL}/users/check_subscription_status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ user_id }),
         });
 
         if (!response.ok) {
-            const errorData = await response.json();
-            throw new Error(errorData.detail || "Failed to mark free attempt as used");
+            const errorText = await response.text();
+            throw new Error(`Failed to check subscription status: ${response.status} - ${response.statusText}, Details: ${errorText}`);
         }
 
-        return await response.json();
+        const data = await response.json();
+        return data;
     } catch (error) {
-        console.error("Error marking free attempt as used:", error);
+        console.error("Error checking subscription status:", error.message);
         throw error;
     }
 };
+
+
+

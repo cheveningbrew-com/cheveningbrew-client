@@ -263,3 +263,85 @@
     font-size: 0.85rem;
   }
 }
+
+/* Add these styles to your existing Feedback.module.css */
+
+.upgradeButton {
+  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
+  color: #4b0082;
+  border: none;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.upgradeButton:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.summarySection {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  text-align: left;
+}
+
+.summarySection h3 {
+  color: #ffe585;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.summaryContent {
+  background: rgba(0, 0, 0, 0.3);
+  padding: 1rem;
+  border-radius: 6px;
+  color: #fff;
+  font-size: 0.9rem;
+}
+
+.summaryContent p {
+  margin-bottom: 0.5rem;
+}
+
+.taskInfo {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  text-align: left;
+}
+
+.taskInfo h4 {
+  color: #ffe585;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.taskInfo p {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  margin-bottom: 0.3rem;
+}
+
+/* Mobile responsiveness */
+@media screen and (max-width: 480px) {
+  .upgradeButton {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem;
+  }
+  
+  .summarySection {
+    padding: 1rem;
+  }
+  
+  .summaryContent {
+    font-size: 0.8rem;
+  }
+}
