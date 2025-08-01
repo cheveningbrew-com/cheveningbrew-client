@@ -12,7 +12,7 @@ import About from "./pages/SupportPages/About/About";
 import Pricing from "./pages/SupportPages/Pricing/Pricing";
 import Privacy from "./pages/SupportPages/Privacy/Privacy";
 import Terms from "./pages/SupportPages/Terms/Terms";
-
+import Profile from "./pages/Profile/Profile"
 const App = () => {
   return (
     <>
@@ -33,6 +33,7 @@ const App = () => {
               <Route element={<ProtectedRoute />}>
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/feedback" element={<Feedback />} />
+                <Route path="/profile" element={<Profile />} />
               </Route>
             </Routes>
           </AuthProvider>

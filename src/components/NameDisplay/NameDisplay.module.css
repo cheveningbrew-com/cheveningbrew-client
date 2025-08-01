@@ -1,6 +1,12 @@
 .nameContainer {
     text-align: right;
     padding: 0 10px;
+    cursor: pointer;
+    transition: opacity 0.3s ease;
+  }
+
+  .nameContainer:hover {
+    opacity: 0.8;
   }
 
   .welcomeText {
