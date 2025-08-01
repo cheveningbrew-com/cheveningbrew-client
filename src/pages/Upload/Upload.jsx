@@ -366,7 +366,7 @@ const Upload = () => {
           </h1>
           
           {/* Status Display */}
-          {subscriptionStatus && (
+          {/* {subscriptionStatus && (
             <div className={styles.statusDisplay}>
               {subscriptionStatus.has_active_subscription ? (
                 <div className={styles.subscriptionStatus}>
@@ -383,7 +383,7 @@ const Upload = () => {
                 </div>
               )}
             </div>
-          )}
+          )} */}
           
           <div className={styles.uploadSection}>
             {/* Queue Status Display */}
@@ -482,7 +482,7 @@ const Upload = () => {
             )}
 
             {/* Pricing Information for Users Who Need It */}
-            {subscriptionStatus && subscriptionStatus.needs_payment && (
+            {/* {subscriptionStatus && subscriptionStatus.needs_payment && (
               <div className={styles.inlinePricing}>
                 <button 
                   className={styles.pricingButton}
@@ -491,7 +491,7 @@ const Upload = () => {
                   View Pricing & Subscribe
                 </button>
               </div>
-            )}
+            )} */}
           </div>
         </div>
       </ActionBox>
