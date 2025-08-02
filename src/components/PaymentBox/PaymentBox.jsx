@@ -10,7 +10,8 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
   const [payHereLoaded, setPayHereLoaded] = useState(false);
   const [showPaidPopup, setShowPaidPopup] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  
+  const [freeAttemptUsed, setFreeAttemptUsed] = useState(false);
+ const [checkingFreeAttempt, setCheckingFreeAttempt] = useState(true);
   const navigate = useNavigate();
 
   // Load PayHere script
@@ -31,6 +32,29 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
     loadPayHereScript();
   }, []);
+
+  // Check if free attempt was already used
+useEffect(() => {
+  const checkFreeAttemptStatus = async () => {
+    if (plan.id === 'free') {
+      try {
+        const userId = getUserId();
+        if (userId) {
+          const freeAttemptUsed = await readUserField(userId, "free_attempt_used");
+          setFreeAttemptUsed(freeAttemptUsed === true);
+        }
+      } catch (error) {
+        console.error("Error checking free attempt status:", error);
+      } finally {
+        setCheckingFreeAttempt(false);
+      }
+    } else {
+      setCheckingFreeAttempt(false);
+    }
+  };
+
+  checkFreeAttemptStatus();
+}, [plan.id]);
 
   const handlePaymentComplete = useCallback(async (orderId) => {
     try {
@@ -54,7 +78,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       setTimeout(() => {
         console.log("Redirecting to upload page...");
         navigate('/upload');
-      }, 20000);
+      }, 1000);
 
     } catch (err) {
       console.error("Error during payment completion:", err);
@@ -198,13 +222,26 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
     <div className={styles.paymentBox}>
       <button
         className={styles.paymentButton}
-        onClick={initiatePayment}
-        disabled={!payHereLoaded || isProcessing || showSuccessMessage}
+        onClick={plan.id === 'free' ? () => navigate('/upload') : initiatePayment}
+        disabled={
+          !payHereLoaded || 
+          isProcessing || 
+          showSuccessMessage || 
+          (plan.id === 'free' && (checkingFreeAttempt || freeAttemptUsed))
+        }
       >
         {showSuccessMessage ? (
           <span><i className={styles.successIcon}></i> Payment Successful! Redirecting...</span>
         ) : isProcessing ? (
           <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
+        ) : plan.id === 'free' ? (
+          checkingFreeAttempt ? (
+            <span>⏳ Checking...</span>
+          ) : freeAttemptUsed ? (
+            <span>✅ Free Trial Used</span>
+          ) : (
+            <span>🆓 Start Free Trial</span>
+          )
         ) : (
           <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
         )}

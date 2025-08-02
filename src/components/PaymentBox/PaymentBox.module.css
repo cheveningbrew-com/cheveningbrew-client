@@ -177,3 +177,14 @@
       padding: 10px;
     }
   }
+
+  .freeTrialUsedMessage {
+  margin-top: 0.5rem;
+  text-align: center;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+}
+
+.freeTrialUsedMessage small {
+  font-size: 0.8rem;
+}
