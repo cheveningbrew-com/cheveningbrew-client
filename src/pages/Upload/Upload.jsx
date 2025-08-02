@@ -242,7 +242,8 @@ const Upload = () => {
           essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
           googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
           googleDrive: analysisResult.summary?.grammar_style_document?.google_drive_link,
-          downloadLink: analysisResult.summary?.grammar_style_document?.download_link,
+          downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
+          downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
           timestamp: new Date().toISOString(),
           fileName: selectedFile.name,
           directoryName: dirName,
@@ -273,6 +274,8 @@ const Upload = () => {
         const analysisData = {
           googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
           essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
+          downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
+          downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
           timestamp: new Date().toISOString(),
           fileName: selectedFile.name,
           taskId: analysisResult.task_info?.task_id,
@@ -444,64 +447,66 @@ const handleDrop = (e) => {
               {/* <h3 className={styles.uploadTitle}>Upload your document</h3> */}
               
               {selectedFile ? (
-                <div className={styles.selectedFileContainer}>
-                  <div className={styles.fileIcon}>📄</div>
-                  <div className={styles.fileDetails}>
-                    <span className={styles.fileName}>{selectedFile.name}</span>
-                    <span className={styles.fileSize}>
-                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                    </span>
+                !isLoading ? (
+                  <div className={styles.selectedFileContainer}>
+                    <div className={styles.fileIcon}>📄</div>
+                    <div className={styles.fileDetails}>
+                      <span className={styles.fileName}>{selectedFile.name}</span>
+                      <span className={styles.fileSize}>
+                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                    </div>
+                    <button 
+                      type="button"
+                      onClick={handleDeleteFile}
+                      className={styles.deleteButton}
+                      title="Remove file"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                ) : <></>
+              ) : (
+               <div 
+                  className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
+                  onDragEnter={handleDragEnter}
+                  onDragLeave={handleDragLeave}
+                  onDragOver={handleDragOver}
+                  onDrop={handleDrop}
+                >
+                  <div className={styles.uploadIcon}>
+                    <CloudUpload size={48} />
+                  </div>
+                  <p className={styles.dragText}>Drag & drop your file here</p>
+                  <div className={styles.orDivider}>
+                    <span>or</span>
                   </div>
                   <button 
                     type="button"
-                    onClick={handleDeleteFile}
-                    className={styles.deleteButton}
-                    title="Remove file"
+                    className={styles.browseButton}
+                    onClick={() => document.getElementById('file-upload').click()}
+                    disabled={isLoading}
                   >
-                    <Trash2 size={16} />
+                    Browse files
                   </button>
+                  
+                  {/* NEW: Upload Requirements */}
+                  <div className={styles.uploadRequirements}>
+                    <p className={styles.requirementsHeader}>
+                      <strong>Please upload a PDF that meets both of the following conditions:</strong>
+                    </p>
+                    <div className={styles.requirementsList}>
+                      <div className={styles.requirementItem}>
+                        <span className={styles.numberBadge}>1</span>
+                        <span><strong>Includes all four Chevening essays.</strong></span>
+                      </div>
+                      <div className={styles.requirementItem}>
+                        <span className={styles.numberBadge}>2</span>
+                        <span><strong>Each essay is between 100 and 500 words, as required by Chevening.</strong></span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-              ) : (
-               <div 
-  className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
-  onDragEnter={handleDragEnter}
-  onDragLeave={handleDragLeave}
-  onDragOver={handleDragOver}
-  onDrop={handleDrop}
->
-  <div className={styles.uploadIcon}>
-    <CloudUpload size={48} />
-  </div>
-  <p className={styles.dragText}>Drag & drop your file here</p>
-  <div className={styles.orDivider}>
-    <span>or</span>
-  </div>
-  <button 
-    type="button"
-    className={styles.browseButton}
-    onClick={() => document.getElementById('file-upload').click()}
-    disabled={isLoading}
-  >
-    Browse files
-  </button>
-  
-  {/* NEW: Upload Requirements */}
-  <div className={styles.uploadRequirements}>
-    <p className={styles.requirementsHeader}>
-      <strong>Please upload a PDF that meets both of the following conditions:</strong>
-    </p>
-    <div className={styles.requirementsList}>
-      <div className={styles.requirementItem}>
-        <span className={styles.numberBadge}>1</span>
-        <span><strong>Includes all four Chevening essays.</strong></span>
-      </div>
-      <div className={styles.requirementItem}>
-        <span className={styles.numberBadge}>2</span>
-        <span><strong>Each essay is between 100 and 500 words, as required by Chevening.</strong></span>
-      </div>
-    </div>
-  </div>
-</div>
               )}
               
               <input
@@ -518,7 +523,7 @@ const handleDrop = (e) => {
             {error && <div className={styles.errorMessage}>{error}</div>}
             
             {/* Dynamic Upload Button */}
-            {subscriptionStatus && selectedFile && (
+            {!isLoading && subscriptionStatus && selectedFile && (
               <button
                 className={styles.uploadButton}
                 onClick={handleUpload}
