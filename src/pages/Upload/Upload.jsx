@@ -11,7 +11,8 @@ import {
 } from "../../services/essay_api";
 import { getUserId, checkSubscriptionStatus } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-import { Trash2 } from "lucide-react";
+import { Trash2,CloudUpload } from "lucide-react";
+
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -25,6 +26,7 @@ const Upload = () => {
   // Unified subscription status
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [statusLoading, setStatusLoading] = useState(true);
+  const [dragActive, setDragActive] = useState(false);
 
   const { userName, userEmail, logout } = useAuth();
   const navigate = useNavigate();
@@ -339,9 +341,51 @@ const Upload = () => {
   const fileInput = document.getElementById("file-upload");
   if (fileInput) fileInput.value = "";
 };
-  const handleGoToPricing = () => {
-    navigate("/pricing");
-  };
+
+// Drag and drop handlers
+const handleDragEnter = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setDragActive(true);
+};
+
+const handleDragLeave = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setDragActive(false);
+};
+
+const handleDragOver = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+};
+
+const handleDrop = (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  setDragActive(false);
+  
+  const files = e.dataTransfer.files;
+  if (files && files[0]) {
+    const file = files[0];
+    
+    // Validate file type
+    if (file.type !== "application/pdf") {
+      setError("Please upload a PDF file.");
+      return;
+    }
+    
+    // Validate file size (10MB limit)
+    const MAX_FILE_SIZE = 10 * 1024 * 1024;
+    if (file.size > MAX_FILE_SIZE) {
+      setError(`File size exceeds the maximum allowed size (10MB)`);
+      return;
+    }
+    
+    setSelectedFile(file);
+    setError(null);
+  }
+};
 
   if (statusLoading) {
     return (
@@ -395,37 +439,86 @@ const Upload = () => {
               </div>
             )}
 
-            {/* File Input - Always Show */}
-            <div className={styles.fileInputContainer}>
+            {/* File Upload Zone */}            
+            <div className={styles.uploadZone}>
+              {/* <h3 className={styles.uploadTitle}>Upload your document</h3> */}
+              
+              {selectedFile ? (
+                <div className={styles.selectedFileContainer}>
+                  <div className={styles.fileIcon}>📄</div>
+                  <div className={styles.fileDetails}>
+                    <span className={styles.fileName}>{selectedFile.name}</span>
+                    <span className={styles.fileSize}>
+                      {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                    </span>
+                  </div>
+                  <button 
+                    type="button"
+                    onClick={handleDeleteFile}
+                    className={styles.deleteButton}
+                    title="Remove file"
+                  >
+                    <Trash2 size={16} />
+                  </button>
+                </div>
+              ) : (
+               <div 
+  className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
+  onDragEnter={handleDragEnter}
+  onDragLeave={handleDragLeave}
+  onDragOver={handleDragOver}
+  onDrop={handleDrop}
+>
+  <div className={styles.uploadIcon}>
+    <CloudUpload size={48} />
+  </div>
+  <p className={styles.dragText}>Drag & drop your file here</p>
+  <div className={styles.orDivider}>
+    <span>or</span>
+  </div>
+  <button 
+    type="button"
+    className={styles.browseButton}
+    onClick={() => document.getElementById('file-upload').click()}
+    disabled={isLoading}
+  >
+    Browse files
+  </button>
+  
+  {/* NEW: Upload Requirements */}
+  <div className={styles.uploadRequirements}>
+    <p className={styles.requirementsHeader}>
+      <strong>Please upload a PDF that meets both of the following conditions:</strong>
+    </p>
+    <div className={styles.requirementsList}>
+      <div className={styles.requirementItem}>
+        <span className={styles.numberBadge}>1</span>
+        <span><strong>Includes all four Chevening essays.</strong></span>
+      </div>
+      <div className={styles.requirementItem}>
+        <span className={styles.numberBadge}>2</span>
+        <span><strong>Each essay is between 100 and 500 words, as required by Chevening.</strong></span>
+      </div>
+    </div>
+  </div>
+</div>
+              )}
+              
               <input
                 type="file"
                 id="file-upload"
                 accept=".pdf"
                 onChange={handleFileChange}
                 disabled={isLoading}
-                className={styles.fileInput}
+                className={styles.hiddenInput}
               />
-             <label htmlFor="file-upload" className={styles.fileInputLabel}>
-                {selectedFile ? (
-                  <>
-                    <span className={styles.fileName}>{selectedFile.name}</span>
-                    <button 
-                      type="button"
-                      onClick={handleDeleteFile}
-                      className={styles.deleteButton}
-                      title="Remove file"
-                    >
-                      <Trash2 size={14} />
-                    </button>
-                  </>
-                ) : "Choose PDF file"}
-              </label>
             </div>
+
             
             {error && <div className={styles.errorMessage}>{error}</div>}
             
             {/* Dynamic Upload Button */}
-            {subscriptionStatus && (
+            {subscriptionStatus && selectedFile && (
               <button
                 className={styles.uploadButton}
                 onClick={handleUpload}
@@ -433,10 +526,10 @@ const Upload = () => {
               >
                 {isLoading ? "Processing..." : 
                  !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed 
-                   ? "Use Free Trial - Leadership Analysis" 
+                   ? "Upload" 
                    : subscriptionStatus.can_upload 
-                     ? "Upload & Analyze All Essays"
-                     : "Upload & Analyze"}
+                     ? "Upload "
+                     : "Upload"}
               </button>
             )}
 
@@ -484,27 +577,7 @@ const Upload = () => {
               </div>
             )}
 
-            {/* Reset Button */}
-            {/* {!isLoading && (selectedFile || error) && (
-              <button
-                className={styles.resetButton}
-                onClick={handleReset}
-              >
-                Reset
-              </button>
-            )} */}
-
-            {/* Pricing Information for Users Who Need It */}
-            {/* {subscriptionStatus && subscriptionStatus.needs_payment && (
-              <div className={styles.inlinePricing}>
-                <button 
-                  className={styles.pricingButton}
-                  onClick={handleGoToPricing}
-                >
-                  View Pricing & Subscribe
-                </button>
-              </div>
-            )} */}
+            
           </div>
         </div>
       </ActionBox>
