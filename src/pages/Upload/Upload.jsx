@@ -11,7 +11,7 @@ import {
 } from "../../services/essay_api";
 import { getUserId, checkSubscriptionStatus } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
-
+import { Trash2 } from "lucide-react";
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -324,20 +324,21 @@ const Upload = () => {
     }
   };
 
-  // Reset everything
-  const handleReset = () => {
-    setSelectedFile(null);
-    setError(null);
-    setAnalysisProgress(null);
-    setCurrentTask(null);
-    setAnalysisType(null);  
-    setEstimatedTime(null);  // Added this
-    
-    // Reset file input
-    const fileInput = document.getElementById("file-upload");
-    if (fileInput) fileInput.value = "";
-  };
-
+ const handleDeleteFile = (event) => {
+  event.preventDefault();
+  event.stopPropagation(); // Prevent label click
+  
+  setSelectedFile(null);
+  setError(null);
+  setAnalysisProgress(null);
+  setCurrentTask(null);
+  setAnalysisType(null);
+  setEstimatedTime(null);
+  
+  // Reset file input
+  const fileInput = document.getElementById("file-upload");
+  if (fileInput) fileInput.value = "";
+};
   const handleGoToPricing = () => {
     navigate("/pricing");
   };
@@ -404,8 +405,20 @@ const Upload = () => {
                 disabled={isLoading}
                 className={styles.fileInput}
               />
-              <label htmlFor="file-upload" className={styles.fileInputLabel}>
-                {selectedFile ? selectedFile.name : "Choose PDF file"}
+             <label htmlFor="file-upload" className={styles.fileInputLabel}>
+                {selectedFile ? (
+                  <>
+                    <span className={styles.fileName}>{selectedFile.name}</span>
+                    <button 
+                      type="button"
+                      onClick={handleDeleteFile}
+                      className={styles.deleteButton}
+                      title="Remove file"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </>
+                ) : "Choose PDF file"}
               </label>
             </div>
             
@@ -472,14 +485,14 @@ const Upload = () => {
             )}
 
             {/* Reset Button */}
-            {!isLoading && (selectedFile || error) && (
+            {/* {!isLoading && (selectedFile || error) && (
               <button
                 className={styles.resetButton}
                 onClick={handleReset}
               >
                 Reset
               </button>
-            )}
+            )} */}
 
             {/* Pricing Information for Users Who Need It */}
             {/* {subscriptionStatus && subscriptionStatus.needs_payment && (

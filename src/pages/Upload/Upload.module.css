@@ -701,3 +701,70 @@
     font-size: 0.85rem;
   }
 }
+
+.fileName {
+  flex: 1;
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  margin-right: 0.5rem;
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0.2rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+}
+
+.deleteButton:hover {
+  color: #ffffff;
+  transform: scale(1.1);
+}
+
+.deleteButton:active {
+  transform: scale(0.9);
+}
+
+.fileInputLabel {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 60px;
+  padding: 0 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #fff;
+  transition: all 0.3s ease;
+  gap: 0.5rem;
+}
+
+@media screen and (max-width: 480px) {
+  .fileName {
+    font-size: 0.85rem;
+  }
+  
+  .deleteButton {
+    min-width: 20px;
+    height: 20px;
+    padding: 0.1rem;
+  }
+  
+  .fileInputLabel {
+    height: 50px;
+    padding: 0 0.8rem;
+  }
+}
