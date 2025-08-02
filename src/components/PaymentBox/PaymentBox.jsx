@@ -10,8 +10,8 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
   const [payHereLoaded, setPayHereLoaded] = useState(false);
   const [showPaidPopup, setShowPaidPopup] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
-  const [freeAttemptUsed, setFreeAttemptUsed] = useState(false);
- const [checkingFreeAttempt, setCheckingFreeAttempt] = useState(true);
+  const [showFreeTrialUsedPopup, setShowFreeTrialUsedPopup] = useState(false);
+  
   const navigate = useNavigate();
 
   // Load PayHere script
@@ -32,29 +32,6 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
     loadPayHereScript();
   }, []);
-
-  // Check if free attempt was already used
-useEffect(() => {
-  const checkFreeAttemptStatus = async () => {
-    if (plan.id === 'free') {
-      try {
-        const userId = getUserId();
-        if (userId) {
-          const freeAttemptUsed = await readUserField(userId, "free_attempt_used");
-          setFreeAttemptUsed(freeAttemptUsed === true);
-        }
-      } catch (error) {
-        console.error("Error checking free attempt status:", error);
-      } finally {
-        setCheckingFreeAttempt(false);
-      }
-    } else {
-      setCheckingFreeAttempt(false);
-    }
-  };
-
-  checkFreeAttemptStatus();
-}, [plan.id]);
 
   const handlePaymentComplete = useCallback(async (orderId) => {
     try {
@@ -107,6 +84,47 @@ useEffect(() => {
     }
     setIsProcessing(false);
   }, [onPaymentDismissed]);
+
+  // Handle free trial
+  const handleFreeTrial = useCallback(async () => {
+    const userId = getUserId();
+
+    // Case 1: If user_id not in sessionStorage
+    if (!userId) {
+      window.location.href = "/"; // Redirect to landing
+      return;
+    }
+
+    try {
+      // Check if user exists
+      const userExists = await readUserField(userId, "id");
+      if (!userExists) {
+        window.location.href = "/";
+        return;
+      }
+
+      // First check if user has already paid
+      const paymentCompleted = await readUserField(userId, "payment_completed");
+      if (paymentCompleted === true) {
+        setShowPaidPopup(true);
+        return;
+      }
+
+      // Then check if free attempt was already used
+      const freeAttemptUsed = await readUserField(userId, "free_attempt_used");
+      if (freeAttemptUsed === true) {
+        setShowFreeTrialUsedPopup(true);
+        return;
+      }
+
+      // If neither condition met, proceed to upload
+      navigate('/upload');
+
+    } catch (error) {
+      console.error("Error checking free trial status:", error);
+      alert("There was an error checking your trial status. Please try again.");
+    }
+  }, [navigate]);
 
   // Initiate payment
   const initiatePayment = useCallback(async () => {
@@ -222,26 +240,15 @@ useEffect(() => {
     <div className={styles.paymentBox}>
       <button
         className={styles.paymentButton}
-        onClick={plan.id === 'free' ? () => navigate('/upload') : initiatePayment}
-        disabled={
-          !payHereLoaded || 
-          isProcessing || 
-          showSuccessMessage || 
-          (plan.id === 'free' && (checkingFreeAttempt || freeAttemptUsed))
-        }
+        onClick={plan.id === 'free' ? handleFreeTrial : initiatePayment}
+        disabled={!payHereLoaded || isProcessing || showSuccessMessage}
       >
         {showSuccessMessage ? (
           <span><i className={styles.successIcon}></i> Payment Successful! Redirecting...</span>
         ) : isProcessing ? (
           <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
         ) : plan.id === 'free' ? (
-          checkingFreeAttempt ? (
-            <span>⏳ Checking...</span>
-          ) : freeAttemptUsed ? (
-            <span>✅ Free Trial Used</span>
-          ) : (
-            <span>🆓 Start Free Trial</span>
-          )
+          <span>Free Trial</span>
         ) : (
           <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
         )}
@@ -255,7 +262,12 @@ useEffect(() => {
         />
       )}
 
-      
+      {showFreeTrialUsedPopup && (
+        <Popup
+          message="You have already used your free trial."
+          onClose={() => setShowFreeTrialUsedPopup(false)}
+        />
+      )}
     </div>
   );
 };
