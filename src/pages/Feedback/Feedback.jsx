@@ -293,68 +293,41 @@ const Feedback = () => {
                       : "✅ Your Analysis is Ready!"}
                   </h2>
                   
+                  {/* Updated: Simple Download Buttons */}
                   <div className={uploadStyles.linkButtons}>
-                    {/* Essay Feedback Document */}
-                    {analysisResults.essayFeedback && (
+                    {/* Grammar & Style Download */}
+                    {analysisResults.downloadLinkGrammarStyleDocument && (
                       <a 
-                        href={analysisResults.essayFeedback} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
-                      >
-                        {analysisResults.analysisType === "leadership_comprehensive_revival" 
-                          ? "👑 Leadership Essay Assessment" 
-                          : "📝 Essay Feedback Assessment"}
-                      </a>
-                    )}
-                    
-                    {/* Grammar & Style Document */}
-                    {analysisResults.googleDocs && (
-                      <a 
-                        href={analysisResults.googleDocs} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className={`${uploadStyles.linkButton} ${uploadStyles.docsButton}`}
-                      >
-                        ✏️ Grammar & Style Analysis
-                      </a>
-                    )}
-                    
-                    {/* Additional Links */}
-                    {analysisResults.googleDrive && (
-                      <a 
-                        href={analysisResults.googleDrive} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className={`${uploadStyles.linkButton} ${uploadStyles.driveButton}`}
-                      >
-                        📁 View in Google Drive
-                      </a>
-                    )}
-                    
-                    {analysisResults.downloadLink && (
-                      <a 
-                        href={analysisResults.downloadLink} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
+                        href={analysisResults.downloadLinkGrammarStyleDocument} 
                         className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
+                        download
                       >
-                        ⬇️ Download DOCX
+                        Download grammar and style feedback
+                      </a>
+                    )}
+                    
+                    {/* Essay Feedback Download */}
+                    {analysisResults.downloadLinkEssayFeedback && (
+                      <a 
+                        href={analysisResults.downloadLinkEssayFeedback} 
+                        className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
+                        download
+                      >
+                        Download Chevening aligned feedback
                       </a>
                     )}
                   </div>
                   
-                  <button 
+                  <p 
                     className={uploadStyles.resetButton} 
                     onClick={handleUploadAnother}
                   >
-                    Upload Another Document
-                  </button>
-
+                    These feedback files have also been shared to your email via Google Drive
+                  </p>
+{/* 
                   <div className={uploadStyles.nextStep}>
-                    <p>Your analysis documents are available anytime through the links above.</p>
-                    
-                    {/* Analysis Type Specific Information */}
+                    <p>Your analysis documents are ready for download.</p>
+                   
                     {analysisResults.analysisType === "leadership_comprehensive_revival" ? (
                       <div>
                         <p><strong>Free Trial Complete!</strong> You analyzed your leadership essay.</p>
@@ -378,10 +351,10 @@ const Feedback = () => {
                         Analysis completed: {new Date(analysisResults.timestamp).toLocaleString()}
                       </small>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Analysis Summary */}
-                  {analysisResults.analysisSummary && (
+                  {/* {analysisResults.analysisSummary && (
                     <div className={styles.summarySection}>
                       <h3>📊 Analysis Summary</h3>
                       <div className={styles.summaryContent}>
@@ -390,16 +363,16 @@ const Feedback = () => {
                         <p><strong>Database Saved:</strong> {analysisResults.databaseSaved ? 'Yes' : 'No'}</p>
                       </div>
                     </div>
-                  )}
+                  )} */}
 
                   {/* Task Information (if available) */}
-                  {analysisResults.taskId && (
+                  {/* {analysisResults.taskId && (
                     <div className={styles.taskInfo}>
                       <h4>Background Processing Information:</h4>
                       <p><strong>Task ID:</strong> {analysisResults.taskId}</p>
                       <p><strong>Analysis Type:</strong> {analysisResults.analysisType}</p>
                     </div>
-                  )}
+                  )} */}
                 </div>
               </div>
             ) : feedback ? (

@@ -30,25 +30,26 @@ const handlePaymentDismissed = () => {
 
 const plans = [
   {
-    id: 'basic',
-    name: 'Basic',
-    amount: '5.00',
+    id: 'free',
+    name: 'Free',
+    amount: '0.00',
     attempts: 1,
-    description: '1 attempt\n20 minutes\nquick practice!',
+    description: '1 attempt\n• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned feedback\n• For leadership essay only',
+    isFree: true
   },
   {
-    id: 'standard',
-    name: 'Standard',
-    amount: '10.00',
-    attempts: 3,
-    description: '3 attempts\n60 minutes\nrefining answers!',
+    id: 'basic',
+    name: 'Basic',
+    amount: '15.00',
+    attempts: 1,
+    description: '1 attempt\n• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned feedback\n• For all four essays',
   },
   {
     id: 'premium',
     name: 'Premium',
-    amount: '15.00',
-    attempts: 5,
-    description: '5 attempts\n100 minutes\nserious prep!',
+    amount: '35.00',
+    attempts: 3,
+    description: '3 attempts\n• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned feedback\n• For all four essays\n• Repeat review process three times',
   },
 ];
 

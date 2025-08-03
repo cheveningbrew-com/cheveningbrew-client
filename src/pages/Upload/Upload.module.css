@@ -64,44 +64,173 @@
   text-align: center;
 }
 
-.fileInputContainer {
-  position: relative;
+/* ==================================================
+   NEW DRAG & DROP UPLOAD ZONE STYLES
+   ================================================== */
+
+/* Upload Zone Container */
+.uploadZone {
   width: 100%;
+  max-width: 500px;
   margin-bottom: 1.5rem;
 }
 
-.fileInput {
-  position: absolute;
-  width: 0.1px;
-  height: 0.1px;
-  opacity: 0;
-  overflow: hidden;
-  z-index: -1;
-}
-
-.fileInputLabel {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 60px;
-  padding: 0 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px dashed rgba(255, 255, 255, 0.4);
-  border-radius: 8px;
-  cursor: pointer;
-  font-size: 1rem;
+.uploadTitle {
+  font-size: 1.2rem;
   color: #fff;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-  transition: all 0.3s ease;
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-weight: 600;
 }
 
-.fileInputLabel:hover {
-  background: rgba(255, 255, 255, 0.15);
-  border-color: rgba(255, 255, 255, 0.6);
+/* Drop Zone */
+.dropZone {
+  border: 2px dashed rgba(255, 255, 255, 0.4);
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.05);
+  transition: all 0.3s ease;
+  cursor: pointer;
 }
+
+.dropZone:hover {
+  border-color: rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.dropZone.dragActive {
+  border-color: #ffe585;
+  background: rgba(255, 229, 133, 0.1);
+  transform: scale(1.02);
+}
+
+
+.dragText {
+  font-size: 1.1rem;
+  color: rgba(255, 255, 255, 0.9);
+  margin-bottom: 1rem;
+}
+
+.orDivider {
+  position: relative;
+  margin: 1.5rem 0;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.orDivider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.2);
+  z-index: 1;
+}
+
+.orDivider span {
+  background: #6D2493;
+  padding: 0 1rem;
+  position: relative;
+  z-index: 2;
+}
+
+.browseButton {
+  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
+  color: #4b0082;
+  border: none;
+  padding: 0.8rem 2rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-bottom: 1rem;
+}
+
+.browseButton:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+.browseButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.formatInfo {
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin: 0;
+}
+
+/* Selected File Display */
+.selectedFileContainer {
+  display: flex;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 8px;
+  padding: 1rem;
+  gap: 1rem;
+}
+
+.fileIcon {
+  font-size: 2rem;
+  flex-shrink: 0;
+}
+
+.fileDetails {
+  flex: 1;
+  text-align: left;
+}
+
+.fileName {
+  display: block;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 0.2rem;
+  word-break: break-all;
+}
+
+.fileSize {
+  display: block;
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.85rem;
+}
+
+.deleteButton {
+  background: transparent;
+  border: none;
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0.4rem;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.deleteButton:hover {
+  color: #ff5252;
+  
+  transform: scale(1.1);
+}
+
+.deleteButton:active {
+  transform: scale(0.9);
+}
+
+.hiddenInput {
+  display: none;
+}
+
+/* ==================================================
+   ERROR HANDLING & MESSAGES
+   ================================================== */
 
 .errorMessage {
   color: #ff5252;
@@ -114,6 +243,10 @@
   border: 1px solid rgba(255, 82, 82, 0.3);
   border-radius: 6px;
 }
+
+/* ==================================================
+   UPLOAD BUTTON & ACTIONS
+   ================================================== */
 
 .uploadButton {
   width: 100%;
@@ -139,22 +272,19 @@
   cursor: not-allowed;
 }
 
-.resetButton {
-  width: 100%;
-  padding: 0.8rem 1.5rem;
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  border-radius: 8px;
-  font-size: 1rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  margin-top: 1rem;
+/* Dynamic Upload Button Styles */
+.uploadButton.freeTrialButton {
+  background: linear-gradient(90deg, #6495ed 0%, #4169e1 100%);
 }
 
-.resetButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+.uploadButton.pricingButton {
+  background: linear-gradient(90deg, #ffc107 0%, #ff8c00 100%);
+  color: #4b0082;
 }
+
+/* ==================================================
+   PROGRESS TRACKING & LOADING
+   ================================================== */
 
 /* Enhanced Loading Container */
 .loadingContainer {
@@ -162,7 +292,6 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  margin-top: 1.5rem;
   padding: 1.5rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 12px;
@@ -178,6 +307,10 @@
   color: #ffe585;
   font-size: 1.2rem;
   margin-bottom: 0.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .progressHeader p {
@@ -201,6 +334,15 @@
   background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
+}
+
+/* Status-specific progress colors */
+.progressFill.leadership {
+  background: linear-gradient(90deg, #6495ed 0%, #4169e1 100%);
+}
+
+.progressFill.comprehensive {
+  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
 }
 
 /* Progress Info */
@@ -270,7 +412,11 @@
   font-size: 0.8rem;
 }
 
-/* Links section (keeping existing styles) */
+/* ==================================================
+   RESULTS & LINKS DISPLAY
+   ================================================== */
+
+/* Links section */
 .linksContainer {
   width: 100%;
   text-align: center;
@@ -341,82 +487,44 @@
   font-size: 1rem;
 }
 
-/* Responsive styles */
-@media screen and (max-width: 768px) {
-  .uploadContainer {
-    padding: 1rem;
-    height: calc(100vh - 200px); /* Ensure proper height on mobile */
-  }
- 
-  .title {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-  }
- 
-  .uploadSection {
-    padding: 1.5rem;
-    max-width: 100%;
-  }
+/* ==================================================
+   STATUS DISPLAYS
+   ================================================== */
 
-  .progressInfo {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.8rem;
-  }
-
-  .progressText {
-    text-align: center;
-  }
+/* Status Display Styles */
+.statusDisplay {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  text-align: center;
 }
 
-@media screen and (max-width: 480px) {
-  .uploadContainer {
-    padding: 0.8rem;
-    padding-bottom: 3rem; /* Extra bottom padding for mobile */
-    height: calc(100vh - 180px); /* Ensure proper height on small mobile */
-  }
- 
-  .title {
-    font-size: 1.3rem;
-    margin-bottom: 1.2rem;
-  }
- 
-  .uploadSection {
-    padding: 1.2rem;
-    margin-bottom: 3rem; /* Extra margin at bottom */
-  }
- 
-  .fileInputLabel {
-    height: 50px;
-    font-size: 0.9rem;
-  }
- 
-  .uploadButton, .resetButton {
-    font-size: 1rem;
-    padding: 0.7rem 1.2rem;
-  }
-
-  .loadingContainer {
-    padding: 1rem;
-  }
-
-  .progressHeader h3 {
-    font-size: 1.1rem;
-  }
-
-  .progressMessage {
-    font-size: 0.9rem;
-  }
-
-  .nextStep {
-    padding: 1rem;
-  }
-
-  .nextStep p {
-    font-size: 0.9rem;
-  }
+.subscriptionStatus {
+  background: rgba(76, 175, 80, 0.2);
+  border: 1px solid rgba(76, 175, 80, 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #4caf50;
 }
+
+.freeTrialStatus {
+  background: rgba(100, 149, 237, 0.2);
+  border: 1px solid rgba(100, 149, 237, 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #6495ed;
+}
+
+.upgradeStatus {
+  background: rgba(255, 193, 7, 0.2);
+  border: 1px solid rgba(255, 193, 7, 0.5);
+  border-radius: 8px;
+  padding: 1rem;
+  color: #ffc107;
+}
+
+/* ==================================================
+   ACCESS DENIED & PRICING
+   ================================================== */
 
 /* Access denied section */
 .accessDeniedSection {
@@ -460,16 +568,6 @@
 .subscriptionInfo p {
   margin-bottom: 0.5rem;
   color: #fff;
-}
-
-.subscriptionStatus {
-  background: rgba(76, 175, 80, 0.2);
-  border: 1px solid rgba(76, 175, 80, 0.5);
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1.5rem;
-  text-align: center;
-  color: #4caf50;
 }
 
 .freeTrialInfo {
@@ -588,8 +686,12 @@
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-/* Responsive pricing grid */
-@media screen and (max-width: 768px) {
+/* ==================================================
+   MOBILE RESPONSIVE STYLES
+   ================================================== */
+
+/* Tablet styles */
+@media screen and (max-width: 1024px) {
   .pricingGrid {
     grid-template-columns: 1fr;
     gap: 1rem;
@@ -600,7 +702,65 @@
   }
 }
 
-@media screen and (max-width: 480px) {
+/* Mobile styles */
+@media screen and (max-width: 768px) {
+  .uploadContainer {
+    padding: 1rem;
+    height: calc(100vh - 200px);
+  }
+ 
+  .title {
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+ 
+  .uploadSection {
+    padding: 1.5rem;
+    max-width: 100%;
+  }
+
+  /* Upload Zone Mobile */
+  .uploadZone {
+    max-width: 100%;
+  }
+  
+  .dropZone {
+    padding: 1.5rem;
+  }
+  
+
+  
+  .dragText {
+    font-size: 1rem;
+  }
+  
+  .browseButton {
+    padding: 0.7rem 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .progressInfo {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0.8rem;
+  }
+
+  .progressText {
+    text-align: center;
+  }
+
+  .statusDisplay {
+    margin-bottom: 1rem;
+  }
+  
+  .subscriptionStatus,
+  .freeTrialStatus,
+  .upgradeStatus {
+    padding: 0.8rem;
+    font-size: 0.9rem;
+  }
+
   .planCard {
     padding: 1rem;
   }
@@ -615,81 +775,75 @@
   }
 }
 
-/* Add these styles to your existing Upload.module.css */
+/* Small mobile styles */
+@media screen and (max-width: 480px) {
+  .uploadContainer {
+    padding: 0.8rem;
+    padding-bottom: 3rem;
+    height: calc(100vh - 180px);
+  }
+ 
+  .title {
+    font-size: 1.3rem;
+    margin-bottom: 1.2rem;
+  }
+ 
+  .uploadSection {
+    padding: 1.2rem;
+    margin-bottom: 3rem;
+  }
 
-/* Status Display Styles */
-.statusDisplay {
-  width: 100%;
-  margin-bottom: 1.5rem;
-  text-align: center;
-}
-
-.subscriptionStatus {
-  background: rgba(76, 175, 80, 0.2);
-  border: 1px solid rgba(76, 175, 80, 0.5);
-  border-radius: 8px;
-  padding: 1rem;
-  color: #4caf50;
-}
-
-.freeTrialStatus {
-  background: rgba(100, 149, 237, 0.2);
-  border: 1px solid rgba(100, 149, 237, 0.5);
-  border-radius: 8px;
-  padding: 1rem;
-  color: #6495ed;
-}
-
-.upgradeStatus {
-  background: rgba(255, 193, 7, 0.2);
-  border: 1px solid rgba(255, 193, 7, 0.5);
-  border-radius: 8px;
-  padding: 1rem;
-  color: #ffc107;
-}
-
-/* Dynamic Upload Button Styles */
-.uploadButton.freeTrialButton {
-  background: linear-gradient(90deg, #6495ed 0%, #4169e1 100%);
-}
-
-.uploadButton.pricingButton {
-  background: linear-gradient(90deg, #ffc107 0%, #ff8c00 100%);
-  color: #4b0082;
-}
-
-/* Enhanced Progress Header */
-.progressHeader h3 {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-/* Status-specific progress colors */
-.progressFill.leadership {
-  background: linear-gradient(90deg, #6495ed 0%, #4169e1 100%);
-}
-
-.progressFill.comprehensive {
-  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
-}
-
-/* Responsive updates for status display */
-@media screen and (max-width: 768px) {
-  .statusDisplay {
+  /* Upload Zone Small Mobile */
+  .uploadTitle {
+    font-size: 1.1rem;
     margin-bottom: 1rem;
   }
   
-  .subscriptionStatus,
-  .freeTrialStatus,
-  .upgradeStatus {
-    padding: 0.8rem;
+  .dropZone {
+    padding: 1rem;
+  }
+  
+  
+  
+  .selectedFileContainer {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.8rem;
+  }
+  
+  .fileDetails {
+    text-align: center;
+  }
+  
+  .fileName {
     font-size: 0.9rem;
   }
-}
+ 
+  .uploadButton {
+    font-size: 1rem;
+    padding: 0.7rem 1.2rem;
+  }
 
-@media screen and (max-width: 480px) {
+  .loadingContainer {
+    padding: 1rem;
+  }
+
+  .progressHeader h3 {
+    font-size: 1.1rem;
+  }
+
+  .progressMessage {
+    font-size: 0.9rem;
+  }
+
+  .nextStep {
+    padding: 1rem;
+  }
+
+  .nextStep p {
+    font-size: 0.9rem;
+  }
+
   .statusDisplay {
     margin-bottom: 0.8rem;
   }
@@ -700,4 +854,80 @@
     padding: 0.6rem;
     font-size: 0.85rem;
   }
+
+  .pricingButton {
+    font-size: 0.9rem;
+    padding: 0.7rem 1.2rem;
+  }
+}
+
+.uploadIcon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  margin-bottom: 1rem;
+  color: rgba(255, 255, 255, );
+}
+
+.uploadIcon svg {
+  transition: all 0.3s ease;
+}
+
+
+
+.dropZone.dragActive .uploadIcon {
+  color: #ffe585;
+  transform: scale(1.1);
+}
+
+/* ==================================================
+   UPLOAD REQUIREMENTS SECTION
+   ================================================== */
+
+.uploadRequirements {
+  margin-top: 1.5rem;
+  padding: 1.2rem;
+  background: rgba(255, 229, 133, 0.08);
+  border: 1px solid rgba(255, 229, 133, 0.25);
+  border-radius: 8px;
+  text-align: left;
+}
+
+.requirementsHeader {
+  color: #ffe585;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+  line-height: 1.4;
+  text-align: center;
+}
+
+.requirementsList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.requirementItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.8rem;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.numberBadge {
+  background: #ffe585;
+  color: #4b0082;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  font-weight: bold;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
 }

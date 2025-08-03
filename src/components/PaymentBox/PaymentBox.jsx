@@ -10,6 +10,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
   const [payHereLoaded, setPayHereLoaded] = useState(false);
   const [showPaidPopup, setShowPaidPopup] = useState(false);
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [showFreeTrialUsedPopup, setShowFreeTrialUsedPopup] = useState(false);
   
   const navigate = useNavigate();
 
@@ -54,7 +55,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       setTimeout(() => {
         console.log("Redirecting to upload page...");
         navigate('/upload');
-      }, 20000);
+      }, 1000);
 
     } catch (err) {
       console.error("Error during payment completion:", err);
@@ -83,6 +84,47 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
     }
     setIsProcessing(false);
   }, [onPaymentDismissed]);
+
+  // Handle free trial
+  const handleFreeTrial = useCallback(async () => {
+    const userId = getUserId();
+
+    // Case 1: If user_id not in sessionStorage
+    if (!userId) {
+      window.location.href = "/"; // Redirect to landing
+      return;
+    }
+
+    try {
+      // Check if user exists
+      const userExists = await readUserField(userId, "id");
+      if (!userExists) {
+        window.location.href = "/";
+        return;
+      }
+
+      // First check if user has already paid
+      const paymentCompleted = await readUserField(userId, "payment_completed");
+      if (paymentCompleted === true) {
+        setShowPaidPopup(true);
+        return;
+      }
+
+      // Then check if free attempt was already used
+      const freeAttemptUsed = await readUserField(userId, "free_attempt_used");
+      if (freeAttemptUsed === true) {
+        setShowFreeTrialUsedPopup(true);
+        return;
+      }
+
+      // If neither condition met, proceed to upload
+      navigate('/upload');
+
+    } catch (error) {
+      console.error("Error checking free trial status:", error);
+      alert("There was an error checking your trial status. Please try again.");
+    }
+  }, [navigate]);
 
   // Initiate payment
   const initiatePayment = useCallback(async () => {
@@ -198,13 +240,15 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
     <div className={styles.paymentBox}>
       <button
         className={styles.paymentButton}
-        onClick={initiatePayment}
+        onClick={plan.id === 'free' ? handleFreeTrial : initiatePayment}
         disabled={!payHereLoaded || isProcessing || showSuccessMessage}
       >
         {showSuccessMessage ? (
           <span><i className={styles.successIcon}></i> Payment Successful! Redirecting...</span>
         ) : isProcessing ? (
           <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
+        ) : plan.id === 'free' ? (
+          <span>Free Trial</span>
         ) : (
           <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
         )}
@@ -218,7 +262,12 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         />
       )}
 
-      
+      {showFreeTrialUsedPopup && (
+        <Popup
+          message="You have already used your free trial."
+          onClose={() => setShowFreeTrialUsedPopup(false)}
+        />
+      )}
     </div>
   );
 };
