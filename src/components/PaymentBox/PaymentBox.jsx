@@ -1,14 +1,17 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import styles from './PaymentBox.module.css';
 import { updateUserField, readUserField, getUserId, subscribeUser } from '../../services/api';
 import Popup from './Popup';
 
-
 const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismissed }) => {
   const [isProcessing, setIsProcessing] = useState(false);
   const [payHereLoaded, setPayHereLoaded] = useState(false);
   const [showPaidPopup, setShowPaidPopup] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  
+  const navigate = useNavigate();
 
   // Load PayHere script
   useEffect(() => {
@@ -19,7 +22,6 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       script.onload = () => {
         console.log("PayHere script loaded successfully");
         setPayHereLoaded(true);
-        
       };
       script.onerror = () => {
         console.error("Failed to load PayHere script");
@@ -38,38 +40,47 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         return;
       }
 
-      // Subscribe the user and update payment status
-      // await subscribeUser({
-      //   user_id: user_id,
-      //   plan: plan.id,
-      //   price: parseFloat(plan.amount),
-      //   attempts: plan.attempts,
-      // });
-      // await updateUserField(user_id, "payment_completed", true);
-
       console.log("Payment completed successfully. Order ID:", orderId);
 
-      // Call the parent's completion handler
-      onPaymentComplete(orderId);
+      // Show success message briefly
+      setShowSuccessMessage(true);
+      
+      // Call the parent's completion handler if provided
+      if (onPaymentComplete) {
+        onPaymentComplete(orderId);
+      }
+
+      // Wait a moment to show success message, then redirect
+      setTimeout(() => {
+        console.log("Redirecting to upload page...");
+        navigate('/upload');
+      }, 20000);
+
     } catch (err) {
       console.error("Error during payment completion:", err);
-      onPaymentError(err);
+      if (onPaymentError) {
+        onPaymentError(err);
+      }
     } finally {
       setIsProcessing(false);
     }
-  }, [onPaymentComplete, onPaymentError, plan]);
+  }, [onPaymentComplete, onPaymentError, plan, navigate]);
 
   // Handle payment errors
   const handlePaymentError = useCallback((error) => {
     console.error("Payment error:", error);
-    onPaymentError(error);
+    if (onPaymentError) {
+      onPaymentError(error);
+    }
     setIsProcessing(false);
   }, [onPaymentError]);
 
   // Handle payment dismissal
   const handlePaymentDismissed = useCallback(() => {
     console.log("Payment dismissed.");
-    onPaymentDismissed();
+    if (onPaymentDismissed) {
+      onPaymentDismissed();
+    }
     setIsProcessing(false);
   }, [onPaymentDismissed]);
 
@@ -188,9 +199,11 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       <button
         className={styles.paymentButton}
         onClick={initiatePayment}
-        disabled={!payHereLoaded || isProcessing}
+        disabled={!payHereLoaded || isProcessing || showSuccessMessage}
       >
-        {isProcessing ? (
+        {showSuccessMessage ? (
+          <span><i className={styles.successIcon}></i> Payment Successful! Redirecting...</span>
+        ) : isProcessing ? (
           <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
         ) : (
           <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
@@ -199,11 +212,13 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       {!payHereLoaded && <p className={styles.loadingMessage}>Loading payment system...</p>}
       
       {showPaidPopup && (
-      <Popup
-        message="You have already paid."
-        onClose={() => setShowPaidPopup(false)}
-      />
-    )}
+        <Popup
+          message="You have already paid."
+          onClose={() => setShowPaidPopup(false)}
+        />
+      )}
+
+      
     </div>
   );
 };

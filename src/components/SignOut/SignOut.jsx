@@ -1,20 +1,48 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import styles from './SignOut.module.css';
 import { handleSignOut } from './SignOutHelper';
+import SignoutPopup from '../SignoutPopup/SignoutPopup';
 
 const SignOut = () => {
   const navigate = useNavigate();
   const { logout, user } = useAuth();
+  const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+
+  const handleSignOutClick = () => {
+    // Show confirmation popup instead of signing out immediately
+    setShowConfirmPopup(true);
+  };
+
+  const handleConfirmSignOut = () => {
+    // User confirmed, proceed with sign out
+    setShowConfirmPopup(false);
+    handleSignOut(logout, navigate, user?.email);
+  };
+
+  const handleCancelSignOut = () => {
+    // User canceled, just close the popup
+    setShowConfirmPopup(false);
+  };
 
   return (
-    <div
-      className={styles.signoutContainer}
-      onClick={() => handleSignOut(logout, navigate, user?.email)}
-    >
-      <p className={styles.signoutText}>Sign Out</p>
-    </div>
+    <>
+      <div
+        className={styles.signoutContainer}
+        onClick={handleSignOutClick}
+      >
+        <p className={styles.signoutText}>Sign Out</p>
+      </div>
+
+      {showConfirmPopup && (
+        <SignoutPopup
+          isOpen={showConfirmPopup}
+          onConfirm={handleConfirmSignOut}
+          onCancel={handleCancelSignOut}
+        />
+      )}
+    </>
   );
 };
 

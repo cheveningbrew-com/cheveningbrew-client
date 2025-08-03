@@ -1,74 +1,46 @@
 import React from 'react';
 import styles from './SignoutPopup.module.css';
-import { downloadFeedbackPDFs } from '../../utils/downloadFeedback';
-import { getUserInterviews, getUserId } from '../../services/api';
 
-const SignOutPopup = ({ isOpen, onConfirm, onCancel }) => {
-  const [interviewList, setInterviewList] = React.useState([]);
-
-  // Load interview list when component mounts
-  React.useEffect(() => {
-    const loadInterviews = async () => {
-      if (isOpen) {
-        try {
-          const userId = getUserId();
-          const data = await getUserInterviews(userId);
-          setInterviewList(data);
-        } catch (err) {
-          console.error("Failed to load interview list", err);
-        }
-      }
-    };
-    loadInterviews();
-  }, [isOpen]);
-
-  const handleDownloadAll = () => {
-    if (interviewList.length > 0) {
-      downloadFeedbackPDFs(interviewList);
-    }
-  };
-
+const SignoutPopup = ({ isOpen, onConfirm, onCancel }) => {
   if (!isOpen) return null;
 
   const handleOverlayClick = (e) => {
-    e.stopPropagation();
+    // Close popup if clicking on overlay (background)
+    if (e.target === e.currentTarget) {
+      onCancel();
+    }
   };
 
   return (
-    <div className={styles.popup_overlay} onClick={onCancel}>
-      <div className={styles.popup_box} onClick={handleOverlayClick}>
-        {/* X cancel button */}
+    <div className={styles.popup_overlay} onClick={handleOverlayClick}>
+      <div className={styles.popup_box}>
+        {/* X close button */}
         <button className={styles.close_icon} onClick={onCancel}>
           &times;
         </button>
 
-        <h3>
-          To start a new interview, please sign out and sign in again.<br /><br />
-          <span style={{ fontWeight: 400, color: '#ffe585' }}>
-            Note: All data will be lost when you sign out.
-          </span>
-        </h3>
-
+        <h3>Sign Out</h3>
+        
+        <p>Are you sure you want to sign out?</p>
+        
         <div className={styles.popup_actions}>
+          <button
+            className={`${styles.btn} ${styles.cancel}`}
+            onClick={onCancel}
+          >
+            Cancel
+          </button>
+          
           <button
             className={`${styles.btn} ${styles.confirm}`}
             onClick={onConfirm}
           >
-            Yes, Sign Out
+            Yes
           </button>
-
-          {interviewList.length > 0 && (
-            <button
-              className={`${styles.btn} ${styles.download}`}
-              onClick={handleDownloadAll}
-            >
-              Download Now
-            </button>
-          )}
         </div>
       </div>
     </div>
   );
 };
 
-export default SignOutPopup;
+export default SignoutPopup;
