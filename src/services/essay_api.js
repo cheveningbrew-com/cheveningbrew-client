@@ -3,7 +3,8 @@
  */
 
 // Configure the API base URL
-const API_BASE_URL = process.env.REACT_APP_ESSAY_API_URL || "http://localhost:8000";
+const API_BASE_URL =
+  process.env.REACT_APP_ESSAY_API_URL || "http://localhost:8000";
 
 /**
  * Upload a PDF file to extract and analyze Chevening essays
@@ -19,12 +20,12 @@ export const uploadEssayFile = async (file) => {
       method: "POST",
       body: formData,
     });
-    
+
     if (!response.ok) {
       const errorData = await response.json();
       throw new Error(errorData.message || "Failed to upload file");
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error("Essay upload error:", error);
@@ -39,11 +40,11 @@ export const uploadEssayFile = async (file) => {
 export const getQueueStatus = async () => {
   try {
     const response = await fetch(`${API_BASE_URL}/queue-status`);
-    
+
     if (!response.ok) {
       throw new Error("Failed to get queue status");
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error("Queue status error:", error);
@@ -59,11 +60,11 @@ export const getQueueStatus = async () => {
 export const getTaskStatus = async (taskId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/task-status/${taskId}`);
-    
+
     if (!response.ok) {
       throw new Error("Failed to get task status");
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error("Task status error:", error);
@@ -81,77 +82,80 @@ export const getTaskStatus = async (taskId) => {
  * @returns {Promise<Object>} Final task result
  */
 export const pollTaskUntilComplete = async (
-  taskId, 
-  onProgress = null, 
+  taskId,
+  onProgress = null,
   onStatusChange = null,
   pollingInterval = 3000,
   maxAttempts = 200
 ) => {
   let attempts = 0;
-  
+
   while (attempts < maxAttempts) {
     try {
       const statusResponse = await getTaskStatus(taskId);
-      
+
       // Call status change callback
       if (onStatusChange) {
         onStatusChange(statusResponse);
       }
-      
+
       // Handle different states
       switch (statusResponse.status) {
-        case 'COMPLETED':
+        case "COMPLETED":
           console.log("✅ Task completed successfully");
           return statusResponse.result;
-          
-        case 'FAILED':
+
+        case "FAILED":
           console.error("❌ Task failed:", statusResponse.error);
           throw new Error(statusResponse.error || "Task failed");
-          
-        case 'PROCESSING':
-        case 'ANALYZING':
-        case 'GENERATING':
-        case 'FINALIZING':
+
+        case "PROCESSING":
+        case "ANALYZING":
+        case "GENERATING":
+        case "FINALIZING":
           // Call progress callback if available
           if (onProgress && statusResponse.meta) {
             onProgress({
               status: statusResponse.status,
-              step: statusResponse.meta.step || '',
-              message: statusResponse.meta.status || '',
+              step: statusResponse.meta.step || "",
+              message: statusResponse.meta.status || "",
               progress: statusResponse.meta.progress || 0,
               current: statusResponse.meta.current || 0,
-              total: statusResponse.meta.total || 100
+              total: statusResponse.meta.total || 100,
             });
           }
-          
-          console.log(`🔄 Task ${statusResponse.status.toLowerCase()}: ${statusResponse.meta?.status || 'Processing...'}`);
+
+          console.log(
+            `🔄 Task ${statusResponse.status.toLowerCase()}: ${
+              statusResponse.meta?.status || "Processing..."
+            }`
+          );
           break;
-          
-        case 'PENDING':
+
+        case "PENDING":
           console.log("⏳ Task is pending...");
           break;
-          
+
         default:
           console.log(`📋 Task status: ${statusResponse.status}`);
       }
-      
+
       // Wait before next poll
-      await new Promise(resolve => setTimeout(resolve, pollingInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollingInterval));
       attempts++;
-      
     } catch (error) {
       console.error(`Polling attempt ${attempts + 1} failed:`, error);
       attempts++;
-      
+
       if (attempts >= maxAttempts) {
         throw new Error("Task polling timeout - maximum attempts reached");
       }
-      
+
       // Wait before retry
-      await new Promise(resolve => setTimeout(resolve, pollingInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollingInterval));
     }
   }
-  
+
   throw new Error("Task polling timeout");
 };
 
@@ -165,7 +169,13 @@ export const pollTaskUntilComplete = async (
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Comprehensive analysis result
  */
-export const getComprehensiveAnalysis = async (dirName, email = null, userName = null, userId, options = {}) => {
+export const getComprehensiveAnalysis = async (
+  dirName,
+  email = null,
+  userName = null,
+  userId,
+  options = {}
+) => {
   try {
     if (!userId) {
       throw new Error("User ID is required for comprehensive analysis");
@@ -174,32 +184,38 @@ export const getComprehensiveAnalysis = async (dirName, email = null, userName =
     const {
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 10000
+      pollingInterval = 10000,
     } = options;
-    
+
     // Build URL with required parameters
     const url = new URL(`${API_BASE_URL}/essay_reviver/${dirName}`);
-    url.searchParams.append('user_id', userId); // Required parameter
+    url.searchParams.append("user_id", userId); // Required parameter
     if (userName) {
-      url.searchParams.append('user_name', userName);
+      url.searchParams.append("user_name", userName);
     }
     if (email) {
-      url.searchParams.append('email', email);
+      url.searchParams.append("email", email);
     }
-    
+
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.detail || `Failed to get comprehensive analysis for ${dirName}`);
+      throw new Error(
+        errorData.error ||
+          errorData.detail ||
+          `Failed to get comprehensive analysis for ${dirName}`
+      );
     }
-    
+
     const result = await response.json();
-    
+
     // This endpoint always uses background processing
     if (result.task_id) {
-      console.log(`🔄 Started comprehensive essay analysis task: ${result.task_id}`);
-      
+      console.log(
+        `🔄 Started comprehensive essay analysis task: ${result.task_id}`
+      );
+
       // Poll until completion
       return await pollTaskUntilComplete(
         result.task_id,
@@ -208,10 +224,9 @@ export const getComprehensiveAnalysis = async (dirName, email = null, userName =
         pollingInterval
       );
     }
-    
+
     // Return direct result if no task ID (shouldn't happen with this endpoint)
     return result;
-    
   } catch (error) {
     console.error(`Comprehensive analysis error for ${dirName}:`, error);
     throw error;
@@ -228,41 +243,55 @@ export const getComprehensiveAnalysis = async (dirName, email = null, userName =
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Leadership comprehensive analysis result
  */
-export const getLeadershipComprehensiveAnalysis = async (dirName, email = null, userName = null, userId, options = {}) => {
+export const getLeadershipComprehensiveAnalysis = async (
+  dirName,
+  email = null,
+  userName = null,
+  userId,
+  options = {}
+) => {
   try {
     if (!userId) {
-      throw new Error("User ID is required for leadership comprehensive analysis");
+      throw new Error(
+        "User ID is required for leadership comprehensive analysis"
+      );
     }
 
     const {
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 10000
+      pollingInterval = 10000,
     } = options;
-    
+
     // Build URL with required parameters
-    const url = new URL(`${API_BASE_URL}/leadership_reviver/${dirName}`);
-    url.searchParams.append('user_id', userId); // Required parameter
+    const url = new URL(`${API_BASE_URL}/leadership_reviewer/${dirName}`);
+    url.searchParams.append("user_id", userId); // Required parameter
     if (userName) {
-      url.searchParams.append('user_name', userName);
+      url.searchParams.append("user_name", userName);
     }
     if (email) {
-      url.searchParams.append('email', email);
+      url.searchParams.append("email", email);
     }
-    
+
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.error || errorData.detail || `Failed to get leadership comprehensive analysis for ${dirName}`);
+      throw new Error(
+        errorData.error ||
+          errorData.detail ||
+          `Failed to get leadership comprehensive analysis for ${dirName}`
+      );
     }
-    
+
     const result = await response.json();
-    
+
     // This endpoint always uses background processing
     if (result.task_id) {
-      console.log(`👑 Started leadership comprehensive analysis task: ${result.task_id}`);
-      
+      console.log(
+        `👑 Started leadership comprehensive analysis task: ${result.task_id}`
+      );
+
       // Poll until completion
       return await pollTaskUntilComplete(
         result.task_id,
@@ -271,12 +300,14 @@ export const getLeadershipComprehensiveAnalysis = async (dirName, email = null, 
         pollingInterval
       );
     }
-    
+
     // Return direct result if no task ID (shouldn't happen with this endpoint)
     return result;
-    
   } catch (error) {
-    console.error(`Leadership comprehensive analysis error for ${dirName}:`, error);
+    console.error(
+      `Leadership comprehensive analysis error for ${dirName}:`,
+      error
+    );
     throw error;
   }
 };
@@ -290,38 +321,45 @@ export const getLeadershipComprehensiveAnalysis = async (dirName, email = null, 
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Task information or direct result
  */
-export const getEssayFeedback = async (dirName, email = null, userName = null, options = {}) => {
+export const getEssayFeedback = async (
+  dirName,
+  email = null,
+  userName = null,
+  options = {}
+) => {
   try {
     const {
       useBackground = true,
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 10000
+      pollingInterval = 10000,
     } = options;
-    
+
     // Build URL with parameters
     const url = new URL(`${API_BASE_URL}/essay_feedback/${dirName}`);
     if (userName) {
-      url.searchParams.append('user_name', userName);
+      url.searchParams.append("user_name", userName);
     }
     if (email) {
-      url.searchParams.append('email', email);
+      url.searchParams.append("email", email);
     }
-    url.searchParams.append('use_background', useBackground.toString());
-    
+    url.searchParams.append("use_background", useBackground.toString());
+
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `Failed to get essay feedback for ${dirName}`);
+      throw new Error(
+        errorData.detail || `Failed to get essay feedback for ${dirName}`
+      );
     }
-    
+
     const result = await response.json();
-    
+
     // If background processing is used and we got a task ID
     if (useBackground && result.task_id) {
       console.log(`🎓 Started essay feedback analysis task: ${result.task_id}`);
-      
+
       // Poll until completion
       return await pollTaskUntilComplete(
         result.task_id,
@@ -330,10 +368,9 @@ export const getEssayFeedback = async (dirName, email = null, userName = null, o
         pollingInterval
       );
     }
-    
+
     // Return direct result for synchronous processing
     return result;
-    
   } catch (error) {
     console.error(`Essay feedback error for ${dirName}:`, error);
     throw error;
@@ -349,36 +386,43 @@ export const getEssayFeedback = async (dirName, email = null, userName = null, o
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Task information or direct result
  */
-export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null, userName = null, options = {}) => {
+export const getCombinedGrammarHemingwayAnalysis = async (
+  dirName,
+  email = null,
+  userName = null,
+  options = {}
+) => {
   try {
     const {
       useBackground = true,
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 10000
+      pollingInterval = 10000,
     } = options;
-    
-    const url = new URL(`${API_BASE_URL}/combined_analysis/grammar_hemingway/${dirName}`);
+
+    const url = new URL(
+      `${API_BASE_URL}/combined_analysis/grammar_hemingway/${dirName}`
+    );
     if (userName) {
-      url.searchParams.append('user_name', userName);
+      url.searchParams.append("user_name", userName);
     }
     if (email) {
-      url.searchParams.append('email', email);
+      url.searchParams.append("email", email);
     }
-    url.searchParams.append('use_background', useBackground.toString());
+    url.searchParams.append("use_background", useBackground.toString());
 
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       throw new Error(`Failed to get combined analysis for ${dirName}`);
     }
-    
+
     const result = await response.json();
-    
+
     // If background processing is used and we got a task ID
     if (useBackground && result.task_id) {
       console.log(`📝 Started combined analysis task: ${result.task_id}`);
-      
+
       // Poll until completion
       return await pollTaskUntilComplete(
         result.task_id,
@@ -387,12 +431,14 @@ export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null,
         pollingInterval
       );
     }
-    
+
     // Return direct result for synchronous processing
     return result;
-    
   } catch (error) {
-    console.error(`Combined grammar + Hemingway analysis error for ${dirName}:`, error);
+    console.error(
+      `Combined grammar + Hemingway analysis error for ${dirName}:`,
+      error
+    );
     throw error;
   }
 };
@@ -404,35 +450,46 @@ export const getCombinedGrammarHemingwayAnalysis = async (dirName, email = null,
  * @param {Object} options - Analysis options
  * @returns {Promise<Object>} Grammar analysis results and Google Drive file links
  */
-export const analyzeLeadershipGrammar = async (dirName, email = null, options = {}) => {
+export const analyzeLeadershipGrammar = async (
+  dirName,
+  email = null,
+  options = {}
+) => {
   try {
     const {
       useBackground = true,
       onProgress = null,
       onStatusChange = null,
-      pollingInterval = 10000
+      pollingInterval = 10000,
     } = options;
-    
+
     // Build URL with optional email parameter
-    const url = new URL(`${API_BASE_URL}/grammar_analysis/leadership/${dirName}`);
+    const url = new URL(
+      `${API_BASE_URL}/grammar_analysis/leadership/${dirName}`
+    );
     if (email) {
-      url.searchParams.append('email', email);
+      url.searchParams.append("email", email);
     }
-    url.searchParams.append('use_background', useBackground.toString());
-    
+    url.searchParams.append("use_background", useBackground.toString());
+
     const response = await fetch(url.toString());
-    
+
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || `Failed to analyze leadership grammar for ${dirName}`);
+      throw new Error(
+        errorData.detail ||
+          `Failed to analyze leadership grammar for ${dirName}`
+      );
     }
-    
+
     const result = await response.json();
-    
+
     // If background processing is used and we got a task ID
     if (useBackground && result.task_id) {
-      console.log(`👑 Started leadership grammar analysis task: ${result.task_id}`);
-      
+      console.log(
+        `👑 Started leadership grammar analysis task: ${result.task_id}`
+      );
+
       // Poll until completion
       return await pollTaskUntilComplete(
         result.task_id,
@@ -441,10 +498,9 @@ export const analyzeLeadershipGrammar = async (dirName, email = null, options = 
         pollingInterval
       );
     }
-    
+
     // Return direct result for synchronous processing
     return result;
-    
   } catch (error) {
     console.error(`Leadership grammar analysis error for ${dirName}:`, error);
     throw error;
@@ -463,21 +519,20 @@ export const createTaskMonitor = async (taskId, callbacks = {}) => {
     onProgress = () => {},
     onStatusChange = () => {},
     onComplete = () => {},
-    onError = () => {}
+    onError = () => {},
   } = callbacks;
-  
+
   try {
     onStart(taskId);
-    
+
     const result = await pollTaskUntilComplete(
       taskId,
       onProgress,
       onStatusChange
     );
-    
+
     onComplete(result);
     return result;
-    
   } catch (error) {
     onError(error);
     throw error;
@@ -491,14 +546,14 @@ export const createTaskMonitor = async (taskId, callbacks = {}) => {
  */
 export const getMultipleTaskStatuses = async (taskIds) => {
   try {
-    const statusPromises = taskIds.map(taskId => 
-      getTaskStatus(taskId).catch(error => ({
+    const statusPromises = taskIds.map((taskId) =>
+      getTaskStatus(taskId).catch((error) => ({
         task_id: taskId,
-        status: 'ERROR',
-        error: error.message
+        status: "ERROR",
+        error: error.message,
       }))
     );
-    
+
     return await Promise.all(statusPromises);
   } catch (error) {
     console.error("Error getting multiple task statuses:", error);
@@ -514,13 +569,13 @@ export const getMultipleTaskStatuses = async (taskIds) => {
 export const cancelTask = async (taskId) => {
   try {
     const response = await fetch(`${API_BASE_URL}/cancel-task/${taskId}`, {
-      method: 'POST'
+      method: "POST",
     });
-    
+
     if (!response.ok) {
       throw new Error("Failed to cancel task");
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error("Task cancellation error:", error);
@@ -534,12 +589,12 @@ export default {
   getQueueStatus,
   getTaskStatus,
   pollTaskUntilComplete,
-  getComprehensiveAnalysis,          // For paid subscription users
+  getComprehensiveAnalysis, // For paid subscription users
   getLeadershipComprehensiveAnalysis, // For free trial users
-  getEssayFeedback,                 // Legacy
+  getEssayFeedback, // Legacy
   getCombinedGrammarHemingwayAnalysis, // Legacy
-  analyzeLeadershipGrammar,         // Legacy
+  analyzeLeadershipGrammar, // Legacy
   createTaskMonitor,
   getMultipleTaskStatuses,
-  cancelTask
+  cancelTask,
 };

@@ -24,7 +24,7 @@
   flex-direction: column;
   align-items: center;
   width: 100%;
-  max-width: 500px;
+  max-width: 800px;
   background: rgba(255, 255, 255, 0.08);
   border-radius: 12px;
   padding: 2rem;
@@ -71,7 +71,7 @@
 /* Upload Zone Container */
 .uploadZone {
   width: 100%;
-  max-width: 500px;
+  max-width: 700px;
   margin-bottom: 1.5rem;
 }
 
@@ -87,7 +87,7 @@
 .dropZone {
   border: 2px dashed rgba(255, 255, 255, 0.4);
   border-radius: 12px;
-  padding: 2rem;
+  padding: 2.5rem;
   text-align: center;
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
@@ -216,7 +216,7 @@
 
 .deleteButton:hover {
   color: #ff5252;
-  
+
   transform: scale(1.1);
 }
 
@@ -696,7 +696,7 @@
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .inlinePricing {
     padding: 1.5rem;
   }
@@ -708,12 +708,12 @@
     padding: 1rem;
     height: calc(100vh - 200px);
   }
- 
+
   .title {
     font-size: 1.5rem;
     margin-bottom: 1.5rem;
   }
- 
+
   .uploadSection {
     padding: 1.5rem;
     max-width: 100%;
@@ -723,17 +723,17 @@
   .uploadZone {
     max-width: 100%;
   }
-  
+
   .dropZone {
     padding: 1.5rem;
   }
-  
 
-  
+
+
   .dragText {
     font-size: 1rem;
   }
-  
+
   .browseButton {
     padding: 0.7rem 1.5rem;
     font-size: 0.9rem;
@@ -753,7 +753,7 @@
   .statusDisplay {
     margin-bottom: 1rem;
   }
-  
+
   .subscriptionStatus,
   .freeTrialStatus,
   .upgradeStatus {
@@ -764,11 +764,11 @@
   .planCard {
     padding: 1rem;
   }
-  
+
   .price {
     font-size: 1.3rem;
   }
-  
+
   .pricingButton {
     font-size: 1rem;
     padding: 0.8rem 1.5rem;
@@ -782,12 +782,12 @@
     padding-bottom: 3rem;
     height: calc(100vh - 180px);
   }
- 
+
   .title {
     font-size: 1.3rem;
     margin-bottom: 1.2rem;
   }
- 
+
   .uploadSection {
     padding: 1.2rem;
     margin-bottom: 3rem;
@@ -798,27 +798,27 @@
     font-size: 1.1rem;
     margin-bottom: 1rem;
   }
-  
+
   .dropZone {
     padding: 1rem;
   }
-  
-  
-  
+
+
+
   .selectedFileContainer {
     flex-direction: column;
     text-align: center;
     gap: 0.8rem;
   }
-  
+
   .fileDetails {
     text-align: center;
   }
-  
+
   .fileName {
     font-size: 0.9rem;
   }
- 
+
   .uploadButton {
     font-size: 1rem;
     padding: 0.7rem 1.2rem;
@@ -847,7 +847,7 @@
   .statusDisplay {
     margin-bottom: 0.8rem;
   }
-  
+
   .subscriptionStatus,
   .freeTrialStatus,
   .upgradeStatus {
@@ -887,7 +887,7 @@
 
 .uploadRequirements {
   margin-top: 1.5rem;
-  padding: 1.2rem;
+  padding: 1.5rem 2rem;
   background: rgba(255, 229, 133, 0.08);
   border: 1px solid rgba(255, 229, 133, 0.25);
   border-radius: 8px;
