@@ -241,9 +241,10 @@ const Upload = () => {
         const analysisData = {
           essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
           googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
-          googleDrive: analysisResult.summary?.grammar_style_document?.google_drive_link,
+          narrativeFeedback: analysisResult.summary?.narrative_feedback_document?.google_docs_link,
           downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
           downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
+          downloadLinkNarrativeFeedback: analysisResult.summary?.narrative_feedback_document?.download_link,
           timestamp: new Date().toISOString(),
           fileName: selectedFile.name,
           directoryName: dirName,
@@ -271,15 +272,17 @@ const Upload = () => {
         });
 
         // Store results for comprehensive format
-        const analysisData = {
+          const analysisData = {
           googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
           essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
+          narrativeFeedback: analysisResult.summary?.narrative_feedback_document?.google_docs_link,
           downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
           downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
+          downloadLinkNarrativeFeedback: analysisResult.summary?.narrative_feedback_document?.download_link,
           timestamp: new Date().toISOString(),
           fileName: selectedFile.name,
           taskId: analysisResult.task_info?.task_id,
-          totalDocuments: analysisResult.summary?.total_documents_created || 2,
+          totalDocuments: analysisResult.summary?.total_documents_created || 3,
           databaseSaved: analysisResult.summary?.database_saved || false,
           analysisType: "comprehensive_essay_revival"
         };

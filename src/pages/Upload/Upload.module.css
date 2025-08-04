@@ -931,3 +931,16 @@
   flex-shrink: 0;
   margin-top: 0.1rem;
 }
+
+.narrativeFeedbackButton {
+  background-color: #007bff !important; /* Blue color */
+  color: white !important;
+  border: 1px solid #007bff !important;
+}
+
+.narrativeFeedbackButton:hover {
+  background-color: #0056b3 !important; /* Darker blue on hover */
+  border-color: #0056b3 !important;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
