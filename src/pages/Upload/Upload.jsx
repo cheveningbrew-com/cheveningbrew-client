@@ -3,8 +3,8 @@ import { useNavigate } from "react-router-dom";
 import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Upload.module.css";
-import { 
-  uploadEssayFile, 
+import {
+  uploadEssayFile,
   getQueueStatus,
   getComprehensiveAnalysis,
   getLeadershipComprehensiveAnalysis
@@ -22,7 +22,7 @@ const Upload = () => {
   const [queueStatus, setQueueStatus] = useState(null);
   const [analysisType, setAnalysisType] = useState(null);  // Added this
   const [estimatedTime, setEstimatedTime] = useState(null);  // Added this
-  
+
   // Unified subscription status
   const [subscriptionStatus, setSubscriptionStatus] = useState(null);
   const [statusLoading, setStatusLoading] = useState(true);
@@ -47,7 +47,7 @@ const Upload = () => {
     try {
       setStatusLoading(true);
       const userId = getUserId();
-      
+
       if (!userId) {
         navigate("/");
         return;
@@ -56,7 +56,7 @@ const Upload = () => {
       // Get comprehensive subscription status
       const status = await checkSubscriptionStatus(userId);
       setSubscriptionStatus(status);
-      
+
     } catch (error) {
       console.error("Error checking user status:", error);
       setError("Unable to verify user status. Please try again.");
@@ -89,7 +89,7 @@ const Upload = () => {
         setError("Please upload a PDF file.");
         return;
       }
-      
+
       setSelectedFile(file);
       setError(null);
     }
@@ -133,52 +133,52 @@ const Upload = () => {
       setError(null);
       setAnalysisProgress(null);
       setCurrentTask(null);
-      setAnalysisType(null);  
+      setAnalysisType(null);
       setEstimatedTime(null);
-      
+
       const userId = getUserId();
 
       // 🚦 STEP 1: CHECK SUBSCRIPTION STATUS FIRST (BEFORE UPLOAD)
       let analysisEndpoint;
       let analysisTypeToUse;
       let estimatedTimeToUse;
-      
+
       // Condition 1: Free attempt available (no payment, no subscription, free attempt not used)
-      if (subscriptionStatus.is_free_attempt_used === false && 
-          subscriptionStatus.payment_completed === false && 
+      if (subscriptionStatus.is_free_attempt_used === false &&
+          subscriptionStatus.payment_completed === false &&
           subscriptionStatus.has_active_subscription === false) {
-        
+
         console.log("🆓 Will use free leadership analysis");
         analysisEndpoint = "leadership";
         analysisTypeToUse = "leadership_comprehensive";
         estimatedTimeToUse = "12-15 minutes";
-        
+
         setAnalysisProgress({
           step: "1/3",
           message: "🆓 Free Trial: Will analyze your leadership essay only",
           progress: 5,
           status: "PREPARING"
         });
-        
-      } 
+
+      }
       // Condition 2: Active subscription with remaining attempts
-      else if (subscriptionStatus.payment_completed === true && 
-               subscriptionStatus.has_active_subscription === true && 
+      else if (subscriptionStatus.payment_completed === true &&
+               subscriptionStatus.has_active_subscription === true &&
                subscriptionStatus.remaining_attempts > 0) {
-        
+
         console.log("💰 Will use comprehensive subscription analysis");
         analysisEndpoint = "comprehensive";
         analysisTypeToUse = "comprehensive_essay_revival";
         estimatedTimeToUse = "25-30 minutes";
-        
+
         setAnalysisProgress({
           step: "1/3",
           message: "💰 Premium Analysis: Will analyze all 4 Chevening essays",
           progress: 5,
           status: "PREPARING"
         });
-        
-      } 
+
+      }
       // Condition 3: All other cases - redirect to pricing
       else {
         console.log("💳 Redirecting to pricing page");
@@ -193,7 +193,7 @@ const Upload = () => {
 
       // Brief pause to show user what analysis they'll get
       await new Promise(resolve => setTimeout(resolve, 1500));
-      
+
       // STEP 2: Upload the file
       setAnalysisProgress({
         step: "2/3",
@@ -203,16 +203,16 @@ const Upload = () => {
       });
 
       const uploadResult = await uploadEssayFile(selectedFile);
-      
+
       if (!uploadResult.success) {
         throw new Error(uploadResult.message || "Upload failed");
       }
-      
+
       // Extract directory name from path
       const extractedTextPath = uploadResult.extracted_text_dir;
       const pathParts = extractedTextPath.split('/');
       const dirName = pathParts[1]; // Format: "text_outs/dirName"
-      
+
       setAnalysisProgress({
         step: "3/3",
         message: `Starting ${analysisTypeToUse === "leadership_comprehensive" ? "leadership" : "comprehensive"} analysis...`,
@@ -256,7 +256,7 @@ const Upload = () => {
         };
 
         sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
-        
+
       } else if (analysisEndpoint === "comprehensive") {
         // Paid subscription - Comprehensive analysis
         analysisResult = await getComprehensiveAnalysis(dirName, userEmail, userName, userId, {
@@ -304,10 +304,10 @@ const Upload = () => {
       setTimeout(() => {
         navigate("/feedback");
       }, 1500);
-      
+
     } catch (err) {
       console.error("Upload and analysis error:", err);
-      
+
       // Handle specific errors
       if (err.message?.includes("queue is full")) {
         setError("Analysis queue is currently full. Please try again in a few minutes.");
@@ -321,7 +321,7 @@ const Upload = () => {
       } else {
         setError(`Error: ${err.message || "Unknown error occurred"}`);
       }
-      
+
       // If authentication issues, redirect to login
       if (err.message?.includes("unauthorized") || err.message?.includes("not authenticated")) {
         logout();
@@ -335,14 +335,14 @@ const Upload = () => {
  const handleDeleteFile = (event) => {
   event.preventDefault();
   event.stopPropagation(); // Prevent label click
-  
+
   setSelectedFile(null);
   setError(null);
   setAnalysisProgress(null);
   setCurrentTask(null);
   setAnalysisType(null);
   setEstimatedTime(null);
-  
+
   // Reset file input
   const fileInput = document.getElementById("file-upload");
   if (fileInput) fileInput.value = "";
@@ -370,24 +370,24 @@ const handleDrop = (e) => {
   e.preventDefault();
   e.stopPropagation();
   setDragActive(false);
-  
+
   const files = e.dataTransfer.files;
   if (files && files[0]) {
     const file = files[0];
-    
+
     // Validate file type
     if (file.type !== "application/pdf") {
       setError("Please upload a PDF file.");
       return;
     }
-    
+
     // Validate file size (10MB limit)
     const MAX_FILE_SIZE = 10 * 1024 * 1024;
     if (file.size > MAX_FILE_SIZE) {
       setError(`File size exceeds the maximum allowed size (10MB)`);
       return;
     }
-    
+
     setSelectedFile(file);
     setError(null);
   }
@@ -412,16 +412,18 @@ const handleDrop = (e) => {
     <MainLayout>
       <ActionBox>
         <div className={`${styles.uploadContainer} customScroll`}>
-          <h1 className={styles.title}>
-            Upload your Chevening Application Essays
-          </h1>
-          
+          {!isLoading && (
+            <h1 className={styles.title}>
+              Upload your Chevening draft essays
+            </h1>
+          )}
+
           {/* Status Display */}
           {/* {subscriptionStatus && (
             <div className={styles.statusDisplay}>
               {subscriptionStatus.has_active_subscription ? (
                 <div className={styles.subscriptionStatus}>
-                  <p><strong>Plan:</strong> {subscriptionStatus.subscription_plan} | 
+                  <p><strong>Plan:</strong> {subscriptionStatus.subscription_plan} |
                      <strong>Attempts Remaining:</strong> {subscriptionStatus.remaining_attempts}</p>
                 </div>
               ) : !subscriptionStatus.is_free_attempt_used ? (
@@ -435,20 +437,20 @@ const handleDrop = (e) => {
               )}
             </div>
           )} */}
-          
+
           <div className={styles.uploadSection}>
             {/* Queue Status Display */}
             {queueStatus && queueStatus.status === "busy" && (
               <div className={styles.queueWarning}>
-                ⚠️ Analysis queue is busy ({queueStatus.queue_length}/{queueStatus.max_queue_length} tasks). 
+                ⚠️ Analysis queue is busy ({queueStatus.queue_length}/{queueStatus.max_queue_length} tasks).
                 Your analysis may take longer than usual.
               </div>
             )}
 
-            {/* File Upload Zone */}            
+            {/* File Upload Zone */}
             <div className={styles.uploadZone}>
               {/* <h3 className={styles.uploadTitle}>Upload your document</h3> */}
-              
+
               {selectedFile ? (
                 !isLoading ? (
                   <div className={styles.selectedFileContainer}>
@@ -459,7 +461,7 @@ const handleDrop = (e) => {
                         {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
                       </span>
                     </div>
-                    <button 
+                    <button
                       type="button"
                       onClick={handleDeleteFile}
                       className={styles.deleteButton}
@@ -470,7 +472,7 @@ const handleDrop = (e) => {
                   </div>
                 ) : <></>
               ) : (
-               <div 
+               <div
                   className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
                   onDragEnter={handleDragEnter}
                   onDragLeave={handleDragLeave}
@@ -484,7 +486,7 @@ const handleDrop = (e) => {
                   <div className={styles.orDivider}>
                     <span>or</span>
                   </div>
-                  <button 
+                  <button
                     type="button"
                     className={styles.browseButton}
                     onClick={() => document.getElementById('file-upload').click()}
@@ -492,7 +494,7 @@ const handleDrop = (e) => {
                   >
                     Browse files
                   </button>
-                  
+
                   {/* NEW: Upload Requirements */}
                   <div className={styles.uploadRequirements}>
                     <p className={styles.requirementsHeader}>
@@ -511,7 +513,7 @@ const handleDrop = (e) => {
                   </div>
                 </div>
               )}
-              
+
               <input
                 type="file"
                 id="file-upload"
@@ -522,9 +524,9 @@ const handleDrop = (e) => {
               />
             </div>
 
-            
+
             {error && <div className={styles.errorMessage}>{error}</div>}
-            
+
             {/* Dynamic Upload Button */}
             {!isLoading && subscriptionStatus && selectedFile && (
               <button
@@ -532,10 +534,10 @@ const handleDrop = (e) => {
                 onClick={handleUpload}
                 disabled={!selectedFile || isLoading}
               >
-                {isLoading ? "Processing..." : 
-                 !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed 
-                   ? "Upload" 
-                   : subscriptionStatus.can_upload 
+                {isLoading ? "Processing..." :
+                 !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed
+                   ? "Upload"
+                   : subscriptionStatus.can_upload
                      ? "Upload "
                      : "Upload"}
               </button>
@@ -552,14 +554,14 @@ const handleDrop = (e) => {
                   </h3>
                   <p>{analysisProgress.step}</p>
                 </div>
-                
+
                 <div className={styles.progressBar}>
-                  <div 
+                  <div
                     className={styles.progressFill}
                     style={{ width: `${analysisProgress.progress}%` }}
                   ></div>
                 </div>
-                
+
                 <div className={styles.progressInfo}>
                   <div className={styles.spinner}></div>
                   <div className={styles.progressText}>
@@ -585,7 +587,7 @@ const handleDrop = (e) => {
               </div>
             )}
 
-            
+
           </div>
         </div>
       </ActionBox>

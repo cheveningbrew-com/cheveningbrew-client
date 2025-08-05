@@ -34,22 +34,25 @@ const plans = [
     name: 'Free',
     amount: '0.00',
     attempts: 1,
-    description: '1 attempt\n• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned feedback\n• For leadership essay only',
+    titleDescription: 'Partial review x 1',
+    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned indicative scoring\n(For leadership essay only)',
     isFree: true
   },
   {
     id: 'basic',
     name: 'Basic',
-    amount: '15.00',
+    amount: '5.00',
     attempts: 1,
-    description: '1 attempt\n• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned feedback\n• For all four essays',
+    titleDescription: 'Full review x 1',
+    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned indicative scoring\n(For all four essays)',
   },
   {
     id: 'premium',
     name: 'Premium',
-    amount: '35.00',
+    amount: '10.00',
     attempts: 3,
-    description: '3 attempts\n• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned feedback\n• For all four essays\n• Repeat review process three times',
+    titleDescription: 'Full review x 3',
+    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned indicative scoring\n(For all essays, repeat thrice)',
   },
 ];
 
@@ -71,6 +74,7 @@ export default function Price({
                 </div>
                 <div className={styles.priceContent}>
                   <div className={styles.priceDescription}>
+                    <p className={styles.priceTitleDescription}>{plan.titleDescription}</p>
                     {plan.description.split('\n').map((line, i) => (
                       <p key={i} className={styles.priceText}>{line}</p>
                     ))}
@@ -100,6 +104,7 @@ export default function Price({
               </div>
               <div className={styles.priceContent}>
                 <div className={styles.priceDescription}>
+                  <p className={styles.priceTitleDescription}>{plan.titleDescription}</p>
                   {plan.description.split('\n').map((line, i) => (
                     <p key={i} className={styles.priceText}>{line}</p>
                   ))}

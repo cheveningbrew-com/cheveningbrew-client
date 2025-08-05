@@ -1,6 +1,6 @@
 .payment-box {
     display: flex;
-    justify-content: center;
+    justify-content: flex-start;
     margin: 20px 0;
   }
 
@@ -27,7 +27,7 @@
   .paymentBox {
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;
     margin: 20px 0;
   }
 
