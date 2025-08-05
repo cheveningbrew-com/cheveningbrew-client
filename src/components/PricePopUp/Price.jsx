@@ -34,8 +34,9 @@ const plans = [
     name: 'Free',
     amount: '0.00',
     attempts: 1,
-    titleDescription: 'Partial review x 1',
-    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned indicative scoring\n(For leadership essay only)',
+    titleDescription: 'Free review x 1',
+    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria indicative scoring',
+    essayInfo: 'For leadership essay only',
     isFree: true
   },
   {
@@ -44,7 +45,8 @@ const plans = [
     amount: '5.00',
     attempts: 1,
     titleDescription: 'Full review x 1',
-    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned indicative scoring\n(For all four essays)',
+    description: '• Grammar and style review\n• Narrative evaluation\n• Chevening criteria indicative scoring',
+    essayInfo: 'For all four essays, one round of feedback',
   },
   {
     id: 'premium',
@@ -52,7 +54,8 @@ const plans = [
     amount: '10.00',
     attempts: 3,
     titleDescription: 'Full review x 3',
-    description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria aligned indicative scoring\n(For all essays, repeat thrice)',
+    description: '• Grammar and style review\n• Narrative evaluation\n• Chevening criteria indicative scoring',
+    essayInfo: 'For all four essays, three rounds of feedback',
   },
 ];
 
@@ -78,6 +81,7 @@ export default function Price({
                     {plan.description.split('\n').map((line, i) => (
                       <p key={i} className={styles.priceText}>{line}</p>
                     ))}
+                    <p className={styles.priceEssayInfo}>{plan.essayInfo}</p>
                   </div>
                   <PaymentBox
                     plan={plan}
@@ -108,6 +112,7 @@ export default function Price({
                   {plan.description.split('\n').map((line, i) => (
                     <p key={i} className={styles.priceText}>{line}</p>
                   ))}
+                  <p className={styles.priceEssayInfo}>{plan.essayInfo}</p>
                 </div>
                 <PaymentBox
                   plan={plan}

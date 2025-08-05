@@ -27,8 +27,9 @@
   .paymentBox {
     display: flex;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
     margin: 20px 0;
+    width: 100%;
   }
 
   .paymentButton {
@@ -43,7 +44,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    min-width: 200px;
+    width: 100%;
   }
 
   .paymentButton:hover:not(:disabled) {
@@ -86,7 +87,7 @@
   }
 
   .paymentIcon {
-    display: inline-block;
+    display: inline-flex;
     width: 16px;
     height: 16px;
     margin-right: 8px;
@@ -94,6 +95,7 @@
     background-repeat: no-repeat;
     background-position: center;
     background-size: contain;
+    vertical-align: middle;
   }
 
   .loadingMessage {
