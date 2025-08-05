@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import SupportPagesLayout from "../../../layouts/SupportPagesLayout";
 import ActionBox from "../../../components/ActionBox/ActionBox";
+import { sendGuide } from "../../../services/marketing_api";
 import styles from "./GetEssayCollection.module.css";
 
 const GetEssayCollection = () => {
@@ -53,9 +54,7 @@ const GetEssayCollection = () => {
       setIsSubmitting(true);
       
       try {
-        // In a real application, this would be an API call to send the email
-        // For now, we'll simulate a successful submission after a short delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await sendGuide(formData.email, formData.name, "essay-collection");
         
         // Show success message
         setIsSubmitted(true);
