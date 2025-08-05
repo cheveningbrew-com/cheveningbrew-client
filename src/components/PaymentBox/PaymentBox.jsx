@@ -248,9 +248,9 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         ) : isProcessing ? (
           <span><i className={styles.loadingIcon}></i> Processing Payment...</span>
         ) : plan.id === 'free' ? (
-          <span>Free Trial</span>
+          <span>Try for free</span>
         ) : (
-          <span><i className={styles.paymentIcon}></i> Pay ${plan.amount} Now</span>
+          <span><i className={styles.paymentIcon}></i> Pay ${plan.amount}</span>
         )}
       </button>
       {!payHereLoaded && <p className={styles.loadingMessage}>Loading payment system...</p>}
