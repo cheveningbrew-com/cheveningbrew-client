@@ -41,6 +41,15 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         return;
       }
 
+      // Check payment is completed
+      const paymentCompleted = await readUserField(user_id, "payment_completed");
+      if (!paymentCompleted) {
+        console.error("Payment not completed for user:", user_id);
+        alert("Payment not completed. Please try again.");
+
+        return;
+      }
+
       console.log("Payment completed successfully. Order ID:", orderId);
 
       // Show success message briefly
