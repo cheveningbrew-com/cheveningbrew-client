@@ -10,17 +10,42 @@ const About = () => {
         <div className={`${styles.supportContent} customScroll`}>
           <h1 className={styles.pageTitle}>About CheveningBrew</h1>
           <p className={styles.description}>
-            Every single Chevening shortlisted candidate come February 2026 will have had their essays reviewed by at least one person. While there are  exceptions, reviewers tend to be Chevening alumni or scholars the candidate personally know. For the many aspirants who do not have such connections, the Chevening application is an exam where the few have the answer key.
-            <br/><br/>
-            Cheveningbrew's Aisha is here to help level the playing field. Aisha reflects her makers: Chevening alumni who wish to see the best candidates selected on merit and not the strength of their social connections. Aisha's feedback can make a radical difference to your application. She evaluates each of your four essays for:
-            <br/><br/>
-            • Grammar and style<br/>
-            • Narrative strength<br/>
-            • Alignment with Chevening scoring criteria*<br/>
-            <br/>
-            The Chevening Secretariat does prescribe strict AI usage guidelines for applications: using AI to **generate** your answers is strictly prohibited (See: <a href="https://www.chevening.org/faqs/can-i-use-ai-to-help-me-write-my-application/">Can I use AI to write Chevening essays</a>). Aisha provides feedback exactly how all shortlisted candidates will receive theirs from their buddy reviewers. She will share a word document(s) with comments and suggestions. She will never write your essays for you.
-            <br/><br/>
-            * Cheveningbrew is not affiliated with the Chevening Secretariat or the UK Foreign, Commonwealth & Development Office. It is an independent initiative by Chevening alumni to support prospective candidates. Chevening criteria are subject to change and applicants should always refer to the official Chevening website for the most current information. We use publicly available information to inform our rubrics and our personal experiences to guide our feedback.
+            Come February 2026, nearly every Chevening-shortlisted candidate will have had their essays reviewed—usually by someone who's walked the path before. Often, that means a Chevening alum or scholar personally known to them. But for many exceptional candidates without those connections, the Chevening application can feel like an exam where a lucky few already have the answer key.
+          </p>
+          
+          <p className={styles.description}>
+            Aisha is here to change that.
+          </p>
+          
+          <p className={styles.description}>
+            Aisha is an AI — short for AI-sha — built by Chevening alumni to democratize access to the kind of insightful, experience-backed feedback that helps strong candidates rise. Trained on dozens of successful Chevening essays and grounded in official guidance, Aisha evaluates each of your four essays with a human-like focus on:
+          </p>
+          
+          <ul className={styles.privacyList}>
+            <li className={styles.privacyListItem}>Grammar and style</li>
+            <li className={styles.privacyListItem}>Narrative strength</li>
+            <li className={styles.privacyListItem}>Alignment with Chevening's selection criteria*</li>
+          </ul>
+          
+          <p className={styles.description}>
+            Her feedback mirrors what shortlisted candidates often receive from alumni mentors: thoughtful comments, suggestions, and guidance that push your writing to its best version — never writing it for you.
+          </p>
+          
+          <p className={styles.description}>
+            Chevening's guidelines are clear: using AI to generate your essays is strictly prohibited. And we agree — not just because of the rules, but because your story deserves to be yours. This is why Aisha is not a ghostwriter.
+          </p>
+          
+          <p className={styles.description}>
+            At Cheveningbrew, we believe that a fundamentally rewarding part of the application process is the act of self-reflection: learning to articulate your values, your journey, and your vision. Letting AI do that for you is not only against policy — it's a disservice to yourself.
+          </p>
+          
+          <p className={styles.description}>
+            Aisha doesn't replace that process. She enhances it.
+          </p>
+          
+          <p className={styles.description}>
+            * Cheveningbrew is not affiliated with the Chevening Secretariat or the UK Foreign, Commonwealth & Development Office.
+            We are an independent initiative by Chevening alumni. Our feedback is informed by publicly available information and personal experience. For official information, always refer to the Chevening website.
           </p>
         </div>
       </ActionBox>

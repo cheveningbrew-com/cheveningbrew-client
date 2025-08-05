@@ -91,15 +91,15 @@ const LandingPage = () => {
 
   const events = [
     {
-      title: "Upload your Chevening essay.",
+      title: "Upload your draft Chevening essays.",
     },
     {
       title:
-        "Mock with our voice AI interviewer, closely simulating your final Chevening interview.",
+        "Get grammar and style review, narrative evaluation, and Chevening criteria indicative scoring.",
     },
     {
       title:
-        "Get detailed, Chevening evaluation aligned feedback that radically improves your chances of winning the Chevening Scholarship this year.",
+        "Refine your essays and boost your shortlisting chances.",
     },
   ];
 
@@ -112,8 +112,7 @@ const LandingPage = () => {
             <Logo />
             <div className={styles.description}>
               <b>
-                Ace your Chevening interview by mocking with our voice-enabled
-                AI expert interviewer.{" "}
+                Ace your Chevening essays with our expert AI feedback.{" "}
               </b>
               Built for Chevening aspirants . . . by Chevening alumni.
             </div>

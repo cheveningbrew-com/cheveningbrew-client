@@ -15,22 +15,28 @@ const Help = () => {
 
   const faqSections = [
     {
-      title: "Interview Retake",
-      content: "Simply, sign out and sign in again to retake the interview."
-    },
-    {
       title: "Refund Process",
-      content: "Please email us at help@cheveningbrew.com with the topic \"REFUND REQUEST\" and we will get back to you."
+      content: (
+        <>
+          Please email us at <a href="mailto:reviewer@cheveningbrew.com">
+            <strong>
+              <u>
+                <span className={styles.email}>reviewer@cheveningbrew.com</span>
+              </u>
+            </strong>
+          </a> with the subject "Refund Request: [Your Order ID]" and we will get back to you.
+        </>
+      )
     },
     {
       title: "Contact Support",
       content: (
         <>
           If you need any other assistance, please contact us at{" "}
-          <a href="mailto:help@cheveningbrew.com">
+          <a href="mailto:reviewer@cheveningbrew.com">
             <strong>
               <u>
-                <span className={styles.email}>help@cheveningbrew.com</span>
+                <span className={styles.email}>reviewer@cheveningbrew.com</span>
               </u>
             </strong>
           </a>
