@@ -73,47 +73,47 @@ const GetEssayCollection = () => {
     <SupportPagesLayout>
       <ActionBox>
         <div className={`${styles.supportContent} customScroll`}>
-          <h1 className={styles.pageTitle}>Grab your copy of our annotated Chevening essays</h1>
-          
-          <div className={styles.description}>
+          <h1 className={styles.pageTitle}>Grab your free annotated Chevening essays</h1>
+
+<div className={styles.description}>
   <div className={styles.termsContent}>
     <p>
-      Unlock a unique library of anonymised Chevening essays—featuring both successful and unsuccessful applications. Our collection includes first drafts, final submissions, and even side-by-side comparisons of drafts and their polished versions. Each essay is accompanied by expert commentary highlighting what works, what doesn’t, and why.
+      Get instant access to a unique library of real Chevening essays—both winners and near-misses. See first drafts, polished finals, and side-by-side comparisons, all with expert notes on what shines and what falls flat.
     </p>
     <ul>
-      <li>Discover the strengths that helped essays stand out—and the pitfalls that held others back.</li>
-      <li>See candid feedback and analysis on structure, storytelling, and clarity.</li>
-      <li>Learn from real outcomes: every essay notes whether it was shortlisted, accepted, or missed the mark.</li>
-    </ul>
+  <li>Spot the winning moves—and the mistakes to avoid.</li>
+  <li>Read candid feedback on structure, storytelling, and clarity.</li>
+  <li>Know the outcome: every essay is tagged as accepted, shortlisted, or not selected.</li>
+</ul>
     <p>
-      Whether you’re starting your first draft or refining your final version, these real-world examples and insights will help you craft a more compelling Chevening application.
+      Whether you’re starting out or perfecting your draft, these real examples and insights will help you write a standout Chevening application.
     </p>
     <p>
-      Complete the form below, and we'll email you a free PDF collection of annotated Chevening essays.
+      Fill in the form below and we’ll send your free PDF straight to your inbox.
     </p>
   </div>
             
             {isSubmitted ? (
               <div className={styles.successMessage}>
-                <h3>Thank you for your request!</h3>
-                <p>We've received your information and will send the annotated Chevening essays collection to your email shortly. Please check your inbox (and spam folder) in the next few minutes.</p>
-                <p>
-                  If you don't receive the email or have any questions, please contact us at{" "}
-                  <a href="mailto:reviewer@cheveningbrew.com">
-                    <strong>
-                      <u>
-                        <span className={styles.email}>reviewer@cheveningbrew.com</span>
-                      </u>
-                    </strong>
-                  </a>
-                </p>
-                <button 
-                  className={styles.submitButton} 
-                  onClick={() => setIsSubmitted(false)}
-                >
-                  Request Another Copy
-                </button>
-              </div>
+  <h3>Thanks for your request!</h3>
+  <p>Your annotated Chevening essays are on their way. Check your inbox (and spam folder) soon.</p>
+  <p>
+    Questions or missing your email? Contact us at{' '}
+    <a href="mailto:reviewer@cheveningbrew.com">
+      <strong>
+        <u>
+          <span className={styles.email}>reviewer@cheveningbrew.com</span>
+        </u>
+      </strong>
+    </a>
+  </p>
+  <button
+    className={styles.submitButton}
+    onClick={() => setIsSubmitted(false)}
+  >
+    Request Another Copy
+  </button>
+</div>
             ) : (
               <form onSubmit={handleSubmit} className={styles.formContainer}>
                 <div className={styles.formGroup}>
