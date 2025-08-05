@@ -12,6 +12,7 @@ import About from "./pages/SupportPages/About/About";
 import Pricing from "./pages/SupportPages/Pricing/Pricing";
 import Privacy from "./pages/SupportPages/Privacy/Privacy";
 import Terms from "./pages/SupportPages/Terms/Terms";
+import GetEssayCollection from "./pages/SupportPages/GetEssayCollection/GetEssayCollection";
 import Profile from "./pages/Profile/Profile"
 const App = () => {
   return (
@@ -28,6 +29,7 @@ const App = () => {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
+              <Route path="/get-essay-collection" element={<GetEssayCollection />} />
 
               {/* Protected Routes - Simplified */}
               <Route element={<ProtectedRoute />}>
