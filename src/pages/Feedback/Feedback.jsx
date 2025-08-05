@@ -316,6 +316,19 @@ const Feedback = () => {
                         Download Chevening aligned feedback
                       </a>
                     )}
+
+                    {/* Narrative Feedback Download */}
+                    {
+                      analysisResults.downloadLinkNarrativeFeedback && (
+                        <a 
+                          href={analysisResults.downloadLinkNarrativeFeedback} 
+                          className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
+                          download
+                        >
+                          Download narrative feedback
+                        </a>
+                      )
+                    }
                   </div>
                   
                   <p 
