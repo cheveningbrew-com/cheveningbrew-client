@@ -3,10 +3,13 @@
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
+    right: 0;
+    bottom: 0;
+    width: 100vw;
+    height: 100vh;
     background: rgba(0, 0, 0, 0.5);
     display: flex;
+    /* Shift the flex positioning to center within the content area */
     justify-content: center;
     align-items: center;
     z-index: 999;
@@ -14,7 +17,7 @@
 
 /* Popup box styles */
 .popup_box {
-    position: relative;
+    /* Position will be set via JavaScript */
     background: linear-gradient(to bottom right, #4b0082, #800080);
     padding: 2rem;
     border-radius: 12px;
@@ -23,6 +26,9 @@
     width: 90%;
     text-align: center;
     color: white;
+    /* Initial position - will be overridden by JS */
+    position: absolute; 
+    z-index: 1000;
 }
 
 .popup_box h3 {
