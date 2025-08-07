@@ -479,21 +479,24 @@ const handleDrop = (e) => {
                   onDragOver={handleDragOver}
                   onDrop={handleDrop}
                 >
-                  <div className={styles.uploadIcon}>
-                    <CloudUpload size={48} />
+
+                  <div className={styles.dash}>
+                      <div className={styles.uploadIcon}>
+                        <CloudUpload size={48} />
+                      </div>
+                      <p className={styles.dragText}>Drag & drop your file here</p>
+                      <div className={styles.orDivider}>
+                        <span>or</span>
+                      </div>
+                      <button
+                        type="button"
+                        className={styles.browseButton}
+                        onClick={() => document.getElementById('file-upload').click()}
+                        disabled={isLoading}
+                      >
+                        Browse files
+                      </button>
                   </div>
-                  <p className={styles.dragText}>Drag & drop your file here</p>
-                  <div className={styles.orDivider}>
-                    <span>or</span>
-                  </div>
-                  <button
-                    type="button"
-                    className={styles.browseButton}
-                    onClick={() => document.getElementById('file-upload').click()}
-                    disabled={isLoading}
-                  >
-                    Browse files
-                  </button>
 
                   {/* NEW: Upload Requirements */}
                   <div className={styles.uploadRequirements}>

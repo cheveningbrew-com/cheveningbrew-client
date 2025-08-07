@@ -702,11 +702,14 @@
   color: black;
 }
 
+
+
 .termsContent {
   max-height: 0;
   overflow: hidden;
   transition: max-height 0.3s ease-out;
   padding: 0 1rem;
+  
 }
 
 /* Style for the first section that's always visible */

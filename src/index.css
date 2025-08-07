@@ -159,7 +159,7 @@ h6 {
 
 p {
   margin-bottom: var(--spacing-md);
-  color: var(--neutral-400);
+  /* color: var(--neutral-400); */
 }
 
 /* Button Base Styles */
