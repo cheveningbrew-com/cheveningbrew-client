@@ -23,6 +23,9 @@ const Footer = () => {
           <Link to="/terms" className="nav-link">
             Terms
           </Link>
+          <Link to="/get-essay-collection" className="nav-link">
+            Essay Collection
+          </Link>
         </div>
 
         <div className="copyright opacity-80">

@@ -165,6 +165,115 @@
   overflow-y: auto; */
 }
 
+/* Form Styles */
+.formContainer {
+  background-color: rgba(75, 0, 130, 0.1);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-top: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.formGroup {
+  margin-bottom: 1.5rem;
+}
+
+.formLabel {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #ffffff;
+}
+
+.formInput {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 4px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #ffffff;
+  font-size: 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.formInput:focus {
+  outline: none;
+  border-color: #800080;
+  box-shadow: 0 0 0 2px rgba(128, 0, 128, 0.3);
+}
+
+.formInput::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.inputError {
+  border-color: #ff6b6b;
+}
+
+.errorText {
+  color: #ff6b6b;
+  font-size: 0.875rem;
+  margin-top: 0.5rem;
+}
+
+.submitButton {
+  background-color: #800080;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.submitButton:hover {
+  background-color: #6a006a;
+}
+
+.submitButton:disabled {
+  background-color: #666666;
+  cursor: not-allowed;
+}
+
+.privacyNote {
+  font-size: 0.875rem;
+  color: rgba(255, 255, 255, 0.7);
+  margin-top: 1.5rem;
+  text-align: center;
+}
+
+.privacyNote a {
+  color: #ba8dba;
+  text-decoration: underline;
+}
+
+.privacyNote a:hover {
+  color: #d8bfd8;
+}
+
+.successMessage {
+  background-color: rgba(0, 128, 0, 0.1);
+  border: 1px solid rgba(0, 128, 0, 0.3);
+  padding: 1.5rem;
+  border-radius: 8px;
+  text-align: center;
+  margin-top: 1.5rem;
+}
+
+.successMessage h3 {
+  color: #2ecc71;
+  margin-bottom: 1rem;
+  font-size: 1.5rem;
+}
+
+.email {
+  color: #ba8dba;
+}
+
 /* Styles for markdown content */
 .markdownContent {
   /* Base text styling */
