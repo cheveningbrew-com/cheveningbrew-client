@@ -20,7 +20,7 @@ const aboutSections = [
   {
     type: "paragraph",
     content:
-      "Aisha is an AI — short for AI-sha — built by Chevening alumni to democratize access to the kind of insightful, experience-backed feedback that helps strong candidates rise. Trained on dozens of successful Chevening essays and grounded in official guidance, Aisha evaluates each of your four essays with a human-like focus on:"
+      "Aisha is an AI — AI-sha, spelt without the hyphen — built by Chevening alumni to democratise access to the kind of insightful, experience-backed feedback that helps strong candidates feedback. Trained on dozens of successful Chevening essays and grounded in official guidance, Aisha evaluates each of your four essays with a human-like focus on:"
   },
   {
     type: "list",
@@ -48,6 +48,10 @@ const aboutSections = [
   {
     type: "paragraph",
     content: "Aisha doesn't replace that process. She enhances it."
+  },
+  {
+    type: "paragraph",
+    content: "When you submit your essays for review, you’ll receive a Word (.docx) document with detailed inline comments—just as you would from a human reviewer. Nothing is ever forced upon you: every suggestion is just that—a suggestion. You remain in full control, and it’s always your choice whether to accept or reject any feedback. Our goal is to empower, not overwrite, your unique voice."
   },
   {
     type: "paragraph",

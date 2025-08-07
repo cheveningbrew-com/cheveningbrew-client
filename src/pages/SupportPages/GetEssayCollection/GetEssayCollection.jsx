@@ -152,7 +152,7 @@ const GetEssayCollection = () => {
                   className={styles.submitButton}
                   disabled={isSubmitting}
                 >
-                  {isSubmitting ? "Sending..." : "Get Essay Collection"}
+                  {isSubmitting ? "Sending..." : "Grab Chevening essays"}
                 </button>
                 
                 <p className={styles.privacyNote}>

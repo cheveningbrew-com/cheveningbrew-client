@@ -95,11 +95,11 @@ const LandingPage = () => {
     },
     {
       title:
-        "Get grammar and style review, narrative evaluation, and Chevening criteria indicative scoring.",
+        "Receive a Word (.docx) with detailed, human-style comments—covering grammar and style, narrative strength, and Chevening criteria alignment. ",
     },
     {
       title:
-        "Refine your essays and boost your shortlisting chances.",
+        "Refine your essays and boost your shortlisting chances, with your unique voice in control.",
     },
   ];
 

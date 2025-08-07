@@ -7,8 +7,13 @@ import SignoutPopup from '../SignoutPopup/SignoutPopup';
 
 const SignOut = () => {
   const navigate = useNavigate();
-  const { logout, user } = useAuth();
+  const { logout, user, isAuthenticated } = useAuth();
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
+
+  // Don't render anything if user is not authenticated
+  if (!isAuthenticated) {
+    return null;
+  }
 
   const handleSignOutClick = () => {
     // Show confirmation popup instead of signing out immediately
