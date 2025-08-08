@@ -524,18 +524,20 @@ const handleDrop = (e) => {
 
             {/* Dynamic Upload Button */}
             {!isLoading && subscriptionStatus && selectedFile && (
-              <button
-                className={styles.uploadButton}
-                onClick={handleUpload}
-                disabled={!selectedFile || isLoading}
-              >
-                {isLoading ? "Processing..." :
-                 !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed
-                   ? "Upload"
-                   : subscriptionStatus.can_upload
-                     ? "Upload "
-                     : "Upload"}
-              </button>
+              <div className={styles.uploadZone}>
+                <button
+                  className={styles.uploadButton}
+                  onClick={handleUpload}
+                  disabled={!selectedFile || isLoading}
+                >
+                  {isLoading ? "Processing..." :
+                   !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed
+                     ? "Upload"
+                     : subscriptionStatus.can_upload
+                       ? "Upload "
+                       : "Upload"}
+                </button>
+              </div>
             )}
 
             {/* Enhanced Progress Display */}
