@@ -539,11 +539,11 @@ const handleDrop = (e) => {
             {isLoading && analysisProgress && (
               <>
                 <div className={styles.progressHeader}>
-                  <h3>
-                    {analysisProgress.status === "UPLOADING" ? "📤 Uploading..." :
-                     analysisType === "leadership_comprehensive" ? "👑 Leadership Analysis" :
-                     "🎓 Comprehensive Analysis"}
-                  </h3>
+                  <h1 className={styles.title}>
+                    {analysisProgress.status === "UPLOADING" ? "Uploading your PDF file . . ." :
+                     analysisType === "leadership_comprehensive" ? "Analysing your leadership essay" :
+                     "Analysing your Chevening essay drafts"}
+                  </h1>
                   <p>{analysisProgress.step}</p>
                 </div>
 
