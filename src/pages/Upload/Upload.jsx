@@ -396,12 +396,10 @@ const handleDrop = (e) => {
   if (statusLoading) {
     return (
       <MainLayout>
-        <ActionBox>
-          <div className={`${styles.uploadContainer} customScroll`}>
-            <div className={styles.loadingContainer}>
-              <div className={styles.spinner}></div>
-              <p>Checking your account status...</p>
-            </div>
+        <ActionBox className={`${styles.actionBoxCustom} customScroll`}>
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <p>Checking your account status...</p>
           </div>
         </ActionBox>
       </MainLayout>
@@ -410,8 +408,7 @@ const handleDrop = (e) => {
 
   return (
     <MainLayout>
-      <ActionBox>
-        <div className={`${styles.uploadContainer} customScroll`}>
+      <ActionBox className={`${styles.actionBoxCustom} customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
               Upload your Chevening draft essays
@@ -437,8 +434,6 @@ const handleDrop = (e) => {
               )}
             </div>
           )} */}
-
-          <div className={styles.uploadSection}>
             {/* Queue Status Display */}
             {queueStatus && queueStatus.status === "busy" && (
               <div className={styles.queueWarning}>
@@ -588,8 +583,6 @@ const handleDrop = (e) => {
             )}
 
 
-          </div>
-        </div>
       </ActionBox>
     </MainLayout>
   );

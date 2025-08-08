@@ -12,6 +12,17 @@
   scroll-behavior: smooth;
 }
 
+/* Custom ActionBox styles for Upload page */
+.actionBoxCustom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  overflow-y: auto;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
+}
+
 .title {
   font-size: 1.8rem;
   margin-bottom: 2rem;
@@ -34,21 +45,25 @@
 }
 
 /* Custom scrollbar for the main container */
-.uploadContainer::-webkit-scrollbar {
+.uploadContainer::-webkit-scrollbar,
+.actionBoxCustom::-webkit-scrollbar {
   width: 8px;
 }
 
-.uploadContainer::-webkit-scrollbar-track {
+.uploadContainer::-webkit-scrollbar-track,
+.actionBoxCustom::-webkit-scrollbar-track {
   background: rgba(255, 255, 255, 0.1);
   border-radius: 4px;
 }
 
-.uploadContainer::-webkit-scrollbar-thumb {
+.uploadContainer::-webkit-scrollbar-thumb,
+.actionBoxCustom::-webkit-scrollbar-thumb {
   background: rgba(255, 229, 133, 0.5);
   border-radius: 4px;
 }
 
-.uploadContainer::-webkit-scrollbar-thumb:hover {
+.uploadContainer::-webkit-scrollbar-thumb:hover,
+.actionBoxCustom::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 229, 133, 0.7);
 }
 
