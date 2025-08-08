@@ -289,8 +289,8 @@ const Feedback = () => {
                 <div className={uploadStyles.linksContainer}>
                   <h2 className={uploadStyles.linksTitle}>
                     {analysisResults.analysisType === "leadership_comprehensive_revival" 
-                      ? "🆓 Your Free Trial Analysis is Ready!" 
-                      : "✅ Your Analysis is Ready!"}
+                      ? "🆓 Your complementary leadership essay feedback is ready!" 
+                      : "✅ Your comprehensive essay feedback is ready!"}
                   </h2>
                   
                   {/* Updated: Simple Download Buttons */}

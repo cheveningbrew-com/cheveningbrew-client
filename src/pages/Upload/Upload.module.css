@@ -189,6 +189,9 @@
   border-radius: 8px;
   padding: 1rem;
   gap: 1rem;
+  width: 100%;
+  max-width: 700px; /* Match uploadZone width */
+  margin-bottom: 1.5rem; /* Match uploadZone margin */
 }
 
 .fileIcon {
@@ -302,7 +305,7 @@
    ================================================== */
 
 /* Enhanced Loading Container */
-.loadingContainer {
+.loadingContainer, .loadingActionBox {
   display: flex;
   flex-direction: column;
   align-items: center;
