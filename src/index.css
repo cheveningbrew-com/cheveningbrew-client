@@ -20,6 +20,24 @@
   --neutral-400: rgba(255, 255, 255, 0.5);
   --neutral-500: rgba(255, 255, 255, 0.3);
   --neutral-600: rgba(255, 255, 255, 0.1);
+  
+  /* Button Color Scheme */
+  --btn-gold-light: #ffe585;
+  --btn-gold-dark: #ffb64d;
+  --btn-purple-light: #6D2493;
+  --btn-purple-dark: #4b0082;
+  --btn-purple-hover-light: #5a1e7a;
+  --btn-purple-hover-dark: #3a006e;
+  
+  /* Button Gradients */
+  --btn-gold-gradient: linear-gradient(90deg, var(--btn-gold-light) 0%, var(--btn-gold-dark) 100%);
+  --btn-purple-gradient: linear-gradient(90deg, var(--btn-purple-light) 0%, var(--btn-purple-dark) 100%);
+  --btn-purple-hover-gradient: linear-gradient(90deg, var(--btn-purple-hover-light) 0%, var(--btn-purple-hover-dark) 100%);
+  
+  /* Button Text Colors */
+  --btn-gold-text: var(--btn-purple-dark);
+  --btn-purple-text: white;
+  --btn-white-text: var(--btn-purple-dark);
 
   /* Gradients */
   --gradient-primary: linear-gradient(

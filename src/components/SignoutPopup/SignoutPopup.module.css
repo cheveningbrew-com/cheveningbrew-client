@@ -61,22 +61,26 @@
 }
 
 .btn.cancel {
-    background-color: rgba(255, 255, 255, 0.2);
-    color: white;
-    border: 1px solid rgba(255, 255, 255, 0.3);
+    background-color: var(--neutral-200);
+    color: var(--btn-white-text);
+    border: 1px solid var(--btn-gold-light);
 }
 
 .btn.cancel:hover {
-    background-color: rgba(255, 255, 255, 0.3);
+    background-color: var(--neutral-100);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
 }
 
 .btn.confirm {
-    background-color: #dd0c7e;
-    color: white;
+    background: var(--btn-purple-gradient);
+    color: var(--btn-purple-text);
 }
 
 .btn.confirm:hover {
-    background-color: #ca1582;
+    background: var(--btn-purple-hover-gradient);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(75, 0, 130, 0.3);
 }
 
 /* Close icon styles */
@@ -100,9 +104,9 @@
 }
 
 .close_icon:hover {
-    background-color: #dd0c7e;
-    border-color: #dd0c7e;
-    color: white;
+    background: var(--btn-gold-gradient);
+    border-color: var(--btn-gold-dark);
+    color: var(--btn-gold-text);
 }
 
 /* Responsive styles for mobile screens */

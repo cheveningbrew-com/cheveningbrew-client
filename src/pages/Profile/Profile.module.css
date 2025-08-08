@@ -21,9 +21,9 @@
 }
 
 .backButton {
-  background: rgba(255, 255, 255, 0.1);
-  color: white;
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: var(--neutral-200);
+  color: var(--btn-white-text);
+  border: 1px solid var(--btn-gold-light);
   padding: 0.5rem 1rem;
   border-radius: 8px;
   cursor: pointer;
@@ -31,7 +31,9 @@
 }
 
 .backButton:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--neutral-100);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
 }
 
 .section {
@@ -121,17 +123,19 @@
 }
 
 .retryButton {
-  background: #dd0c7e;
-  color: white;
+  background: var(--btn-purple-gradient);
+  color: var(--btn-purple-text);
   border: none;
   padding: 0.5rem 1rem;
   border-radius: 6px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
 }
 
 .retryButton:hover {
-  background: #ca1582;
+  background: var(--btn-purple-hover-gradient);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(75, 0, 130, 0.3);
 }
 
 .noData {
@@ -151,8 +155,8 @@
 }
 
 .actionButton {
-  background: linear-gradient(90deg, #ffe585 0%, #ffb64d 100%);
-  color: #4b0082;
+  background: var(--btn-gold-gradient);
+  color: var(--btn-gold-text);
   border: none;
   padding: 1rem;
   border-radius: 8px;
@@ -164,7 +168,7 @@
 
 .actionButton:hover {
   transform: translateY(-2px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
 }
 
 /* Responsive design */

@@ -31,17 +31,19 @@
   
   .popup_actions button {
     padding: 0.5rem 1.5rem;
-    background-color: white;
-    color: #4b0082;
-    border: none;
+    background-color: var(--neutral-200);
+    color: var(--btn-white-text);
+    border: 1px solid var(--btn-gold-light);
     border-radius: 6px;
     font-weight: bold;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.3s ease;
   }
   
   .popup_actions button:hover {
-    background-color: #f2f2f2;
+    background-color: var(--neutral-100);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
   }
 
 /* Responsive styles for tablet screens */

@@ -6,17 +6,18 @@
 
   .payhere-button {
     padding: 10px 20px;
-    background-color: #0066cc;
-    color: white;
+    background: var(--btn-gold-gradient);
+    color: var(--btn-gold-text);
     border: none;
     border-radius: 4px;
     font-size: 16px;
     cursor: pointer;
-    transition: background-color 0.3s;
+    transition: all 0.3s ease;
   }
 
   .payhere-button:hover {
-    background-color: #0052a3;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
   }
 
   .payhere-button:disabled {
@@ -33,14 +34,14 @@
   }
 
   .paymentButton {
-    background-color: #4caf50;
-    color: white;
+    background: var(--btn-gold-gradient);
+    color: var(--btn-gold-text);
     font-size: 16px;
     padding: 12px 24px;
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: all 0.3s ease;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -48,19 +49,20 @@
   }
 
   .paymentButton:hover:not(:disabled) {
-    background-color: #45a049;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
   }
 
   .paymentButton:disabled {
-    background-color: #cccccc;
+    background: linear-gradient(90deg, rgba(255, 229, 133, 0.5), rgba(255, 182, 77, 0.5));
     cursor: not-allowed;
     opacity: 0.7;
   }
 
   /* Success state for payment button */
   .paymentButton:disabled.success {
-    background-color: #2e7d32;
-    color: white;
+    background: var(--btn-purple-gradient);
+    color: var(--btn-purple-text);
     opacity: 1;
   }
 
