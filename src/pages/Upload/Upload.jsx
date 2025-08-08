@@ -411,7 +411,7 @@ const handleDrop = (e) => {
       <ActionBox className={`${styles.actionBoxCustom} customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
-              Upload your Chevening draft essays
+              {selectedFile ? "Upload and get feedback" : "Select your Chevening draft essays"}
             </h1>
           )}
 
