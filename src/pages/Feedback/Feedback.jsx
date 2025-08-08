@@ -279,72 +279,68 @@ const Feedback = () => {
   return (
     <MainLayout>
       <div className={styles.feedbackWrapper}>
-        <ActionBox>
-          <div className={`${styles.feedbackContent} customScroll`}>
-            <div className={styles.title}>{getAnalysisTypeDisplay()}</div>
-            
+        <ActionBox className="customScroll">
             {/* Show analysis results */}
             {analysisResults ? (
-              <div className={uploadStyles.uploadSection}>
-                <div className={uploadStyles.linksContainer}>
-                  <h2 className={uploadStyles.linksTitle}>
-                    {analysisResults.analysisType === "leadership_comprehensive_revival" 
-                      ? "🆓 Your complementary leadership essay feedback is ready!" 
-                      : "✅ Your comprehensive essay feedback is ready!"}
-                  </h2>
+              <>
+                <div className={styles.title}>
+                  {analysisResults.analysisType === "leadership_comprehensive_revival" 
+                    ? "Download your complementary leadership essay review" 
+                    : "Download your full Chevening essay draft review"}
+                </div>
+                
+                {/* Updated: Simple Download Buttons */}
+                <div className={uploadStyles.linkButtons}>
+                  {/* Grammar & Style Download */}
+                  {analysisResults.downloadLinkGrammarStyleDocument && (
+                    <a 
+                      href={analysisResults.downloadLinkGrammarStyleDocument} 
+                      className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
+                      download
+                    >
+                      Download grammar and style feedback
+                    </a>
+                  )}
                   
-                  {/* Updated: Simple Download Buttons */}
-                  <div className={uploadStyles.linkButtons}>
-                    {/* Grammar & Style Download */}
-                    {analysisResults.downloadLinkGrammarStyleDocument && (
-                      <a 
-                        href={analysisResults.downloadLinkGrammarStyleDocument} 
-                        className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
-                        download
-                      >
-                        Download grammar and style feedback
-                      </a>
-                    )}
-                    
-                    {/* Essay Feedback Download */}
-                    {analysisResults.downloadLinkEssayFeedback && (
-                      <a 
-                        href={analysisResults.downloadLinkEssayFeedback} 
-                        className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
-                        download
-                      >
-                        Download Chevening aligned feedback
-                      </a>
-                    )}
+                  {/* Essay Feedback Download */}
+                  {analysisResults.downloadLinkEssayFeedback && (
+                    <a 
+                      href={analysisResults.downloadLinkEssayFeedback} 
+                      className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
+                      download
+                    >
+                      Download Chevening aligned feedback
+                    </a>
+                  )}
 
-                    {/* Narrative Feedback Download */}
-                    {
-                      analysisResults.downloadLinkNarrativeFeedback && (
-                        <a 
-                          href={analysisResults.downloadLinkNarrativeFeedback} 
-                          className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
-                          download
-                        >
-                          Download narrative feedback
-                        </a>
-                      )
-                    }
-                  </div>
-                  
-                  <p 
-                    className={uploadStyles.resetButton} 
-                    onClick={handleUploadAnother}
-                  >
-                    These feedback files have also been shared to your email via Google Drive
-                  </p>
-{/* 
+
+                  {/* Narrative Feedback Download */}
+                  {analysisResults.downloadLinkNarrativeFeedback && (
+                    <a 
+                      href={analysisResults.downloadLinkNarrativeFeedback} 
+                      className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
+                      download
+                    >
+                      Download narrative feedback
+                    </a>
+                  )}
+                </div>
+                
+                <p 
+                  className={uploadStyles.resetButton} 
+                  onClick={handleUploadAnother}
+                >
+                  These feedback files have also been shared to your email via Google Drive
+                </p>
+                
+                {/* 
                   <div className={uploadStyles.nextStep}>
                     <p>Your analysis documents are ready for download.</p>
                    
                     {analysisResults.analysisType === "leadership_comprehensive_revival" ? (
                       <div>
                         <p><strong>Free Trial Complete!</strong> You analyzed your leadership essay.</p>
-                        <p>🎯 To analyze all 4 Chevening essays with full features, please subscribe to one of our plans.</p>
+                        <p>🏁 To analyze all 4 Chevening essays with full features, please subscribe to one of our plans.</p>
                         <button 
                           className={styles.upgradeButton}
                           onClick={() => navigate("/pricing")}
@@ -364,10 +360,12 @@ const Feedback = () => {
                         Analysis completed: {new Date(analysisResults.timestamp).toLocaleString()}
                       </small>
                     )}
-                  </div> */}
+                  </div> 
+                */}
 
-                  {/* Analysis Summary */}
-                  {/* {analysisResults.analysisSummary && (
+                {/* Analysis Summary */}
+                {/* 
+                  {analysisResults.analysisSummary && (
                     <div className={styles.summarySection}>
                       <h3>📊 Analysis Summary</h3>
                       <div className={styles.summaryContent}>
@@ -376,18 +374,20 @@ const Feedback = () => {
                         <p><strong>Database Saved:</strong> {analysisResults.databaseSaved ? 'Yes' : 'No'}</p>
                       </div>
                     </div>
-                  )} */}
+                  )}
+                */}
 
-                  {/* Task Information (if available) */}
-                  {/* {analysisResults.taskId && (
+                {/* Task Information (if available) */}
+                {/* 
+                  {analysisResults.taskId && (
                     <div className={styles.taskInfo}>
                       <h4>Background Processing Information:</h4>
                       <p><strong>Task ID:</strong> {analysisResults.taskId}</p>
                       <p><strong>Analysis Type:</strong> {analysisResults.analysisType}</p>
                     </div>
-                  )} */}
-                </div>
-              </div>
+                  )}
+                */}
+              </>
             ) : feedback ? (
               /* Fall back to old feedback display */
               <div className={styles.markdownContent}>
@@ -414,7 +414,6 @@ const Feedback = () => {
                 </div>
               </div>
             )}
-          </div>
         </ActionBox>
       </div>
     </MainLayout>
