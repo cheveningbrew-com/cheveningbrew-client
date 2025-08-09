@@ -480,8 +480,11 @@
 }
 
 .downloadButton {
-  background: var(--btn-purple-gradient);
-  color: var(--btn-purple-text);
+  background: linear-gradient(90deg, #f0a500 0%, #a259f7 100%);
+  color: #2a1640;
+  border: none;
+  border-radius: 7px;
+  font-weight: 500;
 }
 
 .feedbackButton {

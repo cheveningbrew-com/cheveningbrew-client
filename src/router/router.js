@@ -41,7 +41,7 @@ export const router = createBrowserRouter([
   { path: "/privacy", element: <Privacy /> },
   { path: "/terms", element: <Terms /> },
   {
-    path: "/get-essay-collection",
+    path: "/essays",
     element: <GetEssayCollection />,
   },
 ]);

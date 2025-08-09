@@ -32,6 +32,7 @@
   /* Button Gradients */
   --btn-gold-gradient: linear-gradient(90deg, var(--btn-gold-light) 0%, var(--btn-gold-dark) 100%);
   --btn-purple-gradient: linear-gradient(90deg, var(--btn-purple-light) 0%, var(--btn-purple-dark) 100%);
+  --btn-gold-purple-gradient: linear-gradient(90deg, var(--btn-gold-light) 0%, var(--btn-purple-light) 100%);
   --btn-purple-hover-gradient: linear-gradient(90deg, var(--btn-purple-hover-light) 0%, var(--btn-purple-hover-dark) 100%);
   
   /* Button Text Colors */

@@ -327,6 +327,7 @@ const Feedback = () => {
                 </div>
                 
                 <p 
+                  style={{ textAlign: 'center' }}
                   className={uploadStyles.resetButton} 
                   onClick={handleUploadAnother}
                 >
