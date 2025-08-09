@@ -343,7 +343,7 @@
 
 .progressFill {
   height: 100%;
-  background: linear-gradient(90deg, #6D2493 0%, #9c33d4 100%);
+  background: linear-gradient(90deg, var(--btn-purple-light) 0%, var(--btn-gold-light) 100%);
   border-radius: 4px;
   transition: width 0.3s ease;
 }
