@@ -440,13 +440,12 @@ const handleDrop = (e) => {
               </div>
             )}
 
-            {/* File Upload Zone - Only show when not loading */}
+            {/* File Upload - Only show when not loading */}
             {!isLoading && (
               <>
-                {/* File Upload Container - wraps both states and button */}
-                <div className={styles.uploadZone}>
+                {/* Direct children of ActionBox */}
                   {selectedFile ? (
-                    <div className={styles.selectedFileContainer}>
+                    <div className={styles.selectedFileArea}>
                       <div className={styles.fileIcon}>📄</div>
                       <div className={styles.fileDetails}>
                         <span className={styles.fileName}>{selectedFile.name}</span>
@@ -465,7 +464,7 @@ const handleDrop = (e) => {
                     </div>
                   ) : (
                    <div
-                      className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
+                      className={`${styles.fileUploadArea} ${dragActive ? styles.dragActive : ''}`}
                       onDragEnter={handleDragEnter}
                       onDragLeave={handleDragLeave}
                       onDragOver={handleDragOver}
@@ -475,9 +474,7 @@ const handleDrop = (e) => {
                         <CloudUpload size={48} />
                       </div>
                       <p className={styles.dragText}>Drag & drop your file here</p>
-                      <div className={styles.orDivider}>
-                        <span>or</span>
-                      </div>
+                      <div className={styles.divider}>or</div>
                       <button
                         type="button"
                         className={styles.browseButton}
@@ -487,8 +484,8 @@ const handleDrop = (e) => {
                         Browse files
                       </button>
 
-                      {/* NEW: Upload Requirements */}
-                      <div className={styles.uploadRequirements}>
+                      {/* Requirements section */}
+                      <div className={styles.requirements}>
                         <p className={styles.requirementsHeader}>
                           <strong>Please upload a PDF that meets both of the following conditions:</strong>
                         </p>
@@ -527,17 +524,16 @@ const handleDrop = (e) => {
                       {!subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed
                         ? "Upload"
                         : subscriptionStatus.can_upload
-                          ? "Upload "
+                          ? "Upload"
                           : "Upload"}
                     </button>
                   )}
-                </div>
               </>
             )}
 
-            {/* Enhanced Progress Display - Placed directly inside ActionBox */}
+            {/* Progress Display - Placed directly inside ActionBox */}
             {isLoading && analysisProgress && (
-              <>
+              <div className={styles.progressContainer}>
                 <div className={styles.progressHeader}>
                   <h1 className={styles.title}>
                     {analysisProgress.status === "UPLOADING" ? "Uploading your PDF file" :
@@ -576,7 +572,7 @@ const handleDrop = (e) => {
                 <div className={styles.estimatedTime}>
                   <small>⏱️ Estimated time: {estimatedTime || "Processing analysis..."}</small>
                 </div>
-              </>
+              </div>
             )}
 
 
