@@ -92,8 +92,8 @@ const GetEssayCollection = () => {
               
           {isSubmitted ? (
             <div className={styles.successMessage}>
-              <h3>Thanks for your request!</h3>
-              <p>Your annotated Chevening essays are on their way. Check your inbox (or spam folder).</p>
+              <h3>Your annotated Chevening essays are on their way . . .</h3>
+              <p>Check your inbox (or spam folder).</p>
               <p>
                 Questions or missing your email? Contact us at{' '}
                 <a href="mailto:reviewer@cheveningbrew.com">
