@@ -207,42 +207,40 @@ const Feedback = () => {
   if (loading) {
     return (
       <MainLayout>
-        <ActionBox>
-          <div className={`${styles.feedbackContent} customScroll`}>
-            <div className={styles.loadingContainer}>
-              <div className={styles.spinner}></div>
-              <h3>🎓 Processing Your Essay Analysis</h3>
-              
-              {pollingActive && taskStatuses.length > 0 && (
-                <div className={styles.taskStatusContainer}>
-                  <h4>Background Tasks Status:</h4>
-                  {taskStatuses.map((task, index) => {
-                    const statusDisplay = getTaskStatusDisplay(task.status);
-                    return (
-                      <div key={task.task_id || index} className={styles.taskStatusItem}>
-                        <span className={styles.taskEmoji}>{statusDisplay.emoji}</span>
-                        <div className={styles.taskDetails}>
-                          <p className={styles.taskStatus}>{statusDisplay.text}</p>
-                          {task.meta?.status && (
-                            <small className={styles.taskMeta}>{task.meta.status}</small>
-                          )}
-                          {task.meta?.step && (
-                            <small className={styles.taskStep}>{task.meta.step}</small>
-                          )}
-                        </div>
+        <ActionBox className="customScroll">
+          <div className={styles.loadingContainer}>
+            <div className={styles.spinner}></div>
+            <div className={styles.title}>🎓 Processing Your Essay Analysis</div>
+            
+            {pollingActive && taskStatuses.length > 0 && (
+              <div className={styles.taskStatusContainer}>
+                <h4>Background Tasks Status:</h4>
+                {taskStatuses.map((task, index) => {
+                  const statusDisplay = getTaskStatusDisplay(task.status);
+                  return (
+                    <div key={task.task_id || index} className={styles.taskStatusItem}>
+                      <span className={styles.taskEmoji}>{statusDisplay.emoji}</span>
+                      <div className={styles.taskDetails}>
+                        <p className={styles.taskStatus}>{statusDisplay.text}</p>
+                        {task.meta?.status && (
+                          <small className={styles.taskMeta}>{task.meta.status}</small>
+                        )}
+                        {task.meta?.step && (
+                          <small className={styles.taskStep}>{task.meta.step}</small>
+                        )}
                       </div>
-                    );
-                  })}
-                  <div className={styles.estimatedTime}>
-                    <small>⏱️ This may take 12-30 minutes depending on analysis type</small>
-                  </div>
+                    </div>
+                  );
+                })}
+                <div className={styles.estimatedTime}>
+                  <small>⏱️ This may take 12-30 minutes depending on analysis type</small>
                 </div>
-              )}
-              
-              {!pollingActive && (
-                <p>Loading your essay analysis...</p>
-              )}
-            </div>
+              </div>
+            )}
+            
+            {!pollingActive && (
+              <p>Loading your essay analysis...</p>
+            )}
           </div>
         </ActionBox>
       </MainLayout>
@@ -252,24 +250,16 @@ const Feedback = () => {
   if (error) {
     return (
       <MainLayout>
-        <ActionBox>
-          <div className={`${styles.feedbackContent} customScroll`}>
-            <h2>Oops! Something went wrong</h2>
-            <p>{error}</p>
-            <div className={styles.errorActions}>
-              <button
-                className={styles.retryButton}
-                onClick={() => window.location.reload()}
-              >
-                Retry
-              </button>
-              <button
-                className={styles.uploadButton}
-                onClick={handleUploadAnother}
-              >
-                Upload New Essays
-              </button>
-            </div>
+        <ActionBox className="customScroll">
+          <div className={styles.title}>No essay feedback available</div>
+          <div className={uploadStyles.linkButtons}>
+            <button
+              className={`${uploadStyles.linkButton} ${uploadStyles.uploadButton}`}
+              onClick={handleUploadAnother}
+              style={{ width: '100%', maxWidth: '300px' }}
+            >
+              Upload essay draft 
+            </button>
           </div>
         </ActionBox>
       </MainLayout>
@@ -396,24 +386,30 @@ const Feedback = () => {
               </div>
             ) : (
               /* No analysis available */
-              <div className={styles.feedbackSections}>
-                <p>No essay analysis available. Please upload your Chevening essays to receive detailed feedback and analysis.</p>
-                <div className={styles.uploadPrompt}>
-                  <h3>To get started:</h3>
+              <>
+                <div className={styles.title}>Oops! Something went wrong</div>
+                <p>No essay analysis found. Please upload your essay first.</p>
+                
+                <div className={uploadStyles.statusDisplay}>
+                  <h2>To get started:</h2>
                   <ol>
                     <li>Go to the Upload page</li>
                     <li>Upload your Chevening application essays (PDF format)</li>
                     <li>Wait for background processing to complete (12-30 minutes)</li>
                     <li>Receive detailed writing style analysis and feedback</li>
                   </ol>
+                </div>
+                
+                <div className={uploadStyles.linkButtons}>
                   <button 
-                    className={styles.uploadButton}
+                    className={`${uploadStyles.linkButton} ${uploadStyles.uploadButton}`}
                     onClick={handleUploadAnother}
+                    style={{ width: '100%', maxWidth: '300px' }}
                   >
-                    Go to Upload
+                    Upload New Essays
                   </button>
                 </div>
-              </div>
+              </>
             )}
         </ActionBox>
       </div>
