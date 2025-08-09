@@ -75,18 +75,18 @@ const GetEssayCollection = () => {
         <div className={`${supportStyles.supportContent} customScroll`}>
           <h1 className={styles.pageTitle}>Grab your free annotated Chevening essays</h1>
 
-          <p>
+          <p className={styles.descriptionText}>
             Get instant access to a unique library of real Chevening essays—both winners and near-misses. See first drafts, polished finals, and side-by-side comparisons, all with expert notes on what shines and what falls flat.
           </p>
-          <ul>
+          <ul className={styles.featureList}>
             <li>Spot the winning moves—and the mistakes to avoid.</li>
             <li>Read candid feedback on structure, storytelling, and clarity.</li>
             <li>Know the outcome: every essay is tagged as accepted, shortlisted, or not selected.</li>
           </ul>
-          <p>
+          <p className={styles.descriptionText}>
             Whether you're starting out or perfecting your draft, these real examples and insights will help you write a standout Chevening application.
           </p>
-          <p>
+          <p className={styles.descriptionText}>
             Fill in the form below and we'll send your free PDF straight to your inbox.
           </p>
               
