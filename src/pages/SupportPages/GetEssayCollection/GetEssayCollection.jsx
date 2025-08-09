@@ -94,25 +94,21 @@ const GetEssayCollection = () => {
             
             {isSubmitted ? (
               <div className={styles.successMessage}>
-  <h3>Thanks for your request!</h3>
-  <p>Your annotated Chevening essays are on their way. Check your inbox (and spam folder) soon.</p>
-  <p>
-    Questions or missing your email? Contact us at{' '}
-    <a href="mailto:reviewer@cheveningbrew.com">
-      <strong>
-        <u>
-          <span className={styles.email}>reviewer@cheveningbrew.com</span>
-        </u>
-      </strong>
-    </a>
-  </p>
-  <button
-    className={styles.submitButton}
-    onClick={() => setIsSubmitted(false)}
-  >
-    Request Another Copy
-  </button>
-</div>
+                <h3>Thanks for your request!</h3>
+                <p>Your annotated Chevening essays are on their way. Check your inbox (and spam folder) soon.</p>
+                <p>
+                  Questions or missing your email? Contact us at{' '}
+                  <a href="mailto:reviewer@cheveningbrew.com">
+                    <span className={styles.email}>reviewer@cheveningbrew.com</span>
+                  </a>
+                </p>
+                <button
+                  className={styles.submitButton}
+                  onClick={() => setIsSubmitted(false)}
+                >
+                  Request Another Copy
+                </button>
+              </div>
             ) : (
               <form onSubmit={handleSubmit} className={styles.formContainer}>
                 <div className={styles.formGroup}>
