@@ -173,7 +173,7 @@ const Upload = () => {
 
         setAnalysisProgress({
           step: "1/3",
-          message: "💰 Premium Analysis: Will analyze all 4 Chevening essays",
+          message: "Starting comprehensive analysis",
           progress: 5,
           status: "PREPARING"
         });
@@ -303,6 +303,8 @@ const Upload = () => {
       // Redirect to feedback section
       setTimeout(() => {
         navigate("/feedback");
+        // Only reset loading state after navigation is triggered
+        setIsLoading(false);
       }, 1500);
 
     } catch (err) {
@@ -327,8 +329,10 @@ const Upload = () => {
         logout();
         navigate("/");
       }
-    } finally {
+      // Set loading to false for error cases
       setIsLoading(false);
+    } finally {
+      // Loading state now managed in the success and error paths
     }
   };
 
