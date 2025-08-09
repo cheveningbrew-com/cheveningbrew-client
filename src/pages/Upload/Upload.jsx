@@ -173,7 +173,7 @@ const Upload = () => {
 
         setAnalysisProgress({
           step: "1/3",
-          message: "💰 Premium Analysis: Will analyze all 4 Chevening essays",
+          message: "Starting comprehensive analysis",
           progress: 5,
           status: "PREPARING"
         });
@@ -303,6 +303,8 @@ const Upload = () => {
       // Redirect to feedback section
       setTimeout(() => {
         navigate("/feedback");
+        // Only reset loading state after navigation is triggered
+        setIsLoading(false);
       }, 1500);
 
     } catch (err) {
@@ -327,8 +329,10 @@ const Upload = () => {
         logout();
         navigate("/");
       }
-    } finally {
+      // Set loading to false for error cases
       setIsLoading(false);
+    } finally {
+      // Loading state now managed in the success and error paths
     }
   };
 
@@ -396,13 +400,9 @@ const handleDrop = (e) => {
   if (statusLoading) {
     return (
       <MainLayout>
-        <ActionBox>
-          <div className={`${styles.uploadContainer} customScroll`}>
-            <div className={styles.loadingContainer}>
-              <div className={styles.spinner}></div>
-              <p>Checking your account status...</p>
-            </div>
-          </div>
+        <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox} customScroll`}>
+          <div className={styles.spinner}></div>
+          <p>Checking your account status...</p>
         </ActionBox>
       </MainLayout>
     );
@@ -410,11 +410,10 @@ const handleDrop = (e) => {
 
   return (
     <MainLayout>
-      <ActionBox>
-        <div className={`${styles.uploadContainer} customScroll`}>
+      <ActionBox className={`${styles.actionBoxCustom} ${isLoading ? styles.loadingActionBox : ''} customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
-              Upload your Chevening draft essays
+              {selectedFile ? "Upload and get feedback" : "Select your Chevening draft essays"}
             </h1>
           )}
 
@@ -437,8 +436,6 @@ const handleDrop = (e) => {
               )}
             </div>
           )} */}
-
-          <div className={styles.uploadSection}>
             {/* Queue Status Display */}
             {queueStatus && queueStatus.status === "busy" && (
               <div className={styles.queueWarning}>
@@ -447,111 +444,106 @@ const handleDrop = (e) => {
               </div>
             )}
 
-            {/* File Upload Zone */}
-            <div className={styles.uploadZone}>
-              {/* <h3 className={styles.uploadTitle}>Upload your document</h3> */}
-
-              {selectedFile ? (
-                !isLoading ? (
-                  <div className={styles.selectedFileContainer}>
-                    <div className={styles.fileIcon}>📄</div>
-                    <div className={styles.fileDetails}>
-                      <span className={styles.fileName}>{selectedFile.name}</span>
-                      <span className={styles.fileSize}>
-                        {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
-                      </span>
+            {/* File Upload - Only show when not loading */}
+            {!isLoading && (
+              <>
+                {/* Direct children of ActionBox */}
+                  {selectedFile ? (
+                    <div className={styles.selectedFileArea}>
+                      <div className={styles.fileIcon}>📄</div>
+                      <div className={styles.fileDetails}>
+                        <span className={styles.fileName}>{selectedFile.name}</span>
+                        <span className={styles.fileSize}>
+                          {(selectedFile.size / 1024 / 1024).toFixed(2)} MB
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleDeleteFile}
+                        className={styles.deleteButton}
+                        title="Remove file"
+                      >
+                        <Trash2 size={16} />
+                      </button>
                     </div>
-                    <button
-                      type="button"
-                      onClick={handleDeleteFile}
-                      className={styles.deleteButton}
-                      title="Remove file"
+                  ) : (
+                   <div
+                      className={`${styles.fileUploadArea} ${dragActive ? styles.dragActive : ''}`}
+                      onDragEnter={handleDragEnter}
+                      onDragLeave={handleDragLeave}
+                      onDragOver={handleDragOver}
+                      onDrop={handleDrop}
                     >
-                      <Trash2 size={16} />
-                    </button>
-                  </div>
-                ) : <></>
-              ) : (
-               <div
-                  className={`${styles.dropZone} ${dragActive ? styles.dragActive : ''}`}
-                  onDragEnter={handleDragEnter}
-                  onDragLeave={handleDragLeave}
-                  onDragOver={handleDragOver}
-                  onDrop={handleDrop}
-                >
-                  <div className={styles.uploadIcon}>
-                    <CloudUpload size={48} />
-                  </div>
-                  <p className={styles.dragText}>Drag & drop your file here</p>
-                  <div className={styles.orDivider}>
-                    <span>or</span>
-                  </div>
-                  <button
-                    type="button"
-                    className={styles.browseButton}
-                    onClick={() => document.getElementById('file-upload').click()}
-                    disabled={isLoading}
-                  >
-                    Browse files
-                  </button>
-
-                  {/* NEW: Upload Requirements */}
-                  <div className={styles.uploadRequirements}>
-                    <p className={styles.requirementsHeader}>
-                      <strong>Please upload a PDF that meets both of the following conditions:</strong>
-                    </p>
-                    <div className={styles.requirementsList}>
-                      <div className={styles.requirementItem}>
-                        <span className={styles.numberBadge}>1</span>
-                        <span><strong>Includes all four Chevening essays.</strong></span>
+                      <div className={styles.uploadIcon}>
+                        <CloudUpload size={48} />
                       </div>
-                      <div className={styles.requirementItem}>
-                        <span className={styles.numberBadge}>2</span>
-                        <span><strong>Each essay is between 100 and 500 words, as required by Chevening.</strong></span>
+                      <p className={styles.dragText}>Drag & drop your file here</p>
+                      <div className={styles.divider}>or</div>
+                      <button
+                        type="button"
+                        className={styles.browseButton}
+                        onClick={() => document.getElementById('file-upload').click()}
+                        disabled={isLoading}
+                      >
+                        Browse files
+                      </button>
+
+                      {/* Requirements section */}
+                      <div className={styles.requirements}>
+                        <p className={styles.requirementsHeader}>
+                          <strong>Please upload a PDF that meets both of the following conditions:</strong>
+                        </p>
+                        <div className={styles.requirementsList}>
+                          <div className={styles.requirementItem}>
+                            <span className={styles.numberBadge}>1</span>
+                            <span><strong>Includes all four Chevening essays.</strong></span>
+                          </div>
+                          <div className={styles.requirementItem}>
+                            <span className={styles.numberBadge}>2</span>
+                            <span><strong>Each essay is between 100 and 500 words, as required by Chevening.</strong></span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </div>
-              )}
+                  )}
 
-              <input
-                type="file"
-                id="file-upload"
-                accept=".pdf"
-                onChange={handleFileChange}
-                disabled={isLoading}
-                className={styles.hiddenInput}
-              />
-            </div>
+                  <input
+                    type="file"
+                    id="file-upload"
+                    accept=".pdf"
+                    onChange={handleFileChange}
+                    disabled={isLoading}
+                    className={styles.hiddenInput}
+                  />
 
+                  {error && <div className={styles.errorMessage}>{error}</div>}
 
-            {error && <div className={styles.errorMessage}>{error}</div>}
-
-            {/* Dynamic Upload Button */}
-            {!isLoading && subscriptionStatus && selectedFile && (
-              <button
-                className={styles.uploadButton}
-                onClick={handleUpload}
-                disabled={!selectedFile || isLoading}
-              >
-                {isLoading ? "Processing..." :
-                 !subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed
-                   ? "Upload"
-                   : subscriptionStatus.can_upload
-                     ? "Upload "
-                     : "Upload"}
-              </button>
+                  {/* Dynamic Upload Button */}
+                  {subscriptionStatus && selectedFile && (
+                    <button
+                      className={styles.uploadButton}
+                      onClick={handleUpload}
+                      disabled={!selectedFile || isLoading}
+                    >
+                      {!subscriptionStatus.is_free_attempt_used && !subscriptionStatus.payment_completed
+                        ? "Upload"
+                        : subscriptionStatus.can_upload
+                          ? "Upload"
+                          : "Upload"}
+                    </button>
+                  )}
+              </>
             )}
 
-            {/* Enhanced Progress Display */}
+            {/* Progress Display - Placed directly inside ActionBox */}
             {isLoading && analysisProgress && (
-              <div className={styles.loadingContainer}>
+              <div className={styles.progressContainer}>
                 <div className={styles.progressHeader}>
-                  <h3>
-                    {analysisProgress.status === "UPLOADING" ? "📤 Uploading..." :
-                     analysisType === "leadership_comprehensive" ? "👑 Leadership Analysis" :
-                     "🎓 Comprehensive Analysis"}
-                  </h3>
+                  <h1 className={styles.title}>
+                    {analysisProgress.status === "UPLOADING" ? "Uploading your PDF file" :
+                     analysisType === "leadership_comprehensive" ? "Analysing your leadership essay" :
+                     "Analysing your Chevening essay drafts"}
+                  </h1>
                   <p>{analysisProgress.step}</p>
                 </div>
 
@@ -588,8 +580,6 @@ const handleDrop = (e) => {
             )}
 
 
-          </div>
-        </div>
       </ActionBox>
     </MainLayout>
   );
