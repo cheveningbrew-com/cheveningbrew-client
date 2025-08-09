@@ -280,13 +280,14 @@ const Feedback = () => {
                 </div>
                 
                 {/* Updated: Simple Download Buttons */}
-                <div className={uploadStyles.linkButtons}>
+                <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
                   {/* Grammar & Style Download */}
                   {analysisResults.downloadLinkGrammarStyleDocument && (
                     <a 
                       href={analysisResults.downloadLinkGrammarStyleDocument} 
                       className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
                       download
+                      style={{ width: '100%' }}
                     >
                       Download grammar and style feedback
                     </a>
@@ -298,6 +299,7 @@ const Feedback = () => {
                       href={analysisResults.downloadLinkEssayFeedback} 
                       className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
                       download
+                      style={{ width: '100%' }}
                     >
                       Download Chevening aligned feedback
                     </a>
@@ -310,19 +312,20 @@ const Feedback = () => {
                       href={analysisResults.downloadLinkNarrativeFeedback} 
                       className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
                       download
+                      style={{ width: '100%' }}
                     >
                       Download narrative feedback
                     </a>
                   )}
+                  
+                  <p 
+                    style={{ textAlign: 'center' }}
+                    className={uploadStyles.resetButton} 
+                    onClick={handleUploadAnother}
+                  >
+                    We have shared these files to your email via Google Drive as well. 
+                  </p>
                 </div>
-                
-                <p 
-                  style={{ textAlign: 'center' }}
-                  className={uploadStyles.resetButton} 
-                  onClick={handleUploadAnother}
-                >
-                  These feedback files have also been shared to your email via Google Drive
-                </p>
                 
                 {/* 
                   <div className={uploadStyles.nextStep}>
