@@ -8,10 +8,12 @@ const Pricing = () => {
   return (
     <SupportPagesLayout>
       <ActionBox>
-        <div className={`${styles.supportContent} ${styles.pricingPage} customScroll`}>
+        <div className={`${styles.supportContent} ${styles.pricingPage} ${styles.pricingPageMobile} customScroll`}>
           <h1 className={styles.pageTitle}>Pricing</h1>
           
-          <Price showContainerBox={true} />
+          <div className="mobileScrollContainer">
+            <Price showContainerBox={true} />
+          </div>
         </div>
       </ActionBox>
     </SupportPagesLayout>

@@ -3,6 +3,9 @@
 
 .priceContainerBox {
   width: 100%;
+  height: auto;
+  overflow-y: auto;
+  max-height: 100%;
 }
 
 .priceGrid {
@@ -10,8 +13,8 @@
   grid-template-columns: repeat(3, 1fr);
   gap: 20px 30px;
   width: 100%;
-  max-height: calc(100vh - 150px); /* Set max-height for desktop view */
-  overflow-y: auto; /* Only show scrollbar when needed */
+  height: auto;
+  overflow-y: auto;
 }
 
 .priceCard {
@@ -96,7 +99,6 @@
   .priceGrid {
     grid-template-columns: repeat(2, 1fr);
     gap: 15px 25px;
-    max-height: none; /* Allow auto height on tablet */
   }
   
   .priceCard:last-child {
@@ -113,21 +115,39 @@
 /* Mobile styles */
 @media screen and (max-width: 768px) {
   .priceGrid {
-    grid-template-columns: 1fr;
-    gap: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 10px;
+    overflow-y: auto;
+    height: auto;
+    max-height: unset;
+    padding-bottom: 120px; /* Increased bottom padding to ensure all content is visible */
+  }
+  
+  .priceCard {
+    width: 100%;
+    margin: 0 0 25px 0; /* Increased bottom margin */
+    height: auto;
+    min-height: auto;
   }
   
   .priceCard:last-child {
-    grid-column: span 1;
+    grid-column: auto;
+    max-width: 100%;
+    margin: 0 0 100px 0; /* Significantly increased bottom margin for the last card */
   }
   
   .priceContainerBox {
-    padding: 10px;
-    margin: 0;
+    padding: 5px;
+    overflow-y: auto; /* Change to auto to enable scrolling */
+    height: auto;
+    max-height: unset;
+    padding-bottom: 40px; /* Add bottom padding */
   }
   
   .priceHeader {
-    padding: 12px;
+    padding: 10px;
   }
   
   .priceTitle {
@@ -135,19 +155,17 @@
   }
   
   .priceContent {
-    padding: 15px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
 }
 
 /* Small mobile styles */
 @media screen and (max-width: 480px) {
   .priceGrid {
-    gap: 15px;
-  }
-  
-  .priceContainerBox {
-    padding: 10px;
-    margin: 0;
+    padding: 5px;
   }
   
   .priceHeader {
@@ -159,6 +177,19 @@
   }
   
   .priceContent {
-    padding: 12px;
+    padding: 10px;
+  }
+  
+  .priceTitleDescription {
+    font-size: 1.1rem;
+  }
+  
+  .priceText {
+    font-size: 0.9rem;
+  }
+  
+  .priceEssayInfo {
+    font-size: 0.9rem;
+    padding: 5px 8px;
   }
 }
