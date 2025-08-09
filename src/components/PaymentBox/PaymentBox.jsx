@@ -259,7 +259,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
         ) : plan.id === 'free' ? (
           <span>Try for free</span>
         ) : (
-          <span><i className={styles.paymentIcon}></i> Pay ${plan.amount}</span>
+          <span>Pay ${plan.amount}</span>
         )}
       </button>
       {!payHereLoaded && <p className={styles.loadingMessage}>Loading payment system...</p>}

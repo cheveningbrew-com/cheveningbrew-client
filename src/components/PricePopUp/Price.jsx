@@ -63,37 +63,35 @@ export default function Price({
   onPaymentComplete = () => {}, 
   onPaymentError = () => {}, 
   onPaymentDismissed = () => {},
-  showContainerBox = true // New prop to control container box visibility
+  showContainerBox = true // Prop to control container box styling
 }) {
   return (
-    <div className={`${styles.priceSection} ${showContainerBox ? styles.withContainer : ''}`}>
-      <div className={`${styles.priceGrid} ${showContainerBox ? styles.priceContainerBox : ''}`}>
-        {plans.map((plan) => (
-          <div key={plan.id} className={styles.priceCard}>
-            <div className={styles.priceHeader}>
-              <h2 className={styles.priceTitle}>{plan.name}</h2>
-            </div>
-            <div className={styles.priceContent}>
-              <div className={styles.priceDescription}>
-                <p className={styles.priceTitleDescription}>{plan.titleDescription}</p>
-                {plan.description.split('\n').map((line, i) => (
-                  <p key={i} className={styles.priceText}>{line}</p>
-                ))}
-                <p className={styles.priceEssayInfo}>{plan.essayInfo}</p>
-              </div>
-              <PaymentBox
-                plan={plan}
-                onPaymentComplete={async (orderId) => {
-                  await handlePaymentComplete(orderId);
-                  onPaymentComplete(orderId);
-                }}
-                onPaymentError={handlePaymentError}
-                onPaymentDismissed={handlePaymentDismissed}
-              />
-            </div>
+    <div className={`${styles.priceGrid} ${showContainerBox ? styles.priceContainerBox : ''}`}>
+      {plans.map((plan) => (
+        <div key={plan.id} className={styles.priceCard}>
+          <div className={styles.priceHeader}>
+            <h2 className={styles.priceTitle}>{plan.name}</h2>
           </div>
-        ))}
-      </div>
+          <div className={styles.priceContent}>
+            <div className={styles.priceDescription}>
+              <p className={styles.priceTitleDescription}>{plan.titleDescription}</p>
+              {plan.description.split('\n').map((line, i) => (
+                <p key={i} className={styles.priceText}>{line}</p>
+              ))}
+              <p className={styles.priceEssayInfo}>{plan.essayInfo}</p>
+            </div>
+            <PaymentBox
+              plan={plan}
+              onPaymentComplete={async (orderId) => {
+                await handlePaymentComplete(orderId);
+                onPaymentComplete(orderId);
+              }}
+              onPaymentError={handlePaymentError}
+              onPaymentDismissed={handlePaymentDismissed}
+            />
+          </div>
+        </div>
+      ))}
     </div>
   );
 }
