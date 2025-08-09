@@ -556,6 +556,31 @@
   .pricingPage .description {
     margin-bottom: 20px;
   }
+  
+  /* Mobile-specific styling for pricing page */
+  .pricingPageMobile {
+    height: auto !important;
+    min-height: 100vh;
+    overflow-y: auto;
+    padding-bottom: 120px; /* Increase bottom padding */
+    margin-bottom: 60px; /* Increase bottom margin */
+  }
+  
+  /* Added for mobile scroll container */
+  :global(.mobileScrollContainer) {
+    height: auto;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 100px; /* Significantly increase bottom padding */
+  }
+}
+
+@media screen and (max-width: 480px) {
+  /* Additional mobile tweaks */
+  .pricingPageMobile {
+    padding: 0.75rem;
+  }
 }
 
 .privacySection {
