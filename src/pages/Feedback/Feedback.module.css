@@ -12,6 +12,16 @@
   margin: 0 auto;
 }
 
+/* Scrollable main content container - similar to supportContent and Upload.mainContent */
+.mainContent {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+  height: calc(100vh - 100px); /* Adjust based on header/footer height */
+  overflow-y: auto;
+}
+
 /* Feedback content styles */
 .feedbackContent {
   padding: 20px;
@@ -398,6 +408,14 @@
    MOBILE RESPONSIVE GENERAL
    ================================================== */
 
+/* Responsive styles for mainContent */
+@media screen and (max-width: 768px) {
+  .mainContent {
+    padding: 1rem;
+    height: calc(100vh - 80px);
+  }
+}
+
 @media screen and (max-width: 768px) {
   .feedbackWrapper {
     gap: 15px;
@@ -463,6 +481,11 @@
 }
 
 @media screen and (max-width: 480px) {
+  .mainContent {
+    padding: 0.75rem;
+    height: calc(100vh - 60px);
+  }
+  
   .feedbackWrapper {
     gap: 12px;
   }

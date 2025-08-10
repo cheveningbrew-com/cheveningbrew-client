@@ -207,8 +207,9 @@ const Feedback = () => {
   if (loading) {
     return (
       <MainLayout>
-        <ActionBox className="customScroll">
-          <div className={styles.loadingContainer}>
+        <ActionBox>
+          <div className={`${styles.mainContent} customScroll`}>
+            <div className={styles.loadingContainer}>
             <div className={styles.spinner}></div>
             <div className={styles.title}>🎓 Processing Your Essay Analysis</div>
             
@@ -241,6 +242,7 @@ const Feedback = () => {
             {!pollingActive && (
               <p>Loading your essay analysis...</p>
             )}
+            </div>
           </div>
         </ActionBox>
       </MainLayout>
@@ -250,8 +252,9 @@ const Feedback = () => {
   if (error) {
     return (
       <MainLayout>
-        <ActionBox className="customScroll">
-          <div className={styles.title}>No essay feedback available</div>
+        <ActionBox>
+          <div className={`${styles.mainContent} customScroll`}>
+            <div className={styles.title}>No essay feedback available</div>
           <div className={uploadStyles.linkButtons}>
             <button
               className={`${uploadStyles.linkButton} ${uploadStyles.uploadButton}`}
@@ -261,6 +264,7 @@ const Feedback = () => {
               Upload essay draft 
             </button>
           </div>
+          </div>
         </ActionBox>
       </MainLayout>
     );
@@ -269,7 +273,8 @@ const Feedback = () => {
   return (
     <MainLayout>
       <div className={styles.feedbackWrapper}>
-        <ActionBox className="customScroll">
+        <ActionBox>
+          <div className={`${styles.mainContent} customScroll`}>
             {/* Show analysis results */}
             {analysisResults ? (
               <>
@@ -414,6 +419,7 @@ const Feedback = () => {
                 </div>
               </>
             )}
+          </div>
         </ActionBox>
       </div>
     </MainLayout>
