@@ -39,6 +39,13 @@
   margin-top: 20px;
 }
 
+.navigationTabs {
+  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+}
+
 .contentContainer {
   flex: 1;
   width: 100%;

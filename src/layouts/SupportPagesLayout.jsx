@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer/Footer";
 import Logo from "../components/Logo/Logo";
+import Tabs from "../components/Header/Tabs/Tabs";
 import NameDisplay from "../components/NameDisplay/NameDisplay";
 import SignOut from "../components/SignOut/SignOut";
 import SignIn from "../components/SignIn/SignIn";
@@ -37,6 +38,7 @@ const SupportPagesLayout = ({ children }) => {
               {isAuthenticated ? <SignOut /> : <SignIn />}
             </div>
           </div>
+          {isAuthenticated && <Tabs />}
         </div>
         <div className={styles.contentContainer}>{children}</div>
       </div>
