@@ -1,6 +1,6 @@
 .signoutContainer {
   text-align: left;
-  padding: 10px;
+  padding: 10px 0 10px 10px;
   cursor: pointer;
   transition: all 0.3s ease;
 }
