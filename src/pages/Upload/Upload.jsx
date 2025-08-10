@@ -503,7 +503,7 @@ const handleDrop = (e) => {
                           </div>
                           <div className={styles.requirementItem}>
                             <span className={styles.numberBadge}>2</span>
-                            <span><strong>Each essay is between 100 and 500 words, as required by Chevening.</strong></span>
+                            <span><strong>Each essay is between 100 and 500 words (official word count is 300).</strong></span>
                           </div>
                         </div>
                       </div>
