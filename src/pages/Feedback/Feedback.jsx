@@ -11,7 +11,7 @@ import ReactMarkdown from "react-markdown";
 const Feedback = () => {
   const [feedback, setFeedback] = useState(null);
   const [analysisResults, setAnalysisResults] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [taskStatuses, setTaskStatuses] = useState([]);
   const [pollingActive, setPollingActive] = useState(false);
@@ -20,8 +20,15 @@ const Feedback = () => {
   // Fetch feedback and handle background tasks
   useEffect(() => {
     const fetchFeedback = async () => {
+      // Check if we have cached data first before setting loading state
+      const freshResults = sessionStorage.getItem('latestAnalysisResults');
+      const cachedFeedback = sessionStorage.getItem('cachedFeedback');
+      
+      if (!freshResults && !cachedFeedback) {
+        setLoading(true); // Only set loading if we have nothing cached
+      }
+        
       try {
-        setLoading(true);
         
         // Check for fresh analysis results from recent upload
         const freshResults = sessionStorage.getItem('latestAnalysisResults');
@@ -207,42 +214,16 @@ const Feedback = () => {
   if (loading) {
     return (
       <MainLayout>
-        <ActionBox>
+        <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox}`}>
           <div className={`${styles.mainContent} customScroll`}>
-            <div className={styles.loadingContainer}>
             <div className={styles.spinner}></div>
-            <div className={styles.title}>🎓 Processing Your Essay Analysis</div>
+            <p>Checking your analysis status...</p>
             
             {pollingActive && taskStatuses.length > 0 && (
-              <div className={styles.taskStatusContainer}>
-                <h4>Background Tasks Status:</h4>
-                {taskStatuses.map((task, index) => {
-                  const statusDisplay = getTaskStatusDisplay(task.status);
-                  return (
-                    <div key={task.task_id || index} className={styles.taskStatusItem}>
-                      <span className={styles.taskEmoji}>{statusDisplay.emoji}</span>
-                      <div className={styles.taskDetails}>
-                        <p className={styles.taskStatus}>{statusDisplay.text}</p>
-                        {task.meta?.status && (
-                          <small className={styles.taskMeta}>{task.meta.status}</small>
-                        )}
-                        {task.meta?.step && (
-                          <small className={styles.taskStep}>{task.meta.step}</small>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-                <div className={styles.estimatedTime}>
-                  <small>⏱️ This may take 12-30 minutes depending on analysis type</small>
-                </div>
+              <div className={styles.estimatedTime}>
+                <small>⏱️ This may take 12-30 minutes depending on analysis type</small>
               </div>
             )}
-            
-            {!pollingActive && (
-              <p>Loading your essay analysis...</p>
-            )}
-            </div>
           </div>
         </ActionBox>
       </MainLayout>
