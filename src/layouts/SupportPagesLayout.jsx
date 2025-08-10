@@ -2,12 +2,15 @@ import React, { useState, useEffect } from "react";
 import Footer from "../components/Footer/Footer";
 import Logo from "../components/Logo/Logo";
 import NameDisplay from "../components/NameDisplay/NameDisplay";
-import SignOUt from "../components/SignOut/SignOut";
+import SignOut from "../components/SignOut/SignOut";
+import SignIn from "../components/SignIn/SignIn";
 import styles from "./layout.module.css";
-import { readUserField,getUserId } from "../services/api";
+import { readUserField, getUserId } from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const SupportPagesLayout = ({ children }) => {
   const [userName, setUserName] = useState("");
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     const fetchUserName = async () => {
@@ -30,8 +33,8 @@ const SupportPagesLayout = ({ children }) => {
           <div className={styles.navigationHead}>
             <Logo />
             <div className={styles.navigationUser}>
-            {userName && <NameDisplay userName={userName} />}
-              <SignOUt />
+              {userName && <NameDisplay userName={userName} />}
+              {isAuthenticated ? <SignOut /> : <SignIn />}
             </div>
           </div>
         </div>
