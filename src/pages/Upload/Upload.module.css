@@ -86,7 +86,7 @@
   max-width: 700px;
   border: 2px dashed rgba(255, 255, 255, 0.4);
   border-radius: 12px;
-  padding: 2.5rem;
+  padding: 2rem;
   text-align: center;
   background: rgba(255, 255, 255, 0.05);
   transition: all 0.3s ease;
@@ -94,7 +94,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
 .fileUploadArea:hover {
@@ -110,14 +110,14 @@
 
 /* Upload text and icon */
 .uploadIcon {
-  margin-bottom: 1rem;
+  margin-bottom: 0.5rem;
   color: rgba(255, 255, 255, 0.7);
 }
 
 .dragText {
   font-size: 1.1rem;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 0.5rem;
+  margin-bottom: 0.25rem;
 }
 
 /* Simplified divider */
@@ -126,7 +126,7 @@
   display: flex;
   align-items: center;
   width: 80%;
-  margin: 1.5rem 0;
+  margin: 0.75rem 0;
   color: rgba(255, 255, 255, 0.6);
 }
 
@@ -909,6 +909,11 @@
   border: 1px solid rgba(255, 229, 133, 0.25);
   border-radius: 8px;
   text-align: left;
+}
+
+/* Adding custom class for requirements section to add space */
+.requirements {
+  margin-top: 2rem;
 }
 
 .requirementsHeader {
