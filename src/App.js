@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from './context/AuthContext';
+import { FooterProvider } from './context/FooterContext';
 import MetaTags from "./components/MetaTags/MetaTags";
 import ProtectedRoute from './components/ProtectedRoute/ProtectedRoute';
 import LandingPage from "./pages/Landing/LandingPage";
@@ -21,7 +22,8 @@ const App = () => {
       <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_OAUTH_CLIENT_ID}>
         <BrowserRouter>
           <AuthProvider>
-            <Routes>
+            <FooterProvider>
+              <Routes>
               {/* Public Routes */}
               <Route path="/" element={<LandingPage />} />
               <Route path="/help" element={<Help />} />
@@ -37,7 +39,8 @@ const App = () => {
                 <Route path="/feedback" element={<Feedback />} />
                 <Route path="/profile" element={<Profile />} />
               </Route>
-            </Routes>
+              </Routes>
+            </FooterProvider>
           </AuthProvider>
         </BrowserRouter>
       </GoogleOAuthProvider>

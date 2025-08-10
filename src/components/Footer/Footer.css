@@ -4,6 +4,35 @@
     justify-content: center; 
   }
   
+  /* Container styles for footer links */
+  .footer-links-container {
+    width: 100%;
+    transform: translateZ(0); /* Hardware acceleration */
+  }
+  
+  /* Mobile specific styles */
+  .footer-links-container.mobile {
+    height: 0;
+    opacity: 0;
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: height 0.3s ease, opacity 0.3s ease, transform 0.3s ease;
+    overflow: hidden;
+  }
+  
+  /* Mobile expanded state */
+  .footer-links-container.mobile.expanded {
+    height: auto;
+    opacity: 1;
+    transform: scaleY(1);
+    padding: 0.5rem 0;
+  }
+  
+  /* Desktop specific styles */
+  .footer-links-container.desktop {
+    display: flex;
+  }
+  
   .nav-link {
     color: #fff;
     text-decoration: none;
@@ -26,12 +55,22 @@
     background: linear-gradient(to right, #4c008217, #80008043, #24002459);
     backdrop-filter: blur(10px);
     border-top: 1px solid rgba(255, 255, 255, 0.193);
+    transform: translateZ(0); /* Hardware acceleration */
   }
 
 
   @media (max-width: 768px) {
     .copyright {
       padding-bottom: 5px;
+    }
+  }
+  
+  @media (min-width: 768px) {
+    /* Ensure footer links are always visible on desktop */
+    .footer-links-container.desktop {
+      height: auto !important;
+      opacity: 1 !important;
+      transform: none !important;
     }
   }
 
