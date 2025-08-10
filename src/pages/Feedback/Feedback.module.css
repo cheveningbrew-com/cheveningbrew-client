@@ -12,6 +12,28 @@
   margin: 0 auto;
 }
 
+/* Custom ActionBox styles for Feedback page - matching Upload page */
+.actionBoxCustom {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  padding: 2rem;
+  gap: 1.5rem;
+}
+
+/* Loading ActionBox style - matching Upload page */
+.loadingActionBox {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 1.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
 /* Scrollable main content container - similar to supportContent and Upload.mainContent */
 .mainContent {
   padding: 2rem;
