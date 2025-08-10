@@ -400,9 +400,11 @@ const handleDrop = (e) => {
   if (statusLoading) {
     return (
       <MainLayout>
-        <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox} customScroll`}>
-          <div className={styles.spinner}></div>
-          <p>Checking your account status...</p>
+        <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox}`}>
+          <div className={`${styles.mainContent} customScroll`}>
+            <div className={styles.spinner}></div>
+            <p>Checking your account status...</p>
+          </div>
         </ActionBox>
       </MainLayout>
     );
@@ -410,7 +412,8 @@ const handleDrop = (e) => {
 
   return (
     <MainLayout>
-      <ActionBox className={`${styles.actionBoxCustom} ${isLoading ? styles.loadingActionBox : ''} customScroll`}>
+      <ActionBox className={`${styles.actionBoxCustom} ${isLoading ? styles.loadingActionBox : ''}`}>
+        <div className={`${styles.mainContent} customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
               {selectedFile ? "Upload and get feedback" : "Select your Chevening draft essays"}
@@ -580,6 +583,7 @@ const handleDrop = (e) => {
             )}
 
 
+        </div>
       </ActionBox>
     </MainLayout>
   );
