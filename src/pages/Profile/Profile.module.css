@@ -59,21 +59,29 @@
 .infoItem {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   padding: 0.8rem;
   background: rgba(255, 255, 255, 0.05);
   border-radius: 8px;
   border-left: 3px solid #ffe585;
+  gap: 1rem;
 }
 
 .label {
   font-weight: 600;
   color: rgba(255, 255, 255, 0.8);
+  flex-shrink: 0;
+  min-width: 120px;
 }
 
 .value {
   color: #fff;
   font-weight: 500;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  text-align: right;
+  flex: 1;
 }
 
 .statusGood {
@@ -186,7 +194,18 @@
   .infoItem {
     flex-direction: column;
     gap: 0.5rem;
-    text-align: center;
+    text-align: left;
+    align-items: stretch;
+  }
+
+  .label {
+    min-width: auto;
+    text-align: left;
+  }
+
+  .value {
+    text-align: left;
+    word-break: break-all;
   }
 
   .actionButtons {

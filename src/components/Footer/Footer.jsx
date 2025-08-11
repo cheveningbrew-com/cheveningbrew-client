@@ -59,7 +59,7 @@ const Footer = () => {
             <Link to="/get-essay-collection" className="nav-link">Essay Collection</Link>
           </div>
           
-          {/* Preference option - only shown when mobile and expanded */}
+          {/* Preference option - only shown when mobile and expanded
           {isMobile && isFooterExpanded && (
             <div className="w-full flex justify-center mt-2">
               <label className="flex items-center text-xs text-white opacity-80">
@@ -72,7 +72,7 @@ const Footer = () => {
                 Remember my preference
               </label>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* Copyright - always visible */}
