@@ -95,13 +95,16 @@ const Upload = () => {
     }
   };
 
-  // Progress callback for background tasks
+  // Progress callback for background tasks (5-step system)
   const handleProgress = (progress) => {
     setAnalysisProgress({
-      step: progress.step || '',
+      step: progress.step || '2/5',
       message: progress.message || 'Processing...',
-      progress: progress.progress || 0,
-      status: progress.status || 'PROCESSING'
+      progress: progress.progress || 20,
+      status: progress.status || 'PROCESSING',
+      phase: progress.phase || 'analysis',
+      taskStatus: progress.taskStatus,
+      backendStep: progress.backendStep // For debugging
     });
   };
 
@@ -154,10 +157,11 @@ const Upload = () => {
         estimatedTimeToUse = "12-15 minutes";
 
         setAnalysisProgress({
-          step: "1/3",
+          step: "1/5",
           message: "🆓 Free Trial: Will analyze your leadership essay only",
-          progress: 5,
-          status: "PREPARING"
+          progress: 0,
+          status: "PREPARING",
+          phase: "preparation"
         });
 
       }
@@ -172,10 +176,11 @@ const Upload = () => {
         estimatedTimeToUse = "25-30 minutes";
 
         setAnalysisProgress({
-          step: "1/3",
+          step: "1/5",
           message: "Starting comprehensive analysis",
-          progress: 5,
-          status: "PREPARING"
+          progress: 0,
+          status: "PREPARING",
+          phase: "preparation"
         });
 
       }
@@ -194,12 +199,13 @@ const Upload = () => {
       // Brief pause to show user what analysis they'll get
       await new Promise(resolve => setTimeout(resolve, 1500));
 
-      // STEP 2: Upload the file
+      // STEP 1: Upload the file (simplified)
       setAnalysisProgress({
-        step: "2/3",
-        message: "Uploading PDF and extracting text...",
-        progress: 15,
-        status: "UPLOADING"
+        step: "1/5",
+        message: "Uploading PDF file...",
+        progress: 20,
+        status: "UPLOADING",
+        phase: "upload"
       });
 
       const uploadResult = await uploadEssayFile(selectedFile);
@@ -213,11 +219,13 @@ const Upload = () => {
       const pathParts = extractedTextPath.split('/');
       const dirName = pathParts[1]; // Format: "text_outs/dirName"
 
+      // Update progress after upload completion  
       setAnalysisProgress({
-        step: "3/3",
-        message: `Starting ${analysisTypeToUse === "leadership_comprehensive" ? "leadership" : "comprehensive"} analysis...`,
-        progress: 30,
-        status: "INITIALIZING"
+        step: "2/5",
+        message: `Upload complete. Starting ${analysisTypeToUse === "leadership_comprehensive" ? "leadership" : "comprehensive"} analysis...`,
+        progress: 20,
+        status: "INITIALIZING",
+        phase: "analysis"
       });
 
       // STEP 3: Run the predetermined analysis
@@ -226,14 +234,7 @@ const Upload = () => {
       if (analysisEndpoint === "leadership") {
         // Free trial - Leadership analysis
         analysisResult = await getLeadershipComprehensiveAnalysis(dirName, userEmail, userName, userId, {
-          onProgress: (progress) => {
-            handleProgress({
-              ...progress,
-              step: "3/3",
-              message: `Leadership Analysis: ${progress.message || 'Analyzing leadership essay...'}`,
-              progress: 30 + (progress.progress || 0) * 0.7 // 30-100%
-            });
-          },
+          onProgress: handleProgress,
           onStatusChange: handleStatusChange
         });
 
@@ -260,14 +261,7 @@ const Upload = () => {
       } else if (analysisEndpoint === "comprehensive") {
         // Paid subscription - Comprehensive analysis
         analysisResult = await getComprehensiveAnalysis(dirName, userEmail, userName, userId, {
-          onProgress: (progress) => {
-            handleProgress({
-              ...progress,
-              step: "3/3",
-              message: progress.message || 'Running comprehensive analysis...',
-              progress: 30 + (progress.progress || 0) * 0.7 // 30-100%
-            });
-          },
+          onProgress: handleProgress,
           onStatusChange: handleStatusChange
         });
 
@@ -543,7 +537,7 @@ const handleDrop = (e) => {
               <div className={styles.progressContainer}>
                 <div className={styles.progressHeader}>
                   <h1 className={styles.title}>
-                    {analysisProgress.status === "UPLOADING" ? "Uploading your PDF file" :
+                    {analysisProgress.step === "1/5" ? "Uploading your PDF file" :
                      analysisType === "leadership_comprehensive" ? "Analysing your leadership essay" :
                      "Analysing your Chevening essay drafts"}
                   </h1>
@@ -567,11 +561,11 @@ const handleDrop = (e) => {
                   </div>
                 </div>
 
-                {/* Task Information */}
-                {currentTask && (
+                {/* Task Information - Show when analysis has started */}
+                {currentTask && analysisProgress.step !== "1/5" && (
                   <div className={styles.taskInfo}>
                     <small>Task ID: {currentTask.task_id}</small>
-                    <small>Status: {currentTask.status}</small>
+                    <small>Status: {analysisProgress.taskStatus || currentTask.status}</small>
                   </div>
                 )}
 

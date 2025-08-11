@@ -4,7 +4,7 @@
 
 // Configure the API base URL
 const API_BASE_URL =
-  process.env.REACT_APP_ESSAY_API_URL || "http://localhost:8000";
+  process.env.REACT_APP_ESSAY_API_URL || "http://localhost:6500";
 
 /**
  * Upload a PDF file to extract and analyze Chevening essays
@@ -73,7 +73,79 @@ export const getTaskStatus = async (taskId) => {
 };
 
 /**
- * Poll task status until completion with progress callbacks
+ * Map backend step to frontend 5-step system
+ * Backend provides 4 steps (1/4, 2/4, 3/4, 4/4)
+ * Frontend shows 5 steps: Upload + 4 backend steps
+ * @param {string} backendStep - Backend step string (e.g., "2/4")
+ * @returns {Object} Frontend step info with progress percentage
+ */
+const mapBackendStepToFrontend = (backendStep) => {
+  if (!backendStep || !backendStep.includes("/")) {
+    return { step: "2/5", progress: 20 }; // Default to step 2 if no backend step
+  }
+  
+  try {
+    const [current, total] = backendStep.split("/").map(Number);
+    if (isNaN(current) || isNaN(total) || total === 0) {
+      return { step: "2/5", progress: 20 };
+    }
+    
+    // Map backend steps to frontend steps:
+    // Backend 1/4 -> Frontend 2/5 (20-40%)
+    // Backend 2/4 -> Frontend 3/5 (40-60%) 
+    // Backend 3/4 -> Frontend 4/5 (60-80%)
+    // Backend 4/4 -> Frontend 5/5 (80-100%)
+    
+    const frontendStepNumber = current + 1; // Backend step 1 becomes frontend step 2
+    const frontendStep = `${frontendStepNumber}/5`;
+    const progress = frontendStepNumber * 20; // Each step is 20%
+    
+    return { step: frontendStep, progress };
+  } catch {
+    return { step: "2/5", progress: 20 };
+  }
+};
+
+/**
+ * Get user-friendly message for task status based on frontend step
+ * @param {string} status - Backend status
+ * @param {string} backendMessage - Backend message
+ * @param {string} frontendStep - Frontend step (e.g., "2/5")
+ * @returns {string} User-friendly message
+ */
+const getProgressMessage = (status, backendMessage, frontendStep) => {
+  // If backend provides a specific message, use it with step context
+  if (backendMessage) {
+    return `${backendMessage} (${frontendStep})`;
+  }
+  
+  // Map frontend steps to user-friendly messages
+  switch (frontendStep) {
+    case "2/5":
+      return "Running essay assessment analysis...";
+    case "3/5": 
+      return "Running grammar & style analysis...";
+    case "4/5":
+      return "Running strategic feedback analysis...";
+    case "5/5":
+      return "Creating documents & finalizing...";
+    default:
+      // Fallback to status-based messages
+      switch (status) {
+        case "ANALYZING": 
+          return `Running AI analysis (${frontendStep})...`;
+        case "GENERATING":
+          return `Creating documents (${frontendStep})...`;
+        case "FINALIZING":
+          return `Finalizing and uploading (${frontendStep})...`;
+        default:
+          return `Processing (${frontendStep})...`;
+      }
+  }
+};
+
+/**
+ * Poll task status until completion with 5-step progress tracking
  * @param {string} taskId - The task ID to monitor
  * @param {Function} onProgress - Callback for progress updates
  * @param {Function} onStatusChange - Callback for status changes
@@ -103,6 +175,15 @@ export const pollTaskUntilComplete = async (
       switch (statusResponse.status) {
         case "COMPLETED":
           console.log("✅ Task completed successfully");
+          if (onProgress) {
+            onProgress({
+              status: "COMPLETED",
+              step: "5/5",
+              message: "Analysis completed successfully!",
+              progress: 100,
+              phase: 'analysis'
+            });
+          }
           return statusResponse.result;
 
         case "FAILED":
@@ -113,16 +194,27 @@ export const pollTaskUntilComplete = async (
         case "ANALYZING":
         case "GENERATING":
         case "FINALIZING":
-          // Call progress callback if available
+        case "PENDING":
           if (onProgress && statusResponse.meta) {
-            onProgress({
+            const backendStep = statusResponse.meta.step || "";
+            const backendMessage = statusResponse.meta.status || "";
+            
+            // Map backend step to frontend 5-step system
+            const { step: frontendStep, progress } = mapBackendStepToFrontend(backendStep);
+
+            const progressData = {
               status: statusResponse.status,
-              step: statusResponse.meta.step || "",
-              message: statusResponse.meta.status || "",
-              progress: statusResponse.meta.progress || 0,
+              step: frontendStep,
+              message: getProgressMessage(statusResponse.status, backendMessage, frontendStep),
+              progress: progress,
+              phase: 'analysis',
               current: statusResponse.meta.current || 0,
               total: statusResponse.meta.total || 100,
-            });
+              taskStatus: statusResponse.status,
+              backendStep: backendStep // Keep original for debugging
+            };
+
+            onProgress(progressData);
           }
 
           console.log(
@@ -130,10 +222,6 @@ export const pollTaskUntilComplete = async (
               statusResponse.meta?.status || "Processing..."
             }`
           );
-          break;
-
-        case "PENDING":
-          console.log("⏳ Task is pending...");
           break;
 
         default:
@@ -221,7 +309,8 @@ export const getComprehensiveAnalysis = async (
         result.task_id,
         onProgress,
         onStatusChange,
-        pollingInterval
+        pollingInterval,
+        200 // maxAttempts
       );
     }
 
@@ -297,7 +386,8 @@ export const getLeadershipComprehensiveAnalysis = async (
         result.task_id,
         onProgress,
         onStatusChange,
-        pollingInterval
+        pollingInterval,
+        200 // maxAttempts
       );
     }
 
@@ -365,7 +455,8 @@ export const getEssayFeedback = async (
         result.task_id,
         onProgress,
         onStatusChange,
-        pollingInterval
+        pollingInterval,
+        200 // maxAttempts
       );
     }
 
@@ -428,7 +519,8 @@ export const getCombinedGrammarHemingwayAnalysis = async (
         result.task_id,
         onProgress,
         onStatusChange,
-        pollingInterval
+        pollingInterval,
+        200 // maxAttempts
       );
     }
 
@@ -495,7 +587,8 @@ export const analyzeLeadershipGrammar = async (
         result.task_id,
         onProgress,
         onStatusChange,
-        pollingInterval
+        pollingInterval,
+        200 // maxAttempts
       );
     }
 
