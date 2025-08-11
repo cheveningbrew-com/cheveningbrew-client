@@ -72,6 +72,20 @@ const Upload = () => {
     }
   }, [subscriptionStatus]);
 
+  // Global disable navigation and interactions during upload
+  useEffect(() => {
+    if (isLoading) {
+      document.body.classList.add('upload-processing');
+    } else {
+      document.body.classList.remove('upload-processing');
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      document.body.classList.remove('upload-processing');
+    };
+  }, [isLoading]);
+
   const checkQueueStatus = async () => {
     try {
       const status = await getQueueStatus();
@@ -285,7 +299,7 @@ const Upload = () => {
       }
 
       setAnalysisProgress({
-        step: "3/3",
+        step: "5/5",
         message: "Analysis complete! Redirecting to results...",
         progress: 100,
         status: "COMPLETED"
@@ -297,8 +311,6 @@ const Upload = () => {
       // Redirect to feedback section
       setTimeout(() => {
         navigate("/feedback");
-        // Only reset loading state after navigation is triggered
-        setIsLoading(false);
       }, 1500);
 
     } catch (err) {
@@ -323,10 +335,9 @@ const Upload = () => {
         logout();
         navigate("/");
       }
-      // Set loading to false for error cases
-      setIsLoading(false);
     } finally {
-      // Loading state now managed in the success and error paths
+      // Always reset loading state regardless of success or error
+      setIsLoading(false);
     }
   };
 
@@ -350,24 +361,29 @@ const Upload = () => {
 const handleDragEnter = (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isLoading) return;
   setDragActive(true);
 };
 
 const handleDragLeave = (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isLoading) return;
   setDragActive(false);
 };
 
 const handleDragOver = (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isLoading) return;
 };
 
 const handleDrop = (e) => {
   e.preventDefault();
   e.stopPropagation();
   setDragActive(false);
+
+  if (isLoading) return; // Prevent drop during upload
 
   const files = e.dataTransfer.files;
   if (files && files[0]) {
@@ -395,7 +411,7 @@ const handleDrop = (e) => {
     return (
       <MainLayout>
         <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox}`}>
-          <div className={`${styles.mainContent} customScroll`}>
+          <div className={`${styles.mainContent} upload-container customScroll`}>
             <div className={styles.spinner}></div>
             <p>Checking your account status...</p>
           </div>
@@ -407,7 +423,7 @@ const handleDrop = (e) => {
   return (
     <MainLayout>
       <ActionBox className={`${styles.actionBoxCustom} ${isLoading ? styles.loadingActionBox : ''}`}>
-        <div className={`${styles.mainContent} customScroll`}>
+        <div className={`${styles.mainContent} upload-container customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
               {selectedFile ? "Upload and get feedback" : "Select your Chevening draft essays"}
@@ -459,6 +475,7 @@ const handleDrop = (e) => {
                         onClick={handleDeleteFile}
                         className={styles.deleteButton}
                         title="Remove file"
+                        disabled={isLoading}
                       >
                         <Trash2 size={16} />
                       </button>
