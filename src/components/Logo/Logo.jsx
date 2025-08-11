@@ -4,7 +4,7 @@ import styles from "./Logo.module.css"; // Import as a module
 import logo from "../../assets/images/logo.png"
 import { readUserField,getUserId} from "../../services/api";
 
-const Logo = () => {
+const Logo = ({ isLoading = false }) => {
   const [redirectTo, setRedirectTo] = useState("/");
 
   useEffect(() => {
@@ -20,6 +20,14 @@ const Logo = () => {
 
     fetchSessionToken();
   }, []);
+
+  if (isLoading) {
+    return (
+      <div className={`${styles.logoLink} ${styles.disabled}`}>
+        <img src={logo} alt="logo" />
+      </div>
+    );
+  }
 
   return (
     <Link to={redirectTo} className={styles.logoLink}>

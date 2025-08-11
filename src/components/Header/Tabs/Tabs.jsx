@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import styles from "./Tabs.module.css";
 
-const Tabs = () => {
+const Tabs = ({ isLoading = false }) => {
   const location = useLocation();
 
   const tabs = [
@@ -12,17 +12,31 @@ const Tabs = () => {
 
   return (
     <div className={styles.tabsContainer}>
-      {tabs.map((tab) => (
-        <Link
-          to={tab.path}
-          key={tab.path}
-          className={`${styles.tabLink} ${
-            location.pathname === tab.path ? styles.active : ""
-          } ${tab.label === "Upload" ? styles.firstTab : ""}`}
-        >
-          {tab.label}
-        </Link>
-      ))}
+      {tabs.map((tab) => {
+        if (isLoading) {
+          return (
+            <div
+              key={tab.path}
+              className={`${styles.tabLink} ${styles.disabled} ${
+                location.pathname === tab.path ? styles.active : ""
+              } ${tab.label === "Upload" ? styles.firstTab : ""}`}
+            >
+              {tab.label}
+            </div>
+          );
+        }
+        return (
+          <Link
+            to={tab.path}
+            key={tab.path}
+            className={`${styles.tabLink} ${
+              location.pathname === tab.path ? styles.active : ""
+            } ${tab.label === "Upload" ? styles.firstTab : ""}`}
+          >
+            {tab.label}
+          </Link>
+        );
+      })}
     </div>
   );
 };

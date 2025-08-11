@@ -72,19 +72,6 @@ const Upload = () => {
     }
   }, [subscriptionStatus]);
 
-  // Global disable navigation and interactions during upload
-  useEffect(() => {
-    if (isLoading) {
-      document.body.classList.add('upload-processing');
-    } else {
-      document.body.classList.remove('upload-processing');
-    }
-    
-    // Cleanup on unmount
-    return () => {
-      document.body.classList.remove('upload-processing');
-    };
-  }, [isLoading]);
 
   const checkQueueStatus = async () => {
     try {
@@ -307,10 +294,11 @@ const Upload = () => {
 
       // Refresh user status after successful analysis
       await checkUserStatus();
-
+        
       // Redirect to feedback section
       setTimeout(() => {
         navigate("/feedback");
+        setIsLoading(false);
       }, 1500);
 
     } catch (err) {
@@ -335,9 +323,10 @@ const Upload = () => {
         logout();
         navigate("/");
       }
-    } finally {
-      // Always reset loading state regardless of success or error
+
       setIsLoading(false);
+    } finally {
+      
     }
   };
 
@@ -409,7 +398,7 @@ const handleDrop = (e) => {
 
   if (statusLoading) {
     return (
-      <MainLayout>
+      <MainLayout isLoading={false}>
         <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox}`}>
           <div className={`${styles.mainContent} upload-container customScroll`}>
             <div className={styles.spinner}></div>
@@ -421,7 +410,7 @@ const handleDrop = (e) => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <ActionBox className={`${styles.actionBoxCustom} ${isLoading ? styles.loadingActionBox : ''}`}>
         <div className={`${styles.mainContent} upload-container customScroll`}>
           {!isLoading && (
