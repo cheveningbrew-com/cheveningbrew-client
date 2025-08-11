@@ -453,7 +453,6 @@
   gap: 20px;
   justify-content: center;
   align-items: flex-start;
-  /* margin-top: 20px; */
 }
 
 .pricingContent {
@@ -548,7 +547,6 @@
 }
 
 .pricingPage .description {
-  /* margin-bottom: 30px; */
   text-align: center;
 }
 
@@ -560,10 +558,8 @@
   /* Mobile-specific styling for pricing page */
   .pricingPageMobile {
     height: auto !important;
-    /* min-height: 100vh; */
     overflow-y: auto;
     padding-bottom: 120px; /* Increase bottom padding */
-    /* margin-bottom: 60px;  */
   }
   
   /* Added for mobile scroll container */
