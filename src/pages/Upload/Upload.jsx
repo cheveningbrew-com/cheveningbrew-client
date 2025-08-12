@@ -239,50 +239,12 @@ const Upload = () => {
           onStatusChange: handleStatusChange
         });
 
-        // Store results for free trial format
-        const analysisData = {
-          essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
-          googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
-          narrativeFeedback: analysisResult.summary?.narrative_feedback_document?.google_docs_link,
-          downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
-          downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
-          downloadLinkNarrativeFeedback: analysisResult.summary?.narrative_feedback_document?.download_link,
-          timestamp: new Date().toISOString(),
-          fileName: selectedFile.name,
-          directoryName: dirName,
-          taskId: analysisResult.task_info?.task_id,
-          analysisSummary: analysisResult.summary,
-          totalDocuments: analysisResult.summary?.total_documents_created || 2,
-          databaseSaved: analysisResult.summary?.database_saved || false,
-          analysisType: "leadership_comprehensive_revival"
-        };
-
-        sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
-
       } else if (analysisEndpoint === "comprehensive") {
         // Paid subscription - Comprehensive analysis
         analysisResult = await getComprehensiveAnalysis(dirName, userEmail, userName, userId, {
           onProgress: handleProgress,
           onStatusChange: handleStatusChange
         });
-
-        // Store results for comprehensive format
-          const analysisData = {
-          googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
-          essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
-          narrativeFeedback: analysisResult.summary?.narrative_feedback_document?.google_docs_link,
-          downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
-          downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
-          downloadLinkNarrativeFeedback: analysisResult.summary?.narrative_feedback_document?.download_link,
-          timestamp: new Date().toISOString(),
-          fileName: selectedFile.name,
-          taskId: analysisResult.task_info?.task_id,
-          totalDocuments: analysisResult.summary?.total_documents_created || 3,
-          databaseSaved: analysisResult.summary?.database_saved || false,
-          analysisType: "comprehensive_essay_revival"
-        };
-
-        sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
       }
 
       setAnalysisProgress({

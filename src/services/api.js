@@ -258,5 +258,31 @@ export const checkSubscriptionStatus = async (user_id) => {
     }
 };
 
+// Get user's latest completed essay with structured Google Docs links
+export const getLatestCompletedEssay = async (user_id) => {
+    if (!user_id) {
+        throw new Error("User ID is required");
+    }
+
+    try {
+        const response = await fetch(`${DB_SERVER_URL}/essays/latest_completed`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to get latest completed essay: ${response.status} - ${response.statusText}, Details: ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error getting latest completed essay:", error.message);
+        throw error;
+    }
+};
+
 
 
