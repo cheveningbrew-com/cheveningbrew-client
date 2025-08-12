@@ -59,20 +59,7 @@ const Footer = () => {
             <Link to="/get-essay-collection" className="nav-link">Essay Collection</Link>
           </div>
           
-          {/* Preference option - only shown when mobile and expanded */}
-          {isMobile && isFooterExpanded && (
-            <div className="w-full flex justify-center mt-2">
-              <label className="flex items-center text-xs text-white opacity-80">
-                <input
-                  type="checkbox"
-                  checked={rememberPreference}
-                  onChange={(e) => updateRememberPreference(e.target.checked)}
-                  className="mr-1"
-                />
-                Remember my preference
-              </label>
-            </div>
-          )}
+         
         </div>
 
         {/* Copyright - always visible */}

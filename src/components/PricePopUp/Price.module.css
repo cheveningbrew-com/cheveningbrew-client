@@ -135,7 +135,7 @@
   .priceCard:last-child {
     grid-column: auto;
     max-width: 100%;
-    margin: 0 0 100px 0; /* Significantly increased bottom margin for the last card */
+   
   }
   
   .priceContainerBox {
