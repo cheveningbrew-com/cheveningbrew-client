@@ -288,12 +288,24 @@ const Upload = () => {
           console.log("Detailed errors: err.errors", detailedErrors);
         }
         
-        // Format error message with specific validation issues
-        const errorMessage = detailedErrors.length > 0 
-          ? `Essay word count validation failed:\n\n${detailedErrors.map(error => `• ${error}`).join('\n')}\n\nPlease ensure each essay is between 100-500 words.`
-          : "Essay word count validation failed. Please ensure each essay is between 100-500 words.";
-        
-        setError(errorMessage);
+        // Format error message with specific validation issues using HTML
+        if (detailedErrors.length > 0) {
+          const htmlErrorMessage = (
+            <>
+              <div><strong>Essay word count validation failed:</strong></div>
+              <br />
+              <ul style={{ margin: '10px 0', paddingLeft: '20px' }}>
+                {detailedErrors.map((error, index) => (
+                  <li key={index} style={{ marginBottom: '5px' }}>{error}</li>
+                ))}
+              </ul>
+              <div>Please ensure each essay is between 100-500 words.</div>
+            </>
+          );
+          setError(htmlErrorMessage);
+        } else {
+          setError("Essay word count validation failed. Please ensure each essay is between 100-500 words.");
+        }
       } else {
           setError(`Error: ${err.message || "Unknown error occurred"}`);
         }
@@ -499,7 +511,11 @@ const handleDrop = (e) => {
                     className={styles.hiddenInput}
                   />
 
-                  {error && <div className={styles.errorMessage}>{error}</div>}
+                  {error && (
+                    <div className={styles.errorMessage}>
+                      {typeof error === 'string' ? error : error}
+                    </div>
+                  )}
 
                   {/* Dynamic Upload Button */}
                   {subscriptionStatus && selectedFile && (
