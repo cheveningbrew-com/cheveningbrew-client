@@ -276,9 +276,27 @@ const Upload = () => {
       } else if (err.message?.includes("No attempts remaining")) {
         setError("You have no remaining attempts. Please upgrade your subscription.");
         await checkUserStatus();
+      } else if (
+        err?.message?.includes("Essay word count validation failed")
+      ) {
+
+        // Parse error response to extract detailed validation errors
+        let detailedErrors = [];
+        
+        if (err.errors) {
+          detailedErrors = err.errors;
+          console.log("Detailed errors: err.errors", detailedErrors);
+        }
+        
+        // Format error message with specific validation issues
+        const errorMessage = detailedErrors.length > 0 
+          ? `Essay word count validation failed:\n\n${detailedErrors.map(error => `• ${error}`).join('\n')}\n\nPlease ensure each essay is between 100-500 words.`
+          : "Essay word count validation failed. Please ensure each essay is between 100-500 words.";
+        
+        setError(errorMessage);
       } else {
-        setError(`Error: ${err.message || "Unknown error occurred"}`);
-      }
+          setError(`Error: ${err.message || "Unknown error occurred"}`);
+        }
 
       // If authentication issues, redirect to login
       if (err.message?.includes("unauthorized") || err.message?.includes("not authenticated")) {
