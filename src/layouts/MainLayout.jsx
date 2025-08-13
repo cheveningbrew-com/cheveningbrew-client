@@ -7,7 +7,7 @@ import SignOUt from "../components/SignOut/SignOut";
 import styles from "./layout.module.css";
 import {getUserId,readUserField} from "../services/api"
 
-const MainLayout = ({ children }) => {
+const MainLayout = ({ children, isLoading = false }) => {
   const [userName, setUserName] = useState("");
 
   useEffect(() => {
@@ -29,14 +29,14 @@ const MainLayout = ({ children }) => {
       <div className={styles.mainLayout}>
         <div className={styles.navigationContainer}>
           <div className={styles.navigationHead}>
-            <Logo />
+            <Logo isLoading={isLoading} />
             <div className={styles.navigationUser}>
-              <NameDisplay userName={userName} />
-              <SignOUt />
+              <NameDisplay userName={userName} isLoading={isLoading} />
+              <SignOUt isLoading={isLoading} />
             </div>
           </div>
 
-          <Tabs />
+          <Tabs isLoading={isLoading} />
         </div>
         <div className={styles.contentContainer}>{children}</div>
       </div>

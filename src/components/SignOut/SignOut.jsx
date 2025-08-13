@@ -5,7 +5,7 @@ import styles from './SignOut.module.css';
 import { handleSignOut } from './SignOutHelper';
 import SignoutPopup from '../SignoutPopup/SignoutPopup';
 
-const SignOut = () => {
+const SignOut = ({ isLoading = false }) => {
   const navigate = useNavigate();
   const { logout, user, isAuthenticated } = useAuth();
   const [showConfirmPopup, setShowConfirmPopup] = useState(false);
@@ -16,6 +16,7 @@ const SignOut = () => {
   }
 
   const handleSignOutClick = () => {
+    if (isLoading) return; // Prevent click when disabled
     // Show confirmation popup instead of signing out immediately
     setShowConfirmPopup(true);
   };
@@ -34,13 +35,13 @@ const SignOut = () => {
   return (
     <>
       <div
-        className={styles.signoutContainer}
+        className={`${styles.signoutContainer} ${isLoading ? styles.disabled : ''}`}
         onClick={handleSignOutClick}
       >
         <p className={styles.signoutText}>Sign Out</p>
       </div>
 
-      {showConfirmPopup && (
+      {showConfirmPopup && !isLoading && (
         <SignoutPopup
           isOpen={showConfirmPopup}
           onConfirm={handleConfirmSignOut}

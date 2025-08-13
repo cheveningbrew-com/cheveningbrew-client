@@ -189,7 +189,7 @@ export const pollTaskUntilComplete = async (
         case "FAILED":
           console.error("❌ Task failed:", statusResponse.error);
           throw new Error(statusResponse.error || "Task failed");
-
+          
         case "PROCESSING":
         case "ANALYZING":
         case "GENERATING":

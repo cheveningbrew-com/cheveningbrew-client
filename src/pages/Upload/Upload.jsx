@@ -72,6 +72,7 @@ const Upload = () => {
     }
   }, [subscriptionStatus]);
 
+
   const checkQueueStatus = async () => {
     try {
       const status = await getQueueStatus();
@@ -238,54 +239,16 @@ const Upload = () => {
           onStatusChange: handleStatusChange
         });
 
-        // Store results for free trial format
-        const analysisData = {
-          essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
-          googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
-          narrativeFeedback: analysisResult.summary?.narrative_feedback_document?.google_docs_link,
-          downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
-          downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
-          downloadLinkNarrativeFeedback: analysisResult.summary?.narrative_feedback_document?.download_link,
-          timestamp: new Date().toISOString(),
-          fileName: selectedFile.name,
-          directoryName: dirName,
-          taskId: analysisResult.task_info?.task_id,
-          analysisSummary: analysisResult.summary,
-          totalDocuments: analysisResult.summary?.total_documents_created || 2,
-          databaseSaved: analysisResult.summary?.database_saved || false,
-          analysisType: "leadership_comprehensive_revival"
-        };
-
-        sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
-
       } else if (analysisEndpoint === "comprehensive") {
         // Paid subscription - Comprehensive analysis
         analysisResult = await getComprehensiveAnalysis(dirName, userEmail, userName, userId, {
           onProgress: handleProgress,
           onStatusChange: handleStatusChange
         });
-
-        // Store results for comprehensive format
-          const analysisData = {
-          googleDocs: analysisResult.summary?.grammar_style_document?.google_docs_link,
-          essayFeedback: analysisResult.summary?.assessment_document?.google_docs_link,
-          narrativeFeedback: analysisResult.summary?.narrative_feedback_document?.google_docs_link,
-          downloadLinkGrammarStyleDocument: analysisResult.summary?.grammar_style_document?.download_link,
-          downloadLinkEssayFeedback: analysisResult.summary?.assessment_document?.download_link,
-          downloadLinkNarrativeFeedback: analysisResult.summary?.narrative_feedback_document?.download_link,
-          timestamp: new Date().toISOString(),
-          fileName: selectedFile.name,
-          taskId: analysisResult.task_info?.task_id,
-          totalDocuments: analysisResult.summary?.total_documents_created || 3,
-          databaseSaved: analysisResult.summary?.database_saved || false,
-          analysisType: "comprehensive_essay_revival"
-        };
-
-        sessionStorage.setItem('latestAnalysisResults', JSON.stringify(analysisData));
       }
 
       setAnalysisProgress({
-        step: "3/3",
+        step: "5/5",
         message: "Analysis complete! Redirecting to results...",
         progress: 100,
         status: "COMPLETED"
@@ -293,11 +256,10 @@ const Upload = () => {
 
       // Refresh user status after successful analysis
       await checkUserStatus();
-
+        
       // Redirect to feedback section
       setTimeout(() => {
         navigate("/feedback");
-        // Only reset loading state after navigation is triggered
         setIsLoading(false);
       }, 1500);
 
@@ -323,10 +285,10 @@ const Upload = () => {
         logout();
         navigate("/");
       }
-      // Set loading to false for error cases
+
       setIsLoading(false);
     } finally {
-      // Loading state now managed in the success and error paths
+      
     }
   };
 
@@ -350,24 +312,29 @@ const Upload = () => {
 const handleDragEnter = (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isLoading) return;
   setDragActive(true);
 };
 
 const handleDragLeave = (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isLoading) return;
   setDragActive(false);
 };
 
 const handleDragOver = (e) => {
   e.preventDefault();
   e.stopPropagation();
+  if (isLoading) return;
 };
 
 const handleDrop = (e) => {
   e.preventDefault();
   e.stopPropagation();
   setDragActive(false);
+
+  if (isLoading) return; // Prevent drop during upload
 
   const files = e.dataTransfer.files;
   if (files && files[0]) {
@@ -393,9 +360,9 @@ const handleDrop = (e) => {
 
   if (statusLoading) {
     return (
-      <MainLayout>
+      <MainLayout isLoading={false}>
         <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox}`}>
-          <div className={`${styles.mainContent} customScroll`}>
+          <div className={`${styles.mainContent} upload-container customScroll`}>
             <div className={styles.spinner}></div>
             <p>Checking your account status...</p>
           </div>
@@ -405,9 +372,9 @@ const handleDrop = (e) => {
   }
 
   return (
-    <MainLayout>
+    <MainLayout isLoading={isLoading}>
       <ActionBox className={`${styles.actionBoxCustom} ${isLoading ? styles.loadingActionBox : ''}`}>
-        <div className={`${styles.mainContent} customScroll`}>
+        <div className={`${styles.mainContent} upload-container customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
               {selectedFile ? "Upload and get feedback" : "Select your Chevening draft essays"}
@@ -459,6 +426,7 @@ const handleDrop = (e) => {
                         onClick={handleDeleteFile}
                         className={styles.deleteButton}
                         title="Remove file"
+                        disabled={isLoading}
                       >
                         <Trash2 size={16} />
                       </button>

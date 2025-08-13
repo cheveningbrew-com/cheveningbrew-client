@@ -4,211 +4,110 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import uploadStyles from "../Upload/Upload.module.css";
-import { getUserId } from "../../services/api";
-import { getTaskStatus, getMultipleTaskStatuses } from "../../services/essay_api";
-import ReactMarkdown from "react-markdown";
+import { getUserId, getLatestCompletedEssay } from "../../services/api";
 
 const Feedback = () => {
-  const [feedback, setFeedback] = useState(null);
-  const [analysisResults, setAnalysisResults] = useState(null);
-  const [loading, setLoading] = useState(false);
+  const [essayData, setEssayData] = useState(null);
+  const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [taskStatuses, setTaskStatuses] = useState([]);
-  const [pollingActive, setPollingActive] = useState(false);
   const navigate = useNavigate();
 
-  // Fetch feedback and handle background tasks
+  // Fetch latest completed essay data
   useEffect(() => {
-    const fetchFeedback = async () => {
-      // Check if we have cached data first before setting loading state
-      const freshResults = sessionStorage.getItem('latestAnalysisResults');
-      const cachedFeedback = sessionStorage.getItem('cachedFeedback');
-      
-      if (!freshResults && !cachedFeedback) {
-        setLoading(true); // Only set loading if we have nothing cached
-      }
-        
+    const fetchLatestEssay = async () => {
       try {
+        setLoading(true);
+        const userId = getUserId();
         
-        // Check for fresh analysis results from recent upload
-        const freshResults = sessionStorage.getItem('latestAnalysisResults');
-        if (freshResults) {
-          const parsedResults = JSON.parse(freshResults);
-          setAnalysisResults(parsedResults);
-          
-          // Check if there are pending tasks
-          const taskIds = parsedResults.taskIds || [parsedResults.taskId].filter(Boolean);
-          if (taskIds.length > 0) {
-            await checkPendingTasks(taskIds);
-          } else {
-            setLoading(false);
-          }
+        if (!userId) {
+          setError("User not found. Please log in again.");
+          setLoading(false);
           return;
         }
 
-        // Check for cached feedback in sessionStorage
-        const cachedFeedback = sessionStorage.getItem('cachedFeedback');
-        if (cachedFeedback) {
-          try {
-            const parsed = JSON.parse(cachedFeedback);
-            setFeedback(parsed);
-            setLoading(false);
-            return;
-          } catch (parseError) {
-            console.warn("Failed to parse cached feedback:", parseError);
-          }
+        const response = await getLatestCompletedEssay(userId);
+        
+        if (response.success && response.essay_id) {
+          // Map API response to component state
+          const mappedData = {
+            essay_id: response.essay_id,
+            attempt_number: response.attempt_number,
+            essay_filename: response.essay_filename,
+            is_free_attempt: response.is_free_attempt,
+            created_at: response.created_at,
+            downloadLinkEssayFeedback: response.grading_docs,
+            downloadLinkGrammarStyleDocument: response.grammar_style_docs,
+            downloadLinkNarrativeFeedback: response.narrative_feedback_docs,
+            analysisType: response.is_free_attempt ? "leadership_comprehensive_revival" : "comprehensive_essay_revival"
+          };
+          
+          setEssayData(mappedData);
+          setError(null);
+        } else {
+          setError("No completed essay analysis found. Please upload your essay first.");
         }
-
-        // If no feedback available, show message
-        setError("No essay analysis found. Please upload your essay first.");
-        setLoading(false);
-
       } catch (err) {
-        console.error("Error fetching feedback:", err);
-        setError(
-          err.response?.data?.message ||
-          err.message ||
-          "Failed to load essay analysis. Please try again later."
-        );
+        console.error("Error fetching latest essay:", err);
+        if (err.message.includes("404") || err.message.includes("No completed essays found")) {
+          setError("No essay analysis found. Please upload your essay first.");
+        } else {
+          setError("Failed to load essay analysis. Please try again later.");
+        }
+      } finally {
         setLoading(false);
       }
     };
 
-    fetchFeedback();
+    fetchLatestEssay();
   }, []);
 
-  // Check status of pending background tasks
-  const checkPendingTasks = async (taskIds) => {
-    try {
-      setPollingActive(true);
-      
-      if (taskIds.length === 0) {
-        setLoading(false);
-        return;
-      }
-
-      // Check initial status
-      const statuses = await getMultipleTaskStatuses(taskIds);
-      setTaskStatuses(statuses);
-
-      // Check if all tasks are completed
-      const allCompleted = statuses.every(status => 
-        status.status === 'COMPLETED' || status.status === 'ERROR'
-      );
-
-      if (allCompleted) {
-        setPollingActive(false);
-        setLoading(false);
-        return;
-      }
-
-      // Start polling for incomplete tasks
-      const pollInterval = setInterval(async () => {
-        try {
-          const updatedStatuses = await getMultipleTaskStatuses(taskIds);
-          setTaskStatuses(updatedStatuses);
-
-          const stillProcessing = updatedStatuses.some(status => 
-            !['COMPLETED', 'ERROR', 'FAILED'].includes(status.status)
-          );
-
-          if (!stillProcessing) {
-            clearInterval(pollInterval);
-            setPollingActive(false);
-            setLoading(false);
-            
-            // Update analysis results with completed task data
-            updateAnalysisWithTaskResults(updatedStatuses);
-          }
-        } catch (error) {
-          console.error("Error polling task status:", error);
-          clearInterval(pollInterval);
-          setPollingActive(false);
-          setLoading(false);
-        }
-      }, 3000);
-
-      // Cleanup interval on component unmount
-      return () => {
-        clearInterval(pollInterval);
-        setPollingActive(false);
-      };
-
-    } catch (error) {
-      console.error("Error checking pending tasks:", error);
-      setPollingActive(false);
-      setLoading(false);
-    }
-  };
-
-  // Update analysis results with completed task data
-  const updateAnalysisWithTaskResults = (taskStatuses) => {
-    const completedTasks = taskStatuses.filter(task => task.status === 'COMPLETED');
-    
-    if (completedTasks.length > 0) {
-      setAnalysisResults(prevResults => {
-        const updatedResults = { ...prevResults };
-        
-        completedTasks.forEach(task => {
-          if (task.result) {
-            // Update with new Google Drive links if available
-            if (task.result.google_docs_link) {
-              if (task.task_id === prevResults.taskIds?.feedbackTaskId) {
-                updatedResults.essayFeedback = task.result.google_docs_link;
-              } else if (task.task_id === prevResults.taskIds?.analysisTaskId) {
-                updatedResults.googleDocs = task.result.google_docs_link;
-              }
-            }
-            
-            // Handle comprehensive result structure
-            if (task.result.summary) {
-              if (task.result.summary.assessment_document?.google_docs_link) {
-                updatedResults.essayFeedback = task.result.summary.assessment_document.google_docs_link;
-              }
-              if (task.result.summary.grammar_style_document?.google_docs_link) {
-                updatedResults.googleDocs = task.result.summary.grammar_style_document.google_docs_link;
-              }
-            }
-          }
-        });
-        
-        return updatedResults;
-      });
-    }
-  };
 
   const handleUploadAnother = () => {
-    // Clear current analysis data
-    sessionStorage.removeItem('latestAnalysisResults');
     navigate("/upload");
   };
 
-  const getTaskStatusDisplay = (status) => {
-    const statusMap = {
-      'PENDING': { emoji: '⏳', text: 'Waiting in queue' },
-      'PROCESSING': { emoji: '🔄', text: 'Processing' },
-      'ANALYZING': { emoji: '🧠', text: 'AI Analysis in progress' },
-      'GENERATING': { emoji: '📝', text: 'Creating document' },
-      'FINALIZING': { emoji: '☁️', text: 'Uploading to Google Drive' },
-      'COMPLETED': { emoji: '✅', text: 'Completed' },
-      'FAILED': { emoji: '❌', text: 'Failed' },
-      'ERROR': { emoji: '⚠️', text: 'Error' }
-    };
+  // Helper function to format date creatively
+  const formatCreativeDate = (dateString) => {
+    if (!dateString) return null;
     
-    return statusMap[status] || { emoji: '📋', text: status };
-  };
-
-  // Determine analysis type for display
-  const getAnalysisTypeDisplay = () => {
-    if (!analysisResults) return "Essay Analysis";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
     
-    if (analysisResults.analysisType === "leadership_comprehensive_revival") {
-      return "Leadership Essay Analysis (Free Trial)";
-    } else if (analysisResults.analysisType === "comprehensive_essay_revival") {
-      return "Comprehensive Essay Analysis";
+    // Format the exact date
+    const formattedDate = date.toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long', 
+      day: 'numeric'
+    });
+    
+    const formattedTime = date.toLocaleTimeString('en-US', {
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true
+    });
+    
+    // Calculate relative time
+    let relativeTime = '';
+    if (diffInHours < 1) {
+      relativeTime = 'just now';
+    } else if (diffInHours < 24) {
+      relativeTime = `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
+    } else if (diffInDays === 1) {
+      relativeTime = 'yesterday';
+    } else if (diffInDays < 7) {
+      relativeTime = `${diffInDays} days ago`;
     } else {
-      return "Essay Analysis";
+      relativeTime = `${Math.floor(diffInDays / 7)} week${Math.floor(diffInDays / 7) > 1 ? 's' : ''} ago`;
     }
+    
+    return {
+      formattedDate,
+      formattedTime,
+      relativeTime
+    };
   };
 
   if (loading) {
@@ -217,13 +116,7 @@ const Feedback = () => {
         <ActionBox className={`${styles.actionBoxCustom} ${styles.loadingActionBox}`}>
           <div className={`${styles.mainContent} customScroll`}>
             <div className={styles.spinner}></div>
-            <p>Checking your analysis status...</p>
-            
-            {pollingActive && taskStatuses.length > 0 && (
-              <div className={styles.estimatedTime}>
-                <small>⏱️ This may take 12-30 minutes depending on analysis type</small>
-              </div>
-            )}
+            <p>Loading your essay analysis...</p>
           </div>
         </ActionBox>
       </MainLayout>
@@ -255,21 +148,56 @@ const Feedback = () => {
     <MainLayout>
       <ActionBox>
         <div className={`${styles.mainContent} customScroll`}>
-          {/* Show analysis results */}
-          {analysisResults ? (
+          {/* Show essay analysis results */}
+          {essayData ? (
             <>
               <div className={styles.title}>
-                {analysisResults.analysisType === "leadership_comprehensive_revival" 
+                {essayData.analysisType === "leadership_comprehensive_revival" 
                   ? "Download your complementary leadership essay review" 
                   : "Download your full Chevening essay draft review"}
               </div>
+
+              {/* Creative Date/Time Display */}
+              {essayData.created_at && (() => {
+                const dateInfo = formatCreativeDate(essayData.created_at);
+                return dateInfo ? (
+                  <div style={{
+                    background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
+                    border: '1px solid #e1e5e9',
+                    borderRadius: '12px',
+                    padding: '16px 24px',
+                    margin: '20px auto',
+                    maxWidth: '400px',
+                    textAlign: 'center',
+                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                    fontSize: '14px',
+                    color: '#2c3e50'
+                  }}>
+                    <div style={{ 
+                      fontSize: '16px', 
+                      fontWeight: '600', 
+                      marginBottom: '8px',
+                      color: '#34495e'
+                    }}>
+                      ✨ Analysis completed {dateInfo.relativeTime}
+                    </div>
+                    <div style={{ 
+                      fontSize: '13px', 
+                      opacity: '0.8',
+                      lineHeight: '1.4'
+                    }}>
+                      📅 {dateInfo.formattedDate} • {dateInfo.formattedTime}
+                    </div>
+                  </div>
+                ) : null;
+              })()}
               
-              {/* Updated: Simple Download Buttons */}
+              {/* Download Buttons */}
               <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
                 {/* Grammar & Style Download */}
-                {analysisResults.downloadLinkGrammarStyleDocument && (
+                {essayData.downloadLinkGrammarStyleDocument && (
                   <a 
-                    href={analysisResults.downloadLinkGrammarStyleDocument} 
+                    href={essayData.downloadLinkGrammarStyleDocument} 
                     className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
                     download
                     style={{ width: '100%' }}
@@ -279,9 +207,9 @@ const Feedback = () => {
                 )}
                 
                 {/* Essay Feedback Download */}
-                {analysisResults.downloadLinkEssayFeedback && (
+                {essayData.downloadLinkEssayFeedback && (
                   <a 
-                    href={analysisResults.downloadLinkEssayFeedback} 
+                    href={essayData.downloadLinkEssayFeedback} 
                     className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
                     download
                     style={{ width: '100%' }}
@@ -292,9 +220,9 @@ const Feedback = () => {
 
 
                 {/* Narrative Feedback Download */}
-                {analysisResults.downloadLinkNarrativeFeedback && (
+                {essayData.downloadLinkNarrativeFeedback && (
                   <a 
-                    href={analysisResults.downloadLinkNarrativeFeedback} 
+                    href={essayData.downloadLinkNarrativeFeedback} 
                     className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
                     download
                     style={{ width: '100%' }}
@@ -367,11 +295,6 @@ const Feedback = () => {
                 )}
               */}
             </>
-          ) : feedback ? (
-            /* Fall back to old feedback display */
-            <div className={styles.markdownContent}>
-              <ReactMarkdown>{feedback}</ReactMarkdown>
-            </div>
           ) : (
             /* No analysis available */
             <>

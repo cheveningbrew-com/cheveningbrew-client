@@ -32,6 +32,20 @@
   padding-right: 32px;
 }
 
+.disabled {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  opacity: 0.6;
+  user-select: none;
+}
+
+.disabled:hover {
+  background: none !important;
+  padding-right: 0 !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
 @media screen and (max-width: 768px) {
   .tabsContainer {
     flex-direction: row;
