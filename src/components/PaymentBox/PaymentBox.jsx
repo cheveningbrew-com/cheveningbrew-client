@@ -273,7 +273,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
 
       {showFreeTrialUsedPopup && (
         <Popup
-          message="You have already used your free trial."
+          message="Please purchase a plan for full review"
           onClose={() => setShowFreeTrialUsedPopup(false)}
         />
       )}
