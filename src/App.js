@@ -31,9 +31,9 @@ const App = () => {
               <Route path="/pricing" element={<Pricing />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/terms" element={<Terms />} />
-              <Route path="/get-essay-collection" element={<GetEssayCollection />} />
+              <Route path="/essays" element={<GetEssayCollection />} />
 
-              {/* Protected Routes - Simplified */}
+              {/* Protected Routes - Simplified*/}
               <Route element={<ProtectedRoute />}>
                 <Route path="/upload" element={<Upload />} />
                 <Route path="/feedback" element={<Feedback />} />
