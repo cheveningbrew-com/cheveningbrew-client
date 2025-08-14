@@ -33,22 +33,22 @@ const LandingPage = () => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ code: tokenResponse.code }),
         });
-  
+
         if (!response.ok) {
           throw new Error("Google authentication failed");
         }
-  
+
         const data = await response.json();
-  
+
         if (data.authenticated) {
           console.log("Authentication successful:", data);
-  
+
           // Step 2: Save user in the database first
           const savedUser = await createUser(
-            data.user.email, 
-            data.user.name, 
-            data.user.id, 
-            data.user.picture, 
+            data.user.email,
+            data.user.name,
+            data.user.id,
+            data.user.picture,
             data.authToken // Pass token if needed
           );
 
@@ -60,7 +60,7 @@ const LandingPage = () => {
           } else {
             await authLogin(data.authToken);
           }
-          
+
           // Step 4: Now navigate to the upload page
           console.log("Auth process completed, navigating to /upload");
           navigate("/upload", { replace: true });
@@ -74,13 +74,13 @@ const LandingPage = () => {
         setIsLoading(false);
       }
     },
-  
+
     onError: (error) => {
       console.error("Google Authentication error:", error);
       setIsLoading(false);
       setError("Authentication failed");
     },
-  
+
     flow: "auth-code",
   });
 
@@ -95,14 +95,13 @@ const LandingPage = () => {
     },
     {
       title:
-        "Receive a Word (.docx) with detailed, human-style comments—covering grammar and style, narrative strength, and Chevening criteria alignment. ",
+        "Get a Word doc with feedback comments—just like you would from a helpful Chevening alumni reviewer.",
     },
     {
       title:
         "Refine your essays and boost your shortlisting chances, with your unique voice in control.",
     },
   ];
-
   return (
     <>
     <div className={`${styles.container} customScroll`}>
@@ -137,10 +136,10 @@ const LandingPage = () => {
               className={`${styles.landingPageButton} ${
                 isLoading ? styles.loading : ""
               }`}
-              // #AUTH_REMOVED 
+              // #AUTH_REMOVED
               onClick={handleGoogleSignIn}
               // onClick={() => {navigate("/upload")}}
-            
+
             >
               {isLoading ? (
                 "Signing in..."
