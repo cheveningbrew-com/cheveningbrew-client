@@ -41,6 +41,7 @@ const App = () => {
                   <Route path="/feedback" element={<Feedback />} />
                   <Route path="/profile" element={<Profile />} />
                 </Route>
+
               </Routes>
             </FooterProvider>
           </AuthProvider>
