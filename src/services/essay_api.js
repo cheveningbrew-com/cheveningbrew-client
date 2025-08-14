@@ -23,7 +23,12 @@ export const uploadEssayFile = async (file) => {
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.message || "Failed to upload file");
+      const error = new Error(errorData.message || "Failed to upload file");
+      // Preserve the detailed errors for word count validation
+      if (errorData.errors) {
+        error.errors = errorData.errors;
+      }
+      throw error;
     }
 
     return await response.json();

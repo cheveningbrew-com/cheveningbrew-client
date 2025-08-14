@@ -66,49 +66,6 @@ const Feedback = () => {
     navigate("/upload");
   };
 
-  // Helper function to format date creatively
-  const formatCreativeDate = (dateString) => {
-    if (!dateString) return null;
-    
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInHours = Math.floor((now - date) / (1000 * 60 * 60));
-    const diffInDays = Math.floor(diffInHours / 24);
-    
-    // Format the exact date
-    const formattedDate = date.toLocaleDateString('en-US', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long', 
-      day: 'numeric'
-    });
-    
-    const formattedTime = date.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true
-    });
-    
-    // Calculate relative time
-    let relativeTime = '';
-    if (diffInHours < 1) {
-      relativeTime = 'just now';
-    } else if (diffInHours < 24) {
-      relativeTime = `${diffInHours} hour${diffInHours > 1 ? 's' : ''} ago`;
-    } else if (diffInDays === 1) {
-      relativeTime = 'yesterday';
-    } else if (diffInDays < 7) {
-      relativeTime = `${diffInDays} days ago`;
-    } else {
-      relativeTime = `${Math.floor(diffInDays / 7)} week${Math.floor(diffInDays / 7) > 1 ? 's' : ''} ago`;
-    }
-    
-    return {
-      formattedDate,
-      formattedTime,
-      relativeTime
-    };
-  };
 
   if (loading) {
     return (
@@ -157,40 +114,6 @@ const Feedback = () => {
                   : "Download your full Chevening essay draft review"}
               </div>
 
-              {/* Creative Date/Time Display */}
-              {essayData.created_at && (() => {
-                const dateInfo = formatCreativeDate(essayData.created_at);
-                return dateInfo ? (
-                  <div style={{
-                    background: 'linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%)',
-                    border: '1px solid #e1e5e9',
-                    borderRadius: '12px',
-                    padding: '16px 24px',
-                    margin: '20px auto',
-                    maxWidth: '400px',
-                    textAlign: 'center',
-                    boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-                    fontSize: '14px',
-                    color: '#2c3e50'
-                  }}>
-                    <div style={{ 
-                      fontSize: '16px', 
-                      fontWeight: '600', 
-                      marginBottom: '8px',
-                      color: '#34495e'
-                    }}>
-                      ✨ Analysis completed {dateInfo.relativeTime}
-                    </div>
-                    <div style={{ 
-                      fontSize: '13px', 
-                      opacity: '0.8',
-                      lineHeight: '1.4'
-                    }}>
-                      📅 {dateInfo.formattedDate} • {dateInfo.formattedTime}
-                    </div>
-                  </div>
-                ) : null;
-              })()}
               
               {/* Download Buttons */}
               <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
