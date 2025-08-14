@@ -154,3 +154,16 @@
 .successMessage .submitButton {
   margin-top: 1.2em;
 }
+
+/* Mobile responsive styles */
+@media screen and (max-width: 768px) {
+  .pageTitle {
+    font-size: 1.8rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+}
