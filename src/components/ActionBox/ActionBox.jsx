@@ -19,7 +19,7 @@ const ActionBox = ({ children, className }) => {
         {isUploadOrFeedback ? (
           <div className={styles.announcement}>
             <h1>
-              Our essay reviewer portal opens on <span className={styles["highlight-date"]}>August 18, 2025</span>. Please check back later.
+              Our essay reviewer portal opens on <span className={styles["highlight-date"]}>August 18, 2025.</span> Please check back later.
             </h1>
             {/* Children are intentionally hidden for /upload and /feedback routes as per requirement */}
           </div>

@@ -53,7 +53,7 @@ const Footer = () => {
           <div className="footer-links">
             <Link to="/help" className="nav-link">Help</Link>
             <Link to="/about" className="nav-link">About</Link>
-            <Link to="/pricing" className="nav-link">Pricing</Link>
+            {/* <Link to="/pricing" className="nav-link">Pricing</Link> */}
             <Link to="/privacy" className="nav-link">Privacy</Link>
             <Link to="/terms" className="nav-link">Terms</Link>
             <Link to="/essays" className="nav-link">Essay Collection</Link>
