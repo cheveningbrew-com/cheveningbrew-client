@@ -73,7 +73,7 @@ const GetEssayCollection = () => {
     <SupportPagesLayout>
       <ActionBox>
         <div className={`${supportStyles.supportContent} customScroll`}>
-          <h1 className={styles.pageTitle}>Get Real Chevening Essays & Insider Tips – Free to Your Inbox</h1>
+          <h1 className={styles.pageTitle}>Get shortlisted Chevening essays &  tips – free to your inbox</h1>
 
           <p className={styles.descriptionText}>
             Enter your email to unlock a series of real Chevening essays and expert guidance. As soon as you sign up, you’ll receive Issue 1: early and final versions of all four Chevening essays from a shortlisted candidate—straight to your inbox.
