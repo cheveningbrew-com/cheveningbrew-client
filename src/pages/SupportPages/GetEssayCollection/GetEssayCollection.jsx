@@ -95,21 +95,23 @@ const GetEssayCollection = () => {
 
           {isSubmitted ? (
             <div className={styles.successMessage}>
-              <h3>You’re in!</h3>
+              <h3>You're in!</h3>
               <p>Check your inbox for Issue 1—your first set of real Chevening essays and expert tips.</p>
-              <p>Over the next two weeks, you’ll get at least five more real essays and actionable advice.</p>
+              <p>Over the next two weeks, you'll get at least five more real essays and actionable advice.</p>
               <p>
                 Questions or missing your email? Contact us at{' '}
                 <a href="mailto:reviewer@cheveningbrew.com">
                   <span className={styles.email}>reviewer@cheveningbrew.com</span>
                 </a>
               </p>
-              <button
-                className={styles.submitButton}
-                onClick={() => setIsSubmitted(false)}
-              >
-                Subscribe with another email
-              </button>
+              <div className={styles.buttonContainer}>
+                <button
+                  className={styles.submitButton}
+                  onClick={() => setIsSubmitted(false)}
+                >
+                  Subscribe with another email
+                </button>
+              </div>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className={styles.formContainer}>
