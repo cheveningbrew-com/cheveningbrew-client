@@ -18,7 +18,7 @@ const Feedback = () => {
       try {
         setLoading(true);
         const userId = getUserId();
-        
+
         if (!userId) {
           setError("User not found. Please log in again.");
           setLoading(false);
@@ -26,7 +26,7 @@ const Feedback = () => {
         }
 
         const response = await getLatestCompletedEssay(userId);
-        
+
         if (response.success && response.essay_id) {
           // Map API response to component state
           const mappedData = {
@@ -40,7 +40,7 @@ const Feedback = () => {
             downloadLinkNarrativeFeedback: response.narrative_feedback_docs,
             analysisType: response.is_free_attempt ? "leadership_comprehensive_revival" : "comprehensive_essay_revival"
           };
-          
+
           setEssayData(mappedData);
           setError(null);
         } else {
@@ -92,7 +92,7 @@ const Feedback = () => {
               onClick={handleUploadAnother}
               style={{ width: '100%', maxWidth: '300px' }}
             >
-              Upload essay draft 
+              Upload essay draft
             </button>
           </div>
           </div>
@@ -109,18 +109,18 @@ const Feedback = () => {
           {essayData ? (
             <>
               <div className={styles.title}>
-                {essayData.analysisType === "leadership_comprehensive_revival" 
-                  ? "Download your complementary leadership essay review" 
+                {essayData.analysisType === "leadership_comprehensive_revival"
+                  ? "Download your complementary leadership essay review"
                   : "Download your full Chevening essay draft review"}
               </div>
 
-              
+
               {/* Download Buttons */}
               <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
                 {/* Grammar & Style Download */}
                 {essayData.downloadLinkGrammarStyleDocument && (
-                  <a 
-                    href={essayData.downloadLinkGrammarStyleDocument} 
+                  <a
+                    href={essayData.downloadLinkGrammarStyleDocument}
                     className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
                     download
                     style={{ width: '100%' }}
@@ -128,50 +128,50 @@ const Feedback = () => {
                     Download grammar and style feedback
                   </a>
                 )}
-                
+
                 {/* Essay Feedback Download */}
                 {essayData.downloadLinkEssayFeedback && (
-                  <a 
-                    href={essayData.downloadLinkEssayFeedback} 
+                  <a
+                    href={essayData.downloadLinkEssayFeedback}
                     className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
                     download
                     style={{ width: '100%' }}
                   >
-                    Download Chevening aligned feedback
+                    Download Chevening criteria scoring
                   </a>
                 )}
 
 
                 {/* Narrative Feedback Download */}
                 {essayData.downloadLinkNarrativeFeedback && (
-                  <a 
-                    href={essayData.downloadLinkNarrativeFeedback} 
+                  <a
+                    href={essayData.downloadLinkNarrativeFeedback}
                     className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
                     download
                     style={{ width: '100%' }}
                   >
-                    Download narrative feedback
+                    Download narrative review
                   </a>
                 )}
-                
-                <p 
+
+                <p
                   style={{ textAlign: 'center' }}
-                  className={uploadStyles.resetButton} 
+                  className={uploadStyles.resetButton}
                   onClick={handleUploadAnother}
                 >
-                  We have shared these files to your email via Google Drive as well. 
+                  We have shared these files to your email via Google Drive as well.
                 </p>
               </div>
-              
-              {/* 
+
+              {/*
                 <div className={uploadStyles.nextStep}>
                   <p>Your analysis documents are ready for download.</p>
-                 
+
                   {analysisResults.analysisType === "leadership_comprehensive_revival" ? (
                     <div>
                       <p><strong>Free Trial Complete!</strong> You analyzed your leadership essay.</p>
                       <p>🏁 To analyze all 4 Chevening essays with full features, please subscribe to one of our plans.</p>
-                      <button 
+                      <button
                         className={styles.upgradeButton}
                         onClick={() => navigate("/pricing")}
                       >
@@ -181,7 +181,7 @@ const Feedback = () => {
                   ) : (
                     <p><strong>Comprehensive Analysis Complete!</strong> All 4 essays analyzed with full features.</p>
                   )}
-                  
+
                   {analysisResults.fileName && (
                     <small>Original file: {analysisResults.fileName}</small>
                   )}
@@ -190,11 +190,11 @@ const Feedback = () => {
                       Analysis completed: {new Date(analysisResults.timestamp).toLocaleString()}
                     </small>
                   )}
-                </div> 
+                </div>
               */}
 
               {/* Analysis Summary */}
-              {/* 
+              {/*
                 {analysisResults.analysisSummary && (
                   <div className={styles.summarySection}>
                     <h3>📊 Analysis Summary</h3>
@@ -208,7 +208,7 @@ const Feedback = () => {
               */}
 
               {/* Task Information (if available) */}
-              {/* 
+              {/*
                 {analysisResults.taskId && (
                   <div className={styles.taskInfo}>
                     <h4>Background Processing Information:</h4>
@@ -223,7 +223,7 @@ const Feedback = () => {
             <>
               <div className={styles.title}>Oops! Something went wrong</div>
               <p>No essay analysis found. Please upload your essay first.</p>
-              
+
               <div className={uploadStyles.statusDisplay}>
                 <h2>To get started:</h2>
                 <ol>
@@ -233,9 +233,9 @@ const Feedback = () => {
                   <li>Receive detailed writing style analysis and feedback</li>
                 </ol>
               </div>
-              
+
               <div className={uploadStyles.linkButtons}>
-                <button 
+                <button
                   className={`${uploadStyles.linkButton} ${uploadStyles.uploadButton}`}
                   onClick={handleUploadAnother}
                   style={{ width: '100%', maxWidth: '300px' }}
