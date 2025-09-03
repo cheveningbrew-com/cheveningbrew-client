@@ -203,10 +203,10 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       }
 
       const { hash, merchant_id } = hashResponse.data;
-      const isSandbox = process.env.REACT_APP_SANDBOX === "true"
+      const isSandbox = process.env.REACT_APP_SANDBOX !== "false"
 
       const payment = {
-        sandbox: isSandbox,
+        sandbox: false,
         merchant_id: merchant_id,
         return_url: process.env.REACT_APP_RETURN_URL || window.location.href,
         cancel_url: process.env.REACT_APP_CANCEL_URL || window.location.href,

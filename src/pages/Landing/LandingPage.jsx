@@ -91,7 +91,7 @@ const LandingPage = () => {
 
   const events = [
     {
-      title: "Upload your draft Chevening essays.",
+      title: "shamil",
     },
     {
       title:
