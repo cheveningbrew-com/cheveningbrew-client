@@ -130,7 +130,7 @@
   border-radius: 12px;
   font-size: 1.12rem;
   margin-bottom: 1.3em;
-  text-align: center;
+  text-align: left;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
   border: 1px solid rgba(240, 165, 0, 0.3);
 }
@@ -153,4 +153,46 @@
 
 .successMessage .submitButton {
   margin-top: 1.2em;
+}
+
+.buttonContainer {
+  margin-top: 1.5rem;
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+/* Mobile responsive styles */
+@media screen and (max-width: 768px) {
+  .pageTitle {
+    font-size: 1.8rem;
+  }
+  
+  .successMessage {
+    padding: 1.5em;
+  }
+  
+  .successMessage h3 {
+    font-size: 1.4rem;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .pageTitle {
+    font-size: 1.5rem;
+  }
+  
+  .successMessage {
+    padding: 1.2em;
+  }
+  
+  .successMessage p {
+    font-size: 1rem;
+  }
+  
+  .submitButton {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.8em 1em;
+  }
 }

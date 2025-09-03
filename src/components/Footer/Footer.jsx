@@ -56,7 +56,7 @@ const Footer = () => {
             <Link to="/pricing" className="nav-link">Pricing</Link>
             <Link to="/privacy" className="nav-link">Privacy</Link>
             <Link to="/terms" className="nav-link">Terms</Link>
-            <Link to="/get-essay-collection" className="nav-link">Essay Collection</Link>
+            <Link to="/essays" className="nav-link">Essay Collection</Link>
           </div>
           
          
