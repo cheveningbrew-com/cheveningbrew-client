@@ -203,7 +203,7 @@ const PaymentBox = ({ plan, onPaymentComplete, onPaymentError, onPaymentDismisse
       }
 
       const { hash, merchant_id } = hashResponse.data;
-      const isSandbox = process.env.REACT_APP_SANDBOX !== "false"
+      // const isSandbox = process.env.REACT_APP_SANDBOX !== "false"
 
       const payment = {
         sandbox: false,
