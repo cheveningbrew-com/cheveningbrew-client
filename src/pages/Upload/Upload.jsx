@@ -407,7 +407,15 @@ const handleDrop = (e) => {
         <div className={`${styles.mainContent} upload-container customScroll`}>
           {!isLoading && (
             <h1 className={styles.title}>
-              {selectedFile ? "Upload and get feedback" : "Select your Chevening draft essays"}
+              {selectedFile ? (
+                "Upload and get feedback"
+              ) : subscriptionStatus.is_free_attempt_used === false &&
+                subscriptionStatus.payment_completed === false &&
+                subscriptionStatus.has_active_subscription === false ? (
+                "Get free feedback on your Chevening essay"
+              ) : (
+                "Select your Chevening draft essays"
+              )}
             </h1>
           )}
 
