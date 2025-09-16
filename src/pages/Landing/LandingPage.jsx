@@ -42,26 +42,36 @@ const LandingPage = () => {
 
         if (data.authenticated) {
           console.log("Authentication successful:", data);
-
-          // Step 2: Save user in the database first
-          const savedUser = await createUser(
-            data.user.email,
-            data.user.name,
-            data.user.id,
-            data.user.picture,
-            data.authToken // Pass token if needed
-          );
-
-          console.log("User saved in DB:", savedUser);
-
-          // Step 3: Call auth context login and wait for it to complete
-          if (data.user && data.user.name && data.user.id && data.user.email) {
-            await authLogin(data.authToken, data.user.name, data.user.id, data.user.email);
-          } else {
-            await authLogin(data.authToken);
+          // Prefer immediate client auth, then persist user in background
+          const authToken = data.authToken || data.id_token || data.token;
+          if (!authToken) {
+            throw new Error("No auth token in response");
           }
 
-          // Step 4: Now navigate to the upload page
+          // Step 2: Immediately set client auth state
+          if (data.user && data.user.name && data.user.id && data.user.email) {
+            await authLogin(authToken, data.user.name, data.user.id, data.user.email);
+          } else {
+            await authLogin(authToken);
+          }
+
+          // Step 3: Save user in the database (non-blocking)
+          (async () => {
+            try {
+              const savedUser = await createUser(
+                data.user?.email,
+                data.user?.name,
+                data.user?.id,
+                data.user?.picture,
+                authToken
+              );
+              console.log("User saved in DB:", savedUser);
+            } catch (e) {
+              console.warn("createUser failed (non-blocking):", e);
+            }
+          })();
+
+          // Step 4: Navigate to the upload page
           console.log("Auth process completed, navigating to /upload");
           navigate("/upload", { replace: true });
         } else {

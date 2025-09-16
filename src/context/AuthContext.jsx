@@ -20,29 +20,68 @@ export const AuthProvider = ({ children }) => {
     try {
       console.log("Checking auth status...");
       setLoading(true);
+      // 1) Prefer sessionStorage auth first (avoids race with DB writes)
+      const sessionToken = sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      const sessionName = sessionStorage.getItem(STORAGE_KEYS.USER_NAME);
+      const sessionEmail = sessionStorage.getItem(STORAGE_KEYS.USER_EMAIL);
+      const sessionUserId = sessionStorage.getItem(STORAGE_KEYS.USER_ID);
 
-      const user_id = getUserId();
-      if (!user_id) {
-        throw new Error("No user ID found");
+      if (sessionToken && validateToken(sessionToken)) {
+        console.log("Session token valid; authenticating from sessionStorage");
+        setIsAuthenticated(true);
+        setUserName(sessionName);
+        setUserEmail(sessionEmail);
+
+        // Fire-and-forget: try to refresh from DB in background, but don't flip state on failure
+        (async () => {
+          try {
+            if (!sessionUserId) return;
+            const [dbToken, dbName, dbEmail] = await Promise.all([
+              readUserField(sessionUserId, "auth_token"),
+              readUserField(sessionUserId, "name"),
+              readUserField(sessionUserId, "email")
+            ]);
+            if (dbToken && validateToken(dbToken)) {
+              if (dbName) setUserName(dbName);
+              if (dbEmail) setUserEmail(dbEmail);
+            }
+          } catch (bgErr) {
+            console.warn("Background DB auth refresh failed:", bgErr);
+          }
+        })();
+        return; // We're authenticated; no need to block on DB
       }
 
-      // Fetch both user fields in a single Promise.all
+      // 2) If no valid session token, attempt to read from DB if we have a user id
+      const user_id = sessionUserId || getUserId();
+      if (!user_id) {
+        console.log("No user ID in session; unauthenticated");
+        clearAuthData();
+        setIsAuthenticated(false);
+        setUserName(null);
+        setUserEmail(null);
+        return;
+      }
+
       const [token, name, email] = await Promise.all([
         readUserField(user_id, "auth_token"),
-        readUserField(user_id, "name")
-        , readUserField(user_id, "email")
+        readUserField(user_id, "name"),
+        readUserField(user_id, "email")
       ]);
-      
 
-      console.log("Token exists:", !!token);
+      console.log("DB token exists:", !!token);
 
       if (token && validateToken(token)) {
-        console.log("Token is valid, setting authenticated");
+        console.log("DB token valid; authenticating from DB");
         setIsAuthenticated(true);
         setUserName(name);
         setUserEmail(email);
+        // sync to sessionStorage for future fast loads
+        sessionStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+        if (name) sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
+        if (email) sessionStorage.setItem(STORAGE_KEYS.USER_EMAIL, email);
       } else {
-        console.log("Token is invalid or missing");
+        console.log("DB token invalid or missing");
         clearAuthData();
         setIsAuthenticated(false);
         setUserName(null);
@@ -71,13 +110,20 @@ export const AuthProvider = ({ children }) => {
       if (name) {
         sessionStorage.setItem(STORAGE_KEYS.USER_NAME, name);
       }
-      
-      await checkAuthStatus();
+      // Immediately update state to avoid waiting on DB round-trip
+      if (token && validateToken(token)) {
+        setIsAuthenticated(true);
+        setUserName(name || null);
+        setUserEmail(email || null);
+      } else {
+        throw new Error("Invalid auth token");
+      }
     } catch (error) {
       console.error("Login error:", error);
       clearAuthData();
       setIsAuthenticated(false);
       setUserName(null);
+      setUserEmail(null);
     } finally {
       setLoading(false);
     }
