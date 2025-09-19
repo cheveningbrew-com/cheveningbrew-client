@@ -135,6 +135,34 @@ const Feedback = () => {
     console.log("User chose to donate - integrate payment processing here");
   };
 
+  // Handle successful donation payment
+  const handlePaymentSuccess = async (orderId) => {
+    console.log("Donation payment successful:", orderId);
+
+    // Refresh donation status
+    const userId = getUserId();
+    if (userId) {
+      await checkUserDonationStatus(userId);
+    }
+
+    // Download the pending document
+    if (pendingDownload) {
+      window.open(pendingDownload.url, '_blank');
+      setPendingDownload(null);
+    }
+  };
+
+  // Handle donation payment errors
+  const handlePaymentError = (error) => {
+    console.error("Donation payment error:", error);
+
+    // Still download the document even if payment fails
+    if (pendingDownload) {
+      window.open(pendingDownload.url, '_blank');
+      setPendingDownload(null);
+    }
+  };
+
 
   if (loading) {
     return (
@@ -369,6 +397,8 @@ const Feedback = () => {
         onCancel={handleDonationCancel}
         onDonate={handleDonationConfirm}
         documentName={pendingDownload?.name || "Document"}
+        onPaymentSuccess={handlePaymentSuccess}
+        onPaymentError={handlePaymentError}
       />
     </MainLayout>
   );
