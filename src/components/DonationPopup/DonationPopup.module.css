@@ -460,6 +460,12 @@
   animation: bounceSuccess 0.6s ease-out;
 }
 
+.verifyingIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: spin 1s linear infinite;
+}
+
 @keyframes bounceSuccess {
   0% {
     transform: scale(0);
@@ -472,10 +478,79 @@
   }
 }
 
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
 .successMessage p {
   margin: 0.5rem 0;
   color: rgba(255, 255, 255, 0.95);
   font-size: 1rem;
+}
+
+/* Error Message Styles */
+.errorMessage {
+  text-align: center;
+  margin: 2rem 0;
+  background: rgba(255, 107, 107, 0.1);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.errorIcon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.errorMessage p {
+  margin: 0.8rem 0;
+  color: rgba(255, 255, 255, 0.95);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.errorMessage strong {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+.orderInfo {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 1rem 0;
+  border-left: 3px solid #ffe585;
+}
+
+.orderInfo p {
+  margin: 0.3rem 0;
+  font-family: monospace;
+  font-size: 0.9rem;
+}
+
+.orderInfo small {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 0.8rem;
+  font-style: italic;
 }
 
 /* Enhanced Mobile Responsiveness for Amount Selection */
@@ -502,6 +577,27 @@
   .currencySymbol {
     left: 10px;
     font-size: 0.9rem;
+  }
+
+  .errorMessage {
+    margin: 1.5rem 0;
+    padding: 1.2rem;
+  }
+
+  .errorIcon {
+    font-size: 2.5rem;
+  }
+
+  .errorMessage p {
+    font-size: 0.9rem;
+  }
+
+  .orderInfo {
+    padding: 0.8rem;
+  }
+
+  .orderInfo p {
+    font-size: 0.85rem;
   }
 }
 
@@ -530,7 +626,23 @@
   }
 
   .errorMessage {
+    margin: 1rem 0;
+    padding: 1rem;
+  }
+
+  .errorIcon {
+    font-size: 2rem;
+  }
+
+  .errorMessage p {
+    font-size: 0.8rem;
+  }
+
+  .orderInfo {
+    padding: 0.6rem;
+  }
+
+  .orderInfo p {
     font-size: 0.75rem;
-    padding: 0.4rem;
   }
 }

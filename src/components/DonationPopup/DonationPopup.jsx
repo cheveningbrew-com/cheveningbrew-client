@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import axios from 'axios';
 import styles from './DonationPopup.module.css';
-import { getUserId, readUserField } from '../../services/api';
+import { getUserId, readUserField, checkDonationStatus } from '../../services/api';
 
 const DonationPopup = ({
   isOpen,
@@ -12,11 +12,11 @@ const DonationPopup = ({
   onPaymentError
 }) => {
   const [donationAmount, setDonationAmount] = useState("");
-  const [selectedAmount, setSelectedAmount] = useState(null);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
-  const [paymentStep, setPaymentStep] = useState("select"); // "select" | "processing" | "success"
+  const [paymentStep, setPaymentStep] = useState("select"); // "select" | "processing" | "verifying" | "success" | "error"
   const [payHereLoaded, setPayHereLoaded] = useState(false);
   const [amountError, setAmountError] = useState("");
+  const [failedOrderId, setFailedOrderId] = useState(null);
 
   // Load PayHere script
   useEffect(() => {
@@ -49,25 +49,63 @@ const DonationPopup = ({
   const handlePaymentComplete = useCallback(async (orderId) => {
     try {
       console.log("Donation payment completed successfully. Order ID:", orderId);
-      setPaymentStep("success");
-      setIsProcessingPayment(false);
+      setPaymentStep("verifying");
 
-      // Call success handler
-      if (onPaymentSuccess) {
-        onPaymentSuccess(orderId);
+      const userId = getUserId();
+      if (!userId) {
+        throw new Error("User ID not found");
       }
 
-      // Close popup after short delay and proceed with download
-      setTimeout(() => {
-        handleCancel(); // This will trigger download
-      }, 1500);
+      // Wait for backend processing (3-5 seconds) before checking status
+      console.log("Waiting for backend to process donation...");
+      await new Promise(resolve => setTimeout(resolve, 4000));
+
+      // Verify donation status from backend
+      console.log("Verifying donation status...");
+      const donationStatus = await checkDonationStatus(userId);
+
+      if (donationStatus && donationStatus.one_time_donation === true) {
+        console.log("Donation verified successfully!");
+        setPaymentStep("success");
+        setIsProcessingPayment(false);
+
+        // Call success handler
+        if (onPaymentSuccess) {
+          onPaymentSuccess(orderId);
+        }
+
+        // Close popup after short delay and proceed with download
+        setTimeout(() => {
+          handleCancel(); // This will trigger download
+        }, 1500);
+      } else {
+        // Payment succeeded but verification failed - likely backend issue
+        console.error("Payment verification failed - payment processed but not recorded in database");
+        setFailedOrderId(orderId);
+        setPaymentStep("error");
+        setIsProcessingPayment(false);
+
+        // Still trigger download (non-blocking design)
+        setTimeout(() => {
+          handleCancel(); // This will trigger download
+        }, 5000); // Longer delay to let user read error message
+      }
 
     } catch (err) {
       console.error("Error during donation payment completion:", err);
+
+      // Check if this is a verification error or a different error
+      if (err.message.includes("verification") && paymentStep === "verifying") {
+        // This was already handled in the verification block above
+        return;
+      }
+
+      // Other errors (network, API, etc.) - allow retry
       if (onPaymentError) {
         onPaymentError(err);
       }
       setIsProcessingPayment(false);
+      setPaymentStep("select"); // Reset to allow retry for other errors
     }
   }, [onPaymentSuccess, onPaymentError]);
 
@@ -183,8 +221,6 @@ const DonationPopup = ({
   if (!isOpen) return null;
 
   // Helper functions and variables
-  const suggestedAmounts = [5, 10, 25, 50];
-
   // Validate donation amount
   const validateAmount = (amount) => {
     const numAmount = parseFloat(amount);
@@ -200,18 +236,10 @@ const DonationPopup = ({
     return "";
   };
 
-  // Handle amount selection
-  const handleAmountSelect = (amount) => {
-    setSelectedAmount(amount);
-    setDonationAmount(amount.toString());
-    setAmountError("");
-  };
-
   // Handle custom amount input
   const handleAmountChange = (e) => {
     const value = e.target.value;
     setDonationAmount(value);
-    setSelectedAmount(null); // Clear selected amount when typing custom
 
     if (value) {
       const error = validateAmount(value);
@@ -225,9 +253,9 @@ const DonationPopup = ({
     // Reset state
     setPaymentStep("select");
     setDonationAmount("");
-    setSelectedAmount(null);
     setAmountError("");
     setIsProcessingPayment(false);
+    setFailedOrderId(null);
     onCancel();
   };
 
@@ -255,7 +283,10 @@ const DonationPopup = ({
         <div className={styles.icon}>💝</div>
 
         <h3 className={styles.title}>
-          {paymentStep === "success" ? "Thank You!" : "Support Our Free Service"}
+          {paymentStep === "success" ? "Thank You!" :
+           paymentStep === "verifying" ? "Verifying Payment..." :
+           paymentStep === "error" ? "Payment Verification Issue" :
+           "Support Our Free Service"}
         </h3>
 
         {paymentStep === "success" ? (
@@ -264,39 +295,39 @@ const DonationPopup = ({
             <p>Your donation has been processed successfully!</p>
             <p>Thank you for supporting our free service.</p>
           </div>
+        ) : paymentStep === "verifying" ? (
+          <div className={styles.successMessage}>
+            <div className={styles.verifyingIcon}>⏳</div>
+            <p>Processing your donation...</p>
+            <p>Please wait while we confirm your payment.</p>
+          </div>
+        ) : paymentStep === "error" ? (
+          <div className={styles.errorMessage}>
+            <div className={styles.errorIcon}>⚠️</div>
+            <p><strong>Payment processed, but verification failed</strong></p>
+            <p>Your payment was successful but we couldn't verify it in our system. This may be due to a temporary backend issue.</p>
+            {failedOrderId && (
+              <div className={styles.orderInfo}>
+                <p><strong>Order ID:</strong> {failedOrderId}</p>
+                <small>Please save this Order ID for support reference.</small>
+              </div>
+            )}
+            
+          </div>
         ) : (
           <>
-            <div className={styles.message}>
+            <div className={styles.benefitsSection}>
               <p>
                 We provide comprehensive essay analysis for free to help students succeed.
                 If you find our service valuable, consider making a small donation to help us continue supporting students like you.
               </p>
             </div>
 
-            {/* Amount Selection */}
+            {/* Custom Amount Input */}
             <div className={styles.amountSection}>
-              <h4>Choose your donation amount:</h4>
-
-              {/* Quick Amount Buttons */}
-              <div className={styles.amountButtons}>
-                {suggestedAmounts.map((amount) => (
-                  <button
-                    key={amount}
-                    className={`${styles.amountButton} ${
-                      selectedAmount === amount ? styles.amountButtonSelected : ""
-                    }`}
-                    onClick={() => handleAmountSelect(amount)}
-                    disabled={isProcessingPayment}
-                  >
-                    ${amount}
-                  </button>
-                ))}
-              </div>
-
-              {/* Custom Amount Input */}
               <div className={styles.customAmountSection}>
                 <label className={styles.customAmountLabel}>
-                  Or enter a custom amount:
+                  Enter donation amount:
                 </label>
                 <div className={styles.amountInputWrapper}>
                   <span className={styles.currencySymbol}>$</span>
@@ -304,7 +335,7 @@ const DonationPopup = ({
                     type="number"
                     min="1"
                     max="1000"
-                    step="0.01"
+                    step="1"
                     placeholder="Enter amount"
                     value={donationAmount}
                     onChange={handleAmountChange}
@@ -320,20 +351,22 @@ const DonationPopup = ({
                 )}
               </div>
 
-              <div className={styles.amountInfo}>
+              {/* <div className={styles.amountInfo}>
                 <small>Minimum donation: $1 • Secure payment via PayHere</small>
-              </div>
+              </div> */}
             </div>
 
-            <div className={styles.benefitsSection}>
+            {/* <div className={styles.benefitsSection}>
               <h4>Your support helps us:</h4>
+              
+
               <ul>
                 <li>✨ Keep the service free for all students</li>
                 <li>🚀 Improve our AI analysis capabilities</li>
                 <li>📚 Create more educational resources</li>
                 <li>🌟 Support students worldwide</li>
               </ul>
-            </div>
+            </div> */}
 
             <div className={styles.popup_actions}>
               <button
@@ -362,7 +395,7 @@ const DonationPopup = ({
               <small>
                 {!payHereLoaded
                   ? "Loading payment system..."
-                  : "Your download will begin regardless of your choice • Secure payment via PayHere"}
+                  : ""}
               </small>
             </div>
           </>
