@@ -284,5 +284,35 @@ export const getLatestCompletedEssay = async (user_id) => {
     }
 };
 
+/**
+ * Check if a user has made any donations (one-time or recurring)
+ * @param {string} user_id - The user ID to check donation status for
+ * @returns {Promise<Object>} Donation status object with one_time_donation, recurring_donation, and count_recurring_donation
+ */
+export const checkDonationStatus = async (user_id) => {
+    if (!user_id) {
+        throw new Error("User ID is required");
+    }
+
+    try {
+        const response = await fetch(`${DB_SERVER_URL}/donation/status`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id }),
+        });
+
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(`Failed to check donation status: ${response.status} - ${response.statusText}, Details: ${errorText}`);
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error("Error checking donation status:", error.message);
+        throw error;
+    }
+};
+
 
 

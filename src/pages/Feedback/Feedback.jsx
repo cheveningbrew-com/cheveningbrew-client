@@ -4,14 +4,35 @@ import MainLayout from "../../layouts/MainLayout";
 import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import uploadStyles from "../Upload/Upload.module.css";
-import { getUserId, getLatestCompletedEssay } from "../../services/api";
+import { getUserId, getLatestCompletedEssay, checkDonationStatus } from "../../services/api";
 import { isDonationPromoActive } from "../../utils/promoConfig";
+import DonationPopup from "../../components/DonationPopup/DonationPopup";
 
 const Feedback = () => {
   const [essayData, setEssayData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [donationStatus, setDonationStatus] = useState(null);
+  const [donationLoading, setDonationLoading] = useState(false);
+  const [showDonationPopup, setShowDonationPopup] = useState(false);
+  const [pendingDownload, setPendingDownload] = useState(null);
   const navigate = useNavigate();
+
+  // Check donation status for free attempts
+  const checkUserDonationStatus = async (userId) => {
+    try {
+      setDonationLoading(true);
+      const status = await checkDonationStatus(userId);
+      setDonationStatus(status);
+      console.log("Donation status:", status);
+    } catch (error) {
+      console.error("Error checking donation status:", error);
+      // Default to allowing downloads if API fails
+      setDonationStatus({ one_time_donation: false, recurring_donation: false, count_recurring_donation: 0 });
+    } finally {
+      setDonationLoading(false);
+    }
+  };
 
   // Fetch latest completed essay data
   useEffect(() => {
@@ -46,6 +67,11 @@ const Feedback = () => {
 
           setEssayData(mappedData);
           setError(null);
+
+          // Check donation status if this is a free attempt
+          if (mappedData.is_free_attempt) {
+            await checkUserDonationStatus(userId);
+          }
         } else {
           setError("No completed essay analysis found. Please upload your essay first.");
         }
@@ -67,6 +93,46 @@ const Feedback = () => {
 
   const handleUploadAnother = () => {
     navigate("/upload");
+  };
+
+  // Handle document download with donation logic
+  const handleDownload = async (documentUrl, documentName, requiresDonationCheck = false) => {
+    // If not free attempt or user has donated, download immediately
+    if (!essayData.is_free_attempt || donationStatus?.one_time_donation) {
+      window.open(documentUrl, '_blank');
+      return;
+    }
+
+    // If requires donation check and user hasn't donated, show popup
+    if (requiresDonationCheck && !donationStatus?.one_time_donation) {
+      setPendingDownload({ url: documentUrl, name: documentName });
+      setShowDonationPopup(true);
+      return;
+    }
+
+    // First document or fallback - download immediately
+    window.open(documentUrl, '_blank');
+  };
+
+  // Handle donation popup actions
+  const handleDonationCancel = () => {
+    setShowDonationPopup(false);
+    // Still download the document
+    if (pendingDownload) {
+      window.open(pendingDownload.url, '_blank');
+      setPendingDownload(null);
+    }
+  };
+
+  const handleDonationConfirm = () => {
+    setShowDonationPopup(false);
+    // For now, just download the document
+    // TODO: Integrate actual donation processing
+    if (pendingDownload) {
+      window.open(pendingDownload.url, '_blank');
+      setPendingDownload(null);
+    }
+    console.log("User chose to donate - integrate payment processing here");
   };
 
 
@@ -120,43 +186,73 @@ const Feedback = () => {
               </div>
 
 
+              {/* Free User Donation Info */}
+              {essayData.is_free_attempt && donationStatus && !donationStatus.one_time_donation && (
+                <div style={{
+                  background: 'rgba(255, 229, 133, 0.1)',
+                  border: '1px solid rgba(255, 229, 133, 0.3)',
+                  borderRadius: '8px',
+                  padding: '1rem',
+                  margin: '1rem 0',
+                  textAlign: 'center'
+                }}>
+                  <p style={{ margin: '0 0 0.5rem 0', fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.9)' }}>
+                    💝 <strong>First document is free!</strong> Additional documents will show a donation request to help support our free service.
+                  </p>
+                  <small style={{ color: 'rgba(255, 255, 255, 0.7)' }}>
+                    All documents will download regardless of your choice.
+                  </small>
+                </div>
+              )}
+
               {/* Download Buttons */}
               <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
-                {/* Grammar & Style Download */}
+                {/* Grammar & Style Download - Always free */}
                 {essayData.downloadLinkGrammarStyleDocument && (
-                  <a
-                    href={essayData.downloadLinkGrammarStyleDocument}
+                  <button
+                    onClick={() => handleDownload(
+                      essayData.downloadLinkGrammarStyleDocument,
+                      "Grammar and Style Feedback",
+                      false // First document is always free
+                    )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
-                    download
                     style={{ width: '100%' }}
+                    disabled={donationLoading}
                   >
                     Download grammar and style feedback
-                  </a>
+                  </button>
                 )}
 
-                {/* Essay Feedback Download */}
+                {/* Essay Feedback Download - Requires donation check for free users */}
                 {essayData.downloadLinkEssayFeedback && (
-                  <a
-                    href={essayData.downloadLinkEssayFeedback}
+                  <button
+                    onClick={() => handleDownload(
+                      essayData.downloadLinkEssayFeedback,
+                      "Chevening Criteria Scoring",
+                      true // Second document requires donation check
+                    )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
-                    download
                     style={{ width: '100%' }}
+                    disabled={donationLoading}
                   >
                     Download Chevening criteria scoring
-                  </a>
+                  </button>
                 )}
 
-
-                {/* Narrative Feedback Download */}
+                {/* Narrative Feedback Download - Requires donation check for free users */}
                 {essayData.downloadLinkNarrativeFeedback && (
-                  <a
-                    href={essayData.downloadLinkNarrativeFeedback}
+                  <button
+                    onClick={() => handleDownload(
+                      essayData.downloadLinkNarrativeFeedback,
+                      "Narrative Review",
+                      true // Third document requires donation check
+                    )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
-                    download
                     style={{ width: '100%' }}
+                    disabled={donationLoading}
                   >
                     Download narrative review
-                  </a>
+                  </button>
                 )}
 
                 <p
@@ -254,8 +350,26 @@ const Feedback = () => {
               </div>
             </>
           )}
+
+          {/* Donation Status Loading Indicator */}
+          {donationLoading && essayData?.is_free_attempt && (
+            <div style={{ textAlign: 'center', margin: '1rem 0' }}>
+              <div className={styles.spinner}></div>
+              <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.7)' }}>
+                Checking donation status...
+              </p>
+            </div>
+          )}
         </div>
       </ActionBox>
+
+      {/* Donation Popup */}
+      <DonationPopup
+        isOpen={showDonationPopup}
+        onCancel={handleDonationCancel}
+        onDonate={handleDonationConfirm}
+        documentName={pendingDownload?.name || "Document"}
+      />
     </MainLayout>
   );
 };
