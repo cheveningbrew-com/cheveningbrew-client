@@ -215,7 +215,7 @@ const Feedback = () => {
 
 
               {/* Free User Donation Info */}
-              {essayData.is_free_attempt && donationStatus && !donationStatus.one_time_donation && (
+              {/* {essayData.is_free_attempt && donationStatus && !donationStatus.one_time_donation && (
                 <div style={{
                   background: 'rgba(255, 229, 133, 0.1)',
                   border: '1px solid rgba(255, 229, 133, 0.3)',
@@ -231,7 +231,7 @@ const Feedback = () => {
                     All documents will download regardless of your choice.
                   </small>
                 </div>
-              )}
+              )} */}
 
               {/* Download Buttons */}
               <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
@@ -283,13 +283,25 @@ const Feedback = () => {
                   </button>
                 )}
 
-                <p
-                  style={{ textAlign: 'center' }}
-                  className={uploadStyles.resetButton}
-                  onClick={handleUploadAnother}
-                >
-                  We have shared these files to your email via Google Drive as well.
-                </p>
+                {!essayData.is_free_attempt && (
+                  <p
+                    style={{ textAlign: 'center' }}
+                    className={uploadStyles.resetButton}
+                    onClick={handleUploadAnother}
+                  >
+                    We have shared these files to your email via Google Drive as well.
+                  </p>
+                )}
+              </div>
+
+              {/*
+                <div className={uploadStyles.nextStep}>
+                  <p>Your analysis documents are ready for download.</p>
+
+                  {analysisResults.analysisType === "leadership_comprehensive_revival" ? (
+                    <div>
+                      <p><strong>Free Trial Complete!</strong> You analyzed your leadership essay.</p>
+                </p>}
               </div>
 
               {/*
