@@ -408,52 +408,63 @@ export const getLeadershipComprehensiveAnalysis = async (
 };
 
 /**
- * LEGACY: Essay feedback analysis (still available but deprecated)
- * Use getComprehensiveAnalysis instead for new implementations
+ * NEW: Donation Essay Comprehensive Analysis with Database Integration
+ * For donation essay analysis - combines donation assessment + grammar analysis
  * @param {string} dirName - Directory name containing the extraction
- * @param {string} email - Optional email address to share the assessment document with
- * @param {string} userName - Optional user name for personalized feedback
+ * @param {string} email - Optional email address to share documents with
+ * @param {string} userName - User name for personalized feedback
+ * @param {string} userId - User ID for database operations (REQUIRED)
  * @param {Object} options - Analysis options
- * @returns {Promise<Object>} Task information or direct result
+ * @returns {Promise<Object>} Donation comprehensive analysis result
  */
-export const getEssayFeedback = async (
+export const getDonationComprehensiveAnalysis = async (
   dirName,
   email = null,
   userName = null,
+  userId,
   options = {}
 ) => {
   try {
+    if (!userId) {
+      throw new Error(
+        "User ID is required for donation comprehensive analysis"
+      );
+    }
+
     const {
-      useBackground = true,
       onProgress = null,
       onStatusChange = null,
       pollingInterval = 10000,
     } = options;
 
-    // Build URL with parameters
-    const url = new URL(`${API_BASE_URL}/essay_feedback/${dirName}`);
+    // Build URL with required parameters
+    const url = new URL(`${API_BASE_URL}/donation_essay_reviver/${dirName}`);
+    url.searchParams.append("user_id", userId); // Required parameter
     if (userName) {
       url.searchParams.append("user_name", userName);
     }
     if (email) {
       url.searchParams.append("email", email);
     }
-    url.searchParams.append("use_background", useBackground.toString());
 
     const response = await fetch(url.toString());
 
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        errorData.detail || `Failed to get essay feedback for ${dirName}`
+        errorData.error ||
+          errorData.detail ||
+          `Failed to get donation comprehensive analysis for ${dirName}`
       );
     }
 
     const result = await response.json();
 
-    // If background processing is used and we got a task ID
-    if (useBackground && result.task_id) {
-      console.log(`🎓 Started essay feedback analysis task: ${result.task_id}`);
+    // This endpoint always uses background processing
+    if (result.task_id) {
+      console.log(
+        `💝 Started donation comprehensive analysis task: ${result.task_id}`
+      );
 
       // Poll until completion
       return await pollTaskUntilComplete(
@@ -465,145 +476,17 @@ export const getEssayFeedback = async (
       );
     }
 
-    // Return direct result for synchronous processing
-    return result;
-  } catch (error) {
-    console.error(`Essay feedback error for ${dirName}:`, error);
-    throw error;
-  }
-};
-
-/**
- * LEGACY: Combined grammar and Hemingway analysis (still available but deprecated)
- * Use getComprehensiveAnalysis instead for new implementations
- * @param {string} dirName - Directory name containing the extraction
- * @param {string} email - Optional email address to share the document with
- * @param {string} userName - User name for personalized feedback
- * @param {Object} options - Analysis options
- * @returns {Promise<Object>} Task information or direct result
- */
-export const getCombinedGrammarHemingwayAnalysis = async (
-  dirName,
-  email = null,
-  userName = null,
-  options = {}
-) => {
-  try {
-    const {
-      useBackground = true,
-      onProgress = null,
-      onStatusChange = null,
-      pollingInterval = 10000,
-    } = options;
-
-    const url = new URL(
-      `${API_BASE_URL}/combined_analysis/grammar_hemingway/${dirName}`
-    );
-    if (userName) {
-      url.searchParams.append("user_name", userName);
-    }
-    if (email) {
-      url.searchParams.append("email", email);
-    }
-    url.searchParams.append("use_background", useBackground.toString());
-
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      throw new Error(`Failed to get combined analysis for ${dirName}`);
-    }
-
-    const result = await response.json();
-
-    // If background processing is used and we got a task ID
-    if (useBackground && result.task_id) {
-      console.log(`📝 Started combined analysis task: ${result.task_id}`);
-
-      // Poll until completion
-      return await pollTaskUntilComplete(
-        result.task_id,
-        onProgress,
-        onStatusChange,
-        pollingInterval,
-        200 // maxAttempts
-      );
-    }
-
-    // Return direct result for synchronous processing
+    // Return direct result if no task ID (shouldn't happen with this endpoint)
     return result;
   } catch (error) {
     console.error(
-      `Combined grammar + Hemingway analysis error for ${dirName}:`,
+      `Donation comprehensive analysis error for ${dirName}:`,
       error
     );
     throw error;
   }
 };
 
-/**
- * Analyze leadership essay for grammar and spelling issues with background processing
- * @param {string} dirName - Directory name containing the extracted essays
- * @param {string} email - Optional email address to share the document with
- * @param {Object} options - Analysis options
- * @returns {Promise<Object>} Grammar analysis results and Google Drive file links
- */
-export const analyzeLeadershipGrammar = async (
-  dirName,
-  email = null,
-  options = {}
-) => {
-  try {
-    const {
-      useBackground = true,
-      onProgress = null,
-      onStatusChange = null,
-      pollingInterval = 10000,
-    } = options;
-
-    // Build URL with optional email parameter
-    const url = new URL(
-      `${API_BASE_URL}/grammar_analysis/leadership/${dirName}`
-    );
-    if (email) {
-      url.searchParams.append("email", email);
-    }
-    url.searchParams.append("use_background", useBackground.toString());
-
-    const response = await fetch(url.toString());
-
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.detail ||
-          `Failed to analyze leadership grammar for ${dirName}`
-      );
-    }
-
-    const result = await response.json();
-
-    // If background processing is used and we got a task ID
-    if (useBackground && result.task_id) {
-      console.log(
-        `👑 Started leadership grammar analysis task: ${result.task_id}`
-      );
-
-      // Poll until completion
-      return await pollTaskUntilComplete(
-        result.task_id,
-        onProgress,
-        onStatusChange,
-        pollingInterval,
-        200 // maxAttempts
-      );
-    }
-
-    // Return direct result for synchronous processing
-    return result;
-  } catch (error) {
-    console.error(`Leadership grammar analysis error for ${dirName}:`, error);
-    throw error;
-  }
-};
 
 /**
  * Utility function to create a task monitor with automatic UI updates
@@ -689,9 +572,7 @@ export default {
   pollTaskUntilComplete,
   getComprehensiveAnalysis, // For paid subscription users
   getLeadershipComprehensiveAnalysis, // For free trial users
-  getEssayFeedback, // Legacy
-  getCombinedGrammarHemingwayAnalysis, // Legacy
-  analyzeLeadershipGrammar, // Legacy
+  getDonationComprehensiveAnalysis, // For donation essay analysis
   createTaskMonitor,
   getMultipleTaskStatuses,
   cancelTask,

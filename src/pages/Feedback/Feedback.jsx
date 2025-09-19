@@ -5,6 +5,7 @@ import ActionBox from "../../components/ActionBox/ActionBox";
 import styles from "./Feedback.module.css";
 import uploadStyles from "../Upload/Upload.module.css";
 import { getUserId, getLatestCompletedEssay } from "../../services/api";
+import { isDonationPromoActive } from "../../utils/promoConfig";
 
 const Feedback = () => {
   const [essayData, setEssayData] = useState(null);
@@ -38,7 +39,9 @@ const Feedback = () => {
             downloadLinkEssayFeedback: response.grading_docs,
             downloadLinkGrammarStyleDocument: response.grammar_style_docs,
             downloadLinkNarrativeFeedback: response.narrative_feedback_docs,
-            analysisType: response.is_free_attempt ? "leadership_comprehensive_revival" : "comprehensive_essay_revival"
+            analysisType: response.is_free_attempt
+              ? (isDonationPromoActive() ? "donation_comprehensive_revival" : "leadership_comprehensive_revival")
+              : "comprehensive_essay_revival"
           };
 
           setEssayData(mappedData);
@@ -111,7 +114,9 @@ const Feedback = () => {
               <div className={styles.title}>
                 {essayData.analysisType === "leadership_comprehensive_revival"
                   ? "Download your complementary leadership essay review"
-                  : "Download your full Chevening essay draft review"}
+                  : essayData.analysisType === "donation_comprehensive_revival"
+                    ? "Download your complimentary full essay review"
+                    : "Download your full Chevening essay draft review"}
               </div>
 
 
@@ -171,6 +176,10 @@ const Feedback = () => {
                     <div>
                       <p><strong>Free Trial Complete!</strong> You analyzed your leadership essay.</p>
                       <p>🏁 To analyze all 4 Chevening essays with full features, please subscribe to one of our plans.</p>
+                  ) : analysisResults.analysisType === "donation_comprehensive_revival" ? (
+                    <div>
+                      <p><strong>Free Analysis Complete!</strong> You analyzed all four essays for free.</p>
+                      <p>🏁 To get additional analysis rounds and full features, please subscribe to one of our plans.</p>
                       <button
                         className={styles.upgradeButton}
                         onClick={() => navigate("/pricing")}

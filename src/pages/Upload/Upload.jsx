@@ -7,11 +7,13 @@ import {
   uploadEssayFile,
   getQueueStatus,
   getComprehensiveAnalysis,
-  getLeadershipComprehensiveAnalysis
+  getLeadershipComprehensiveAnalysis,
+  getDonationComprehensiveAnalysis
 } from "../../services/essay_api";
 import { getUserId, checkSubscriptionStatus } from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import { Trash2,CloudUpload } from "lucide-react";
+import { getAnalysisConfig, getAnalysisFunction, isDonationPromoActive, getDonationPromoMessage } from "../../utils/promoConfig";
 
 const Upload = () => {
   const [selectedFile, setSelectedFile] = useState(null);
@@ -152,14 +154,17 @@ const Upload = () => {
           subscriptionStatus.payment_completed === false &&
           subscriptionStatus.has_active_subscription === false) {
 
-        console.log("🆓 Will use free leadership analysis");
-        analysisEndpoint = "leadership";
-        analysisTypeToUse = "leadership_comprehensive";
-        estimatedTimeToUse = "12-15 minutes";
+        // Get analysis configuration based on promotion status
+        const analysisConfig = getAnalysisConfig();
+
+        console.log(`🆓 Will use free ${analysisConfig.endpoint} analysis`);
+        analysisEndpoint = analysisConfig.endpoint;
+        analysisTypeToUse = analysisConfig.analysisType;
+        estimatedTimeToUse = analysisConfig.estimatedTime;
 
         setAnalysisProgress({
           step: "1/5",
-          message: "🆓 Free Trial: Will analyze your leadership essay only",
+          message: analysisConfig.progressMessage,
           progress: 0,
           status: "PREPARING",
           phase: "preparation"
@@ -220,10 +225,14 @@ const Upload = () => {
       const pathParts = extractedTextPath.split('/');
       const dirName = pathParts[1]; // Format: "text_outs/dirName"
 
-      // Update progress after upload completion  
+      // Update progress after upload completion
       setAnalysisProgress({
         step: "2/5",
-        message: `Upload complete. Starting ${analysisTypeToUse === "leadership_comprehensive" ? "leadership" : "comprehensive"} analysis...`,
+        message: `Upload complete. Starting ${
+          analysisTypeToUse === "leadership_comprehensive" ? "leadership" :
+          analysisTypeToUse === "donation_comprehensive" ? "donation" :
+          "comprehensive"
+        } analysis...`,
         progress: 20,
         status: "INITIALIZING",
         phase: "analysis"
@@ -235,6 +244,13 @@ const Upload = () => {
       if (analysisEndpoint === "leadership") {
         // Free trial - Leadership analysis
         analysisResult = await getLeadershipComprehensiveAnalysis(dirName, userEmail, userName, userId, {
+          onProgress: handleProgress,
+          onStatusChange: handleStatusChange
+        });
+
+      } else if (analysisEndpoint === "donation") {
+        // Free trial - Donation promotion (full analysis)
+        analysisResult = await getDonationComprehensiveAnalysis(dirName, userEmail, userName, userId, {
           onProgress: handleProgress,
           onStatusChange: handleStatusChange
         });
@@ -270,7 +286,7 @@ const Upload = () => {
       if (err.message?.includes("queue is full")) {
         setError("Analysis queue is currently full. Please try again in a few minutes.");
         await checkQueueStatus();
-      } else if (err.message?.includes("You've used your free leadership analysis")) {
+      } else if (err.message?.includes("You've used your free") || err.message?.includes("free attempt")) {
         setError("Free trial already used. Please subscribe for full analysis features.");
         await checkUserStatus();
       } else if (err.message?.includes("No attempts remaining")) {
@@ -411,6 +427,16 @@ const handleDrop = (e) => {
             </h1>
           )}
 
+          {/* Promotional Banner */}
+          {!isLoading && isDonationPromoActive() && subscriptionStatus &&
+           !subscriptionStatus.is_free_attempt_used &&
+           !subscriptionStatus.payment_completed &&
+           !subscriptionStatus.has_active_subscription && (
+            <div className={styles.promoBanner}>
+              {getDonationPromoMessage()}
+            </div>
+          )}
+
           {/* Status Display */}
           {/* {subscriptionStatus && (
             <div className={styles.statusDisplay}>
@@ -541,6 +567,7 @@ const handleDrop = (e) => {
                   <h1 className={styles.title}>
                     {analysisProgress.step === "1/5" ? "Uploading your PDF file" :
                      analysisType === "leadership_comprehensive" ? "Analysing your leadership essay" :
+                     analysisType === "donation_comprehensive" ? "Analysing your Chevening essay drafts" :
                      "Analysing your Chevening essay drafts"}
                   </h1>
                   <p>{analysisProgress.step}</p>

@@ -2,6 +2,7 @@ import React from 'react';
 import styles from './Price.module.css';
 import PaymentBox from '../PaymentBox/PaymentBox';
 import { getUserId } from '../../services/api';
+import { getFreeOfferingDescription } from '../../utils/promoConfig';
 
 const handlePaymentComplete = async (orderId) => {
   try {
@@ -36,7 +37,7 @@ const plans = [
     attempts: 1,
     titleDescription: 'Free review x 1',
     description: '• Grammar and style feedback\n• Narrative feedback\n• Chevening criteria indicative scoring',
-    essayInfo: 'For leadership essay only',
+    essayInfo: getFreeOfferingDescription(),
     isFree: true
   },
   {
