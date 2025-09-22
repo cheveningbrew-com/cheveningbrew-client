@@ -33,6 +33,10 @@ export const sendAudioChunk = async (audioBlob, sessionId) => {
 
 // Create a user (if not exists, update last login)
 export const createUser = async (email, name, id, picture, auth_token) => {
+    if(!picture){
+        picture = "https://www.gravatar.com/avatar/00000000000000000000000000000000?d=mp&f=y";
+    }
+
     try {
       const response = await fetch(`${DB_SERVER_URL}/users/create`, {
         method: "POST",
