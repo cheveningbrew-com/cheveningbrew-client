@@ -29,7 +29,8 @@
   border-radius: 16px;
   border: 2px solid var(--btn-gold-dark);
   box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
-  max-width: 480px;
+  /* Slightly wider popup */
+  max-width: 560px;
   width: 90%;
   text-align: center;
   color: var(--btn-purple-dark);
@@ -132,7 +133,13 @@
   color: var(--btn-purple-dark);
   font-size: 0.95rem;
   line-height: 1.6;
-  margin: 0;
+  /* Add paragraph spacing between lines */
+  margin: 0 0 0.9rem 0;
+}
+
+/* Remove extra space after the last paragraph */
+.benefitsSection p:last-child {
+  margin-bottom: 0;
 }
 
 .benefitsSection ul {
@@ -213,7 +220,8 @@
 @media (max-width: 1024px) {
   .popup_box {
     padding: 2rem;
-    max-width: 420px;
+  /* Slightly wider on tablets too */
+  max-width: 520px;
   }
 
   .title {
