@@ -6,9 +6,9 @@
 
 /* Countdown Banner Styles */
 .countdownBanner {
-  background: var(--btn-purple-gradient);
+  background: var(--btn-gold-gradient);
   border-bottom: 2px solid var(--btn-gold-dark);
-  box-shadow: 0 4px 8px rgba(109, 36, 147, 0.3);
+  box-shadow: 0 4px 8px rgba(255, 181, 77, 0.3);
   padding: 0.8rem 1rem;
   display: flex;
   justify-content: center;
@@ -20,10 +20,10 @@
 
 @keyframes pulseGlow {
   0% {
-    box-shadow: 0 4px 8px rgba(109, 36, 147, 0.3);
+    box-shadow: 0 4px 8px rgba(255, 181, 77, 0.3);
   }
   100% {
-    box-shadow: 0 4px 12px rgba(109, 36, 147, 0.5);
+    box-shadow: 0 4px 12px rgba(255, 181, 77, 0.5);
   }
 }
 
@@ -39,12 +39,7 @@
   font-size: 1rem;
   font-weight: 600;
   color: var(--btn-purple-dark);
-  background: var(--btn-gold-gradient);
-  padding: 0.4rem 0.8rem;
-  border-radius: 8px;
-  text-shadow: none;
-  border: 1px solid var(--btn-gold-dark);
-  box-shadow: 0 2px 4px rgba(255, 181, 77, 0.3);
+  text-shadow: 0 1px 2px rgba(255, 255, 255, 0.3);
 }
 
 .countdownNumbers {
@@ -57,10 +52,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(109, 36, 147, 0.15);
   border-radius: 8px;
   padding: 0.3rem 0.6rem;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(109, 36, 147, 0.3);
   backdrop-filter: blur(10px);
   min-width: 3rem;
 }
@@ -68,7 +63,7 @@
 .number {
   font-size: 1.2rem;
   font-weight: 700;
-  color: var(--btn-gold-light);
+  color: white;
   text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   line-height: 1;
 }
