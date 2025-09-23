@@ -159,23 +159,22 @@
 
 .cancelButton {
   padding: 0.8rem 0.5rem;
-  background: var(--btn-purple-gradient);
-  color: white;
-  border: none;
+  background: var(--neutral-100); /* match popup white */
+  color: var(--btn-purple-dark);
+  border: 2px solid var(--btn-purple-dark);
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.2s ease;
   font-size: 0.9rem;
   width: 100%;
   text-align: center;
-  box-shadow: 0 4px 12px rgba(109, 36, 147, 0.4);
+  box-shadow: none;
 }
 
 .cancelButton:hover {
-  background: var(--btn-purple-hover-gradient);
-  transform: translateY(-2px);
-  box-shadow: 0 8px 20px rgba(109, 36, 147, 0.6);
+  background: #ffffff;
+  filter: brightness(1.02);
 }
 
 .donateButton {

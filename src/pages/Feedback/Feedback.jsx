@@ -235,13 +235,13 @@ const Feedback = () => {
 
               {/* Download Buttons */}
               <div className={uploadStyles.linkButtons} style={{ width: '100%', maxWidth: '400px', margin: '0 auto' }}>
-                {/* Grammar & Style Download - Always free */}
+        {/* Grammar & Style Download - Now also triggers donation prompt */}
                 {essayData.downloadLinkGrammarStyleDocument && (
                   <button
                     onClick={() => handleDownload(
                       essayData.downloadLinkGrammarStyleDocument,
                       "Grammar and Style Feedback",
-                      false // First document is always free
+          true // Apply donation prompt to all downloads
                     )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
                     style={{ width: '100%' }}

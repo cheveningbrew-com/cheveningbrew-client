@@ -312,14 +312,19 @@ const DonationPopup = ({
                 <small>Please save this Order ID for support reference.</small>
               </div>
             )}
-            
+
           </div>
         ) : (
           <>
             <div className={styles.benefitsSection}>
               <p>
-                We provide comprehensive essay analysis for free to help students succeed.
-                If you find our service valuable, consider making a small donation to help us continue supporting students like you.
+                Although we are providing these comprehensive review of your Chevening essays free of charge, there are many hours of work and many dollars in cost to build, maintain, and improve the service.
+              </p>
+              <p>
+                If you found that our feedback improved your essays, please consider supporting us with a donation.
+              </p>
+              <p>
+                Your contribution helps us keep the service running and develop new features such as a voice-AI platform for mock Chevening interviews.
               </p>
             </div>
 
@@ -358,7 +363,7 @@ const DonationPopup = ({
 
             {/* <div className={styles.benefitsSection}>
               <h4>Your support helps us:</h4>
-              
+
 
               <ul>
                 <li>✨ Keep the service free for all students</li>
