@@ -6,7 +6,7 @@ import NameDisplay from "../components/NameDisplay/NameDisplay";
 import SignOUt from "../components/SignOut/SignOut";
 import styles from "./layout.module.css";
 import { getUserId, readUserField, checkSubscriptionStatus } from "../services/api";
-import { isDonationPromoActive } from "../utils/promoConfig";
+import { isDonationPromoActive, isPromoBannerEnabled } from "../utils/promoConfig";
 
 const MainLayout = ({ children, isLoading = false }) => {
   const [userName, setUserName] = useState("");
@@ -101,6 +101,7 @@ const MainLayout = ({ children, isLoading = false }) => {
   const shouldShowCountdown =
     !isLoading &&
     !statusLoading &&
+  isPromoBannerEnabled() &&
     isDonationPromoActive() &&
     subscriptionStatus &&
     !subscriptionStatus.is_free_attempt_used &&

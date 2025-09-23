@@ -48,6 +48,15 @@ export const isDonationPromoActive = () => {
 };
 
 /**
+ * Check if the promotional countdown banner should be shown
+ * Controlled via env var REACT_APP_SHOW_PROMO_BANNER (true/false)
+ * Defaults to false to keep banner disabled unless explicitly enabled
+ */
+export const isPromoBannerEnabled = () => {
+  return process.env.REACT_APP_SHOW_PROMO_BANNER === 'true';
+};
+
+/**
  * Get the promotional message for the donation campaign
  * @returns {string} Promotional message
  */
@@ -137,6 +146,7 @@ export const getDonationPromoEndDate = () => {
 // Export configuration object for easy access
 export const PROMO_CONFIG = {
   isDonationPromoActive,
+  isPromoBannerEnabled,
   getDonationPromoMessage,
   getAnalysisConfig,
   getAnalysisFunction,
