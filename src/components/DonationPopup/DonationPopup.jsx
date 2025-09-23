@@ -318,13 +318,13 @@ const DonationPopup = ({
           <>
             <div className={styles.benefitsSection}>
               <p>
-                Although we are providing these comprehensive review of your Chevening essays free of charge, there are many hours of work and many dollars in cost to build, maintain, and improve the service.
+                Although we are providing these comprehensive reviews of your Chevening essays free of charge, there are many hours of work and many thousands of dollars in cost to build, maintain, and improve the service.
               </p>
               <p>
-                If you found that our feedback improved your essays, please consider supporting us with a donation.
+                If our feedback meaningfully improved your essays, please consider supporting us with a donation.
               </p>
               <p>
-                Your contribution helps us keep the service running and develop new features such as a voice-AI platform for mock Chevening interviews.
+                Your contribution helps us keep Cheveningbrew up and also develop new features such as a voice-AI platform to mock Chevening interviews.
               </p>
             </div>
 
@@ -392,7 +392,7 @@ const DonationPopup = ({
                 onClick={handleCancel}
                 disabled={isProcessingPayment}
               >
-                No, just download file
+                No, just download
               </button>
             </div>
 
