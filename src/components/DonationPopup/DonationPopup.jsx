@@ -11,7 +11,7 @@ const DonationPopup = ({
   onPaymentSuccess,
   onPaymentError
 }) => {
-  const [donationAmount, setDonationAmount] = useState("");
+  const [donationAmount, setDonationAmount] = useState(5);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [paymentStep, setPaymentStep] = useState("select"); // "select" | "processing" | "verifying" | "success" | "error"
   const [payHereLoaded, setPayHereLoaded] = useState(false);
