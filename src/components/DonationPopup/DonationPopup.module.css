@@ -27,7 +27,8 @@
   background: var(--neutral-100);
   padding: 2.5rem;
   border-radius: 16px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+  border: 2px solid var(--btn-gold-dark);
+  box-shadow: 0 4px 8px rgba(255, 229, 133, 0.3);
   max-width: 480px;
   width: 90%;
   text-align: center;
