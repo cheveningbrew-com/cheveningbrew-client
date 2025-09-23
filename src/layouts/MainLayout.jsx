@@ -114,7 +114,7 @@ const MainLayout = ({ children, isLoading = false }) => {
       {shouldShowCountdown && (
         <div className={styles.countdownBanner}>
           <div className={styles.countdownContent}>
-            <span className={styles.countdownText}>⏰ Limited Time Offer Ends In:</span>
+            <span className={styles.countdownText}>⏰ Limited Time: Get full analysis of all four essays for FREE!</span>
             <div className={styles.countdownNumbers}>
               <span className={styles.timeUnit}>
                 <span className={styles.number}>{timeRemaining.days}</span>
