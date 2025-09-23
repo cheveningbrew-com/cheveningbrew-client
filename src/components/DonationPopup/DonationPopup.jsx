@@ -375,13 +375,6 @@ const DonationPopup = ({
 
             <div className={styles.popup_actions}>
               <button
-                className={styles.cancelButton}
-                onClick={handleCancel}
-                disabled={isProcessingPayment}
-              >
-                No, just download review
-              </button>
-              <button
                 className={styles.donateButton}
                 onClick={handleDonate}
                 disabled={!donationAmount || !!amountError || isProcessingPayment || !payHereLoaded}
@@ -393,6 +386,13 @@ const DonationPopup = ({
                     Donate {donationAmount ? `$${parseFloat(donationAmount).toFixed(2)}` : ""} ❤️
                   </span>
                 )}
+              </button>
+              <button
+                className={styles.cancelButton}
+                onClick={handleCancel}
+                disabled={isProcessingPayment}
+              >
+                No, just download file
               </button>
             </div>
 

@@ -158,9 +158,9 @@
 }
 
 .popup_actions {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
   margin-bottom: 1rem;
 }
 
@@ -282,10 +282,7 @@
     font-size: 0.8rem;
   }
 
-  .popup_actions {
-    flex-direction: column;
-    gap: 0.8rem;
-  }
+  .popup_actions { gap: 0.7rem; }
 
   .cancelButton,
   .donateButton {
