@@ -115,13 +115,33 @@ export const getFreeOfferingDescription = () => {
   }
 };
 
+/**
+ * Get the donation promotion end date
+ * @returns {Date|null} The promotion end date or null if not set/invalid
+ */
+export const getDonationPromoEndDate = () => {
+  const endDate = process.env.REACT_APP_DONATION_PROMO_END_DATE;
+
+  if (!endDate) {
+    return null;
+  }
+
+  try {
+    return new Date(endDate);
+  } catch (error) {
+    console.error('Invalid REACT_APP_DONATION_PROMO_END_DATE format:', endDate);
+    return null;
+  }
+};
+
 // Export configuration object for easy access
 export const PROMO_CONFIG = {
   isDonationPromoActive,
   getDonationPromoMessage,
   getAnalysisConfig,
   getAnalysisFunction,
-  getFreeOfferingDescription
+  getFreeOfferingDescription,
+  getDonationPromoEndDate
 };
 
 export default PROMO_CONFIG;
