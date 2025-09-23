@@ -428,14 +428,14 @@ const handleDrop = (e) => {
           )}
 
           {/* Promotional Banner */}
-          {!isLoading && isDonationPromoActive() && subscriptionStatus &&
+          {/* {!isLoading && isDonationPromoActive() && subscriptionStatus &&
            !subscriptionStatus.is_free_attempt_used &&
            !subscriptionStatus.payment_completed &&
            !subscriptionStatus.has_active_subscription && (
             <div className={styles.promoBanner}>
               {getDonationPromoMessage()}
             </div>
-          )}
+          )} */}
 
           {/* Status Display */}
           {/* {subscriptionStatus && (

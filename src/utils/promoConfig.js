@@ -29,11 +29,11 @@ export const isDonationPromoActive = () => {
 
       // Return false if current time is past the end date
       if (now > promoEndDate) {
-        console.log('🎉 Donation promotion has expired');
+        // console.log('🎉 Donation promotion has expired');
         return false;
       }
 
-      console.log('🎉 Donation promotion is active until:', promoEndDate.toLocaleDateString());
+      // console.log('🎉 Donation promotion is active until:', promoEndDate.toLocaleDateString());
       return true;
     } catch (error) {
       console.error('Invalid REACT_APP_DONATION_PROMO_END_DATE format:', endDate);
@@ -43,7 +43,7 @@ export const isDonationPromoActive = () => {
   }
 
   // If no end date is specified, rely only on the boolean flag
-  console.log('🎉 Donation promotion is active (no end date specified)');
+  // console.log('🎉 Donation promotion is active (no end date specified)');
   return true;
 };
 
