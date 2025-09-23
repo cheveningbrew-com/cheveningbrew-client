@@ -167,8 +167,9 @@
 .cancelButton {
   padding: 0.8rem 0.5rem;
   background: var(--neutral-100); /* match popup white */
-  color: var(--btn-purple-dark);
-  border: 2px solid var(--btn-purple-dark);
+  /* Make less prominent: use lighter purple like donation info box & amount styles */
+  color: var(--btn-purple-light);
+  border: 2px solid rgba(109, 36, 147, 0.1);
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
@@ -182,6 +183,8 @@
 .cancelButton:hover {
   background: #ffffff;
   filter: brightness(1.02);
+  /* Slightly increase visibility only on hover */
+  border-color: rgba(109, 36, 147, 0.2);
 }
 
 .donateButton {
