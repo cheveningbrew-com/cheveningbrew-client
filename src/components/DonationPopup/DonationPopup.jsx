@@ -374,7 +374,7 @@ const DonationPopup = ({
                 onClick={handleCancel}
                 disabled={isProcessingPayment}
               >
-                Maybe Later
+                No, just download review
               </button>
               <button
                 className={styles.donateButton}

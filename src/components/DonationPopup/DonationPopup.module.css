@@ -24,14 +24,14 @@
 }
 
 .popup_box {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: var(--neutral-100);
   padding: 2.5rem;
   border-radius: 16px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
   max-width: 480px;
   width: 90%;
   text-align: center;
-  color: white;
+  color: var(--btn-purple-dark);
   animation: slideUp 0.3s ease-out;
   position: relative;
   overflow: hidden;
@@ -90,8 +90,8 @@
   font-size: 1.5rem;
   font-weight: 700;
   margin-bottom: 1.5rem;
-  color: #fff;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  color: var(--btn-purple-dark);
+  text-shadow: none;
 }
 
 .message {
@@ -102,7 +102,7 @@
 .message p {
   margin-bottom: 0.8rem;
   font-size: 0.95rem;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--btn-purple-dark);
 }
 
 .message strong {
@@ -489,7 +489,7 @@
 
 .successMessage p {
   margin: 0.5rem 0;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--btn-purple-dark);
   font-size: 1rem;
 }
 
@@ -523,7 +523,7 @@
 
 .errorMessage p {
   margin: 0.8rem 0;
-  color: rgba(255, 255, 255, 0.95);
+  color: var(--btn-purple-dark);
   font-size: 0.95rem;
   line-height: 1.5;
 }
@@ -548,7 +548,7 @@
 }
 
 .orderInfo small {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--btn-purple-light);
   font-size: 0.8rem;
   font-style: italic;
 }
