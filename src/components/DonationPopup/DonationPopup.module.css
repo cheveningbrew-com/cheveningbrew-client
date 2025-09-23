@@ -171,7 +171,7 @@
   color: var(--btn-purple-light);
   border: 2px solid rgba(109, 36, 147, 0.1);
   border-radius: 10px;
-  font-weight: 600;
+  font-weight: 300;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
