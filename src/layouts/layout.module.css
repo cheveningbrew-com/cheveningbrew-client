@@ -38,8 +38,13 @@
 .countdownText {
   font-size: 1rem;
   font-weight: 600;
-  color: white;
-  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: var(--btn-purple-dark);
+  background: var(--btn-gold-gradient);
+  padding: 0.4rem 0.8rem;
+  border-radius: 8px;
+  text-shadow: none;
+  border: 1px solid var(--btn-gold-dark);
+  box-shadow: 0 2px 4px rgba(255, 181, 77, 0.3);
 }
 
 .countdownNumbers {
