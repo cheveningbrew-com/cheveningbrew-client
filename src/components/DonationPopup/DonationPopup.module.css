@@ -111,7 +111,8 @@
 }
 
 .benefitsSection {
-  background: rgba(255, 255, 255, 0.1);
+  background: rgba(109, 36, 147, 0.05);
+  border: 1px solid rgba(109, 36, 147, 0.1);
   border-radius: 12px;
   padding: 1.2rem;
   margin-bottom: 1.5rem;
@@ -150,22 +151,21 @@
 
 .cancelButton {
   padding: 0.8rem 1.8rem;
-  background: rgba(255, 255, 255, 0.2);
-  color: white;
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(109, 36, 147, 0.1);
+  color: var(--btn-purple-dark);
+  border: 2px solid rgba(109, 36, 147, 0.3);
   border-radius: 10px;
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s ease;
   font-size: 0.9rem;
-  backdrop-filter: blur(10px);
 }
 
 .cancelButton:hover {
-  background: rgba(255, 255, 255, 0.3);
-  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(109, 36, 147, 0.2);
+  border-color: var(--btn-purple-light);
   transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 12px rgba(109, 36, 147, 0.2);
 }
 
 .donateButton {
@@ -379,8 +379,9 @@
 .customAmountLabel {
   display: block;
   font-size: 0.9rem;
-  color: rgba(255, 255, 255, 0.9);
+  color: var(--btn-purple-dark);
   margin-bottom: 0.8rem;
+  font-weight: 600;
 }
 
 .amountInputWrapper {
@@ -394,7 +395,7 @@
 .currencySymbol {
   position: absolute;
   left: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  color: var(--btn-purple-light);
   font-weight: 600;
   font-size: 1rem;
   z-index: 1;
@@ -403,24 +404,23 @@
 .amountInput {
   width: 100%;
   padding: 0.8rem 0.8rem 0.8rem 2rem;
-  background: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.3);
+  background: rgba(109, 36, 147, 0.05);
+  border: 2px solid rgba(109, 36, 147, 0.2);
   border-radius: 8px;
-  color: white;
+  color: var(--btn-purple-dark);
   font-size: 1rem;
   text-align: center;
-  backdrop-filter: blur(10px);
   transition: all 0.3s ease;
 }
 
 .amountInput:focus {
   outline: none;
-  border-color: #ffe585;
-  background: rgba(255, 255, 255, 0.15);
+  border-color: var(--btn-purple-light);
+  background: rgba(109, 36, 147, 0.1);
 }
 
 .amountInput::placeholder {
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(109, 36, 147, 0.6);
 }
 
 .amountInputError {
