@@ -273,7 +273,7 @@ const Feedback = () => {
                     onClick={() => handleDownload(
                       essayData.downloadLinkNarrativeFeedback,
                       "Narrative Review",
-                      tisDonationPromoActive() // Third document requires donation check
+                      isDonationPromoActive() // Third document requires donation check
                     )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
                     style={{ width: '100%' }}
