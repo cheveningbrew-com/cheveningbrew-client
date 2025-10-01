@@ -69,7 +69,7 @@ const Feedback = () => {
           setError(null);
 
           // Check donation status if this is a free attempt
-          if (mappedData.is_free_attempt) {
+          if (mappedData.is_free_attempt && isDonationPromoActive()) {
             await checkUserDonationStatus(userId);
           }
         } else {
@@ -241,7 +241,7 @@ const Feedback = () => {
                     onClick={() => handleDownload(
                       essayData.downloadLinkGrammarStyleDocument,
                       "Grammar and Style Feedback",
-          true // Apply donation prompt to all downloads
+                      isDonationPromoActive() // First document requires donation check
                     )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.downloadButton}`}
                     style={{ width: '100%' }}
@@ -257,7 +257,7 @@ const Feedback = () => {
                     onClick={() => handleDownload(
                       essayData.downloadLinkEssayFeedback,
                       "Chevening Criteria Scoring",
-                      true // Second document requires donation check
+                      isDonationPromoActive()// Second document requires donation check
                     )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.feedbackButton}`}
                     style={{ width: '100%' }}
@@ -273,7 +273,7 @@ const Feedback = () => {
                     onClick={() => handleDownload(
                       essayData.downloadLinkNarrativeFeedback,
                       "Narrative Review",
-                      true // Third document requires donation check
+                      tisDonationPromoActive() // Third document requires donation check
                     )}
                     className={`${uploadStyles.linkButton} ${uploadStyles.narrativeFeedbackButton}`}
                     style={{ width: '100%' }}
@@ -392,7 +392,7 @@ const Feedback = () => {
           )}
 
           {/* Donation Status Loading Indicator */}
-          {donationLoading && essayData?.is_free_attempt && (
+          {donationLoading && essayData?.is_free_attempt && isDonationPromoActive() && (
             <div style={{ textAlign: 'center', margin: '1rem 0' }}>
               <div className={styles.spinner}></div>
               <p style={{ fontSize: '0.9rem', color: 'rgba(255, 255, 255, 0.7)' }}>
